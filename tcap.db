@@ -1,0 +1,2602 @@
+ 
+www.dialogic.com 
+Dialogic® SS7 Protocols 
+TCAP Programmer's Manual 
+ 
+ 
+ 
+2 
+Copyright© 1995-2008 Dialogic Corporation. All Rights Reserved. You may not reproduce this document in whole or in part without 
+permission in writing from Dialogic Corporation at the address provided below. 
+All contents of this document are furnished for informational use only and are subject to change without notice and do not represent a 
+commitment on the part of Dialogic Corporation or its subsidiaries (“Dialogic”). Reasonable effort is made to ensure the accuracy of the 
+information contained in the document. However, Dialogic does not warrant the accuracy of this information and cannot accept 
+responsibility for errors, inaccuracies or omissions that may be contained in this document. 
+INFORMATION IN THIS DOCUMENT IS PROVIDED IN CONNECTION WITH DIALOGIC® PRODUCTS. NO LICENSE, EXPRESS OR IMPLIED, 
+BY ESTOPPEL OR OTHERWISE, TO ANY INTELLECTUAL PROPERTY RIGHTS IS GRANTED BY THIS DOCUMENT. EXCEPT AS PROVIDED IN 
+A SIGNED AGREEMENT BETWEEN YOU AND DIALOGIC, DIALOGIC ASSUMES NO LIABILITY WHATSOEVER, AND DIALOGIC DISCLAIMS 
+ANY EXPRESS OR IMPLIED WARRANTY, RELATING TO SALE AND/OR USE OF DIALOGIC PRODUCTS INCLUDING LIABILITY OR 
+WARRANTIES RELATING TO FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR INFRINGEMENT OF ANY INTELLECTUAL 
+PROPERTY RIGHT OF A THIRD PARTY. 
+Dialogic products are not intended for use in medical, life saving, life sustaining, critical control or safety systems, or in nuclear facility 
+applications. 
+It is possible that the use or implementation of any one of the concepts, applications, or ideas described in this document, in marketing 
+collateral produced by or on web pages maintained by Dialogic may infringe one or more patents or other intellectual property rights 
+owned by third parties. Dialogic does not provide any intellectual property licenses with the sale of Dialogic products other than a 
+license to use such product in accordance with intellectual property owned or validly licensed by Dialogic and no such licenses are 
+provided except pursuant to a signed agreement with Dialogic. More detailed information about such intellectual property is available 
+from Dialogic’s legal department at 9800 Cavendish Blvd., 5th Floor, Montreal, Quebec, Canada H4M 2V9. 
+Dialogic encourages all users of its products to procure all necessary intellectual property licenses required to implement 
+any concepts or applications and does not condone or encourage any intellectual property infringement and disclaims any 
+responsibility related thereto. These intellectual property licenses may differ from country to country and it is the 
+responsibility of those who develop the concepts or applications to be aware of and comply with different national license 
+requirements.  
+Dialogic, Dialogic Pro, Brooktrout, Cantata, SnowShore, Eicon, Eicon Networks, Eiconcard, Diva, SIPcontrol, Diva ISDN, TruFax, 
+Realblocs, Realcomm 100, NetAccess, Instant ISDN, TRXStream, Exnet, Exnet Connect, EXS, ExchangePlus VSE, Switchkit, N20, 
+Powering The Service-Ready Network, Vantage, Connecting People to Information, Connecting to Growth and Shiva, among others as 
+well as related logos, are either registered trademarks or trademarks of Dialogic. Dialogic's trademarks may be used publicly only with 
+permission from Dialogic. Such permission may only be granted by Dialogic’s legal department at 9800 Cavendish Blvd., 5th Floor, 
+Montreal, Quebec, Canada H4M 2V9. Any authorized use of Dialogic's trademarks will be subject to full respect of the trademark 
+guidelines published by Dialogic from time to time and any use of Dialogic’s trademarks requires proper acknowledgement. 
+The names of actual companies and products mentioned herein are the trademarks of their respective owners. 
+Publication Date: February 2008 
+Document Number: U06SSS, Issue 10 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+3 
+Contents 
+Revision History...........................................................................................................5 
+1 Introduction........................................................................................................7 
+1.1 Overview...............................................................................................................................7 
+1.2 Abbreviations.........................................................................................................................7 
+1.3 Related Documentation............................................................................................................7 
+1.4 Feature Overview....................................................................................................................8 
+2 General Description.............................................................................................9 
+2.1 Module Overview....................................................................................................................9 
+2.2 Module Configuration.............................................................................................................10 
+2.3 Dialogue ID Assignment.........................................................................................................10 
+2.4 Dialogue ID Groups...............................................................................................................11 
+2.5 Local Transaction ID Format...................................................................................................11 
+2.6 Constant Definitions..............................................................................................................12 
+3 Interface to System Services.............................................................................13 
+3.1 System Functions.................................................................................................................13 
+3.2 Timer Operation...................................................................................................................13 
+4 Interface to Network Layer...............................................................................15 
+5 Interface to TC-User..........................................................................................17 
+5.1 Introduction.........................................................................................................................17 
+5.2 Multiple TC-User Applications.................................................................................................17 
+5.3 Primitive Parameters.............................................................................................................18 
+5.4 Component Primitive Types....................................................................................................19 
+5.5 Dialogue Primitive Types........................................................................................................20 
+5.6 TC-COMPONENT-REQUEST.....................................................................................................21 
+5.7 TC-COMPONENT-INDICATION.................................................................................................24 
+5.8 TC-DIALOGUE-REQUEST........................................................................................................26 
+5.9 TC-DIALOGUE-INDICATION....................................................................................................32 
+6 Management Interface......................................................................................35 
+7 Non-Primitive Interface....................................................................................37 
+7.1 TCAP Configuration Request...................................................................................................37 
+7.2 Configure NC Request............................................................................................................43 
+7.3 Configure Dialogue Group Request..........................................................................................44 
+7.4 Configure TC-User Request....................................................................................................46 
+7.5 Configure TC-Instance Request...............................................................................................47 
+7.6 TCAP Set Default Parameters Request.....................................................................................48 
+7.7 Read TCAP Statistics Request.................................................................................................50 
+7.8 Read TCAP RAM Request........................................................................................................51 
+7.9 Read TCAP Dialogue Request..................................................................................................52 
+7.10 Read TCAP Module Status Request..........................................................................................53 
+7.11 Read TCAP Dialogue Status Request........................................................................................55 
+7.12 Maintenance Event Indication.................................................................................................57 
+7.13 Software Event Indication......................................................................................................58 
+7.14 TCAP Dialogue Discard Indication............................................................................................60 
+7.15 TCAP Component Discard Indication........................................................................................61 
+7.16 Read Revision Request..........................................................................................................62 
+7.17 Management Event Indication................................................................................................63 
+Contents 
+4 
+7.18 Set Trace Mask Request........................................................................................................64 
+7.19 Trace Event Indication...........................................................................................................65 
+7.20 Module Reset Request...........................................................................................................66 
+Appendix A ...............................................................................................................67 
+A.1 Timer Services.....................................................................................................................67 
+A.2 Keep Time...........................................................................................................................67 
+A.3 Timer Expiry........................................................................................................................68 
+Appendix B ...............................................................................................................69 
+B.1 Message Type Reference.......................................................................................................69 
+Index  ...............................................................................................................71 
+  
+ 
+ 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+5 
+ 
+Revision History 
+Issue Date Description 
+10 February 2008 Document rebranded and reformatted. 
+9 Sep 2006 Added statement on ITU-T TCAP 1997 support. 
+Added new messages:  
+Added new status returned in confirmation messages for network context. 
+8 May 2004 Addition support of TCPPN_timeout with length=0 to disable TCAP timer. 
+7 July 2003 Branding changed: references to System7 removed. 
+6 November -2001 Messages to monitor module and dialogue status added. 
+5 August 2000 Addition of message definitions for dialogue discard indications, component 
+discards indications and module version identification. 
+4 February 1999 Address format parameter added to module configuration. 
+Operation with multiple local application programs (sub-systems) described. 
+Description of TCP_MSG_S_TCU_ID added. 
+Additional information provided for parameters in TCP_MSG_CONFIG. 
+Structure of timer messages added in an appendix 
+Message type reference appendix added 
+3 December 1998 Dialogue Groups and message tracing added. 
+2 May 1997 ANSI operation added. 
+1 November 1995 Minor typographical corrections and the addition of the TC-NULL-IND primitive. 
+Note: The latest release issue of this guide can be found at:  
+http://www.dialogic.com/support/helpweb/signaling 
+ 
+Section  Revision History 
+6 
+ 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+7 
+ Introduction 
+1.1 Overview 
+The TCAP module is a portable software implementation of the Signaling 
+System Number 7, Transaction Capabilities Application Part (TCAP). It 
+operates according to either ITU-T Q.771-Q.774 (1992/1996) or ANSI 
+T1.114-1996, the selection being made by a run-time option. This is the 
+Programmer's Manual, which is intended for users developing their own 
+applications that will interface with, and use the functionality provided by, the 
+TCAP module. 
+The module uses the services provided by the underlying network-layer 
+service provider for the transfer of information between nodes, and provides 
+generic services to applications, while remaining independent of both the 
+network layer and the application. 
+The TCAP module is an event-driven task, which uses standard structured 
+message types for communication with other layers of the protocol stack. 
+These messages are used to convey the protocol primitives between TCAP 
+and the TC-User and TCAP and the network layer. Each message contains the 
+primitive parameters as defined in the CCITT recommendations, thereby 
+ensuring that the module can easily be interfaced with other vendors’ 
+implementations of the adjacent layers. Typically, the module is used in 
+conjunction with the SCCP and MTP modules. 
+This manual provides an overview of the internal operation of the TCAP 
+module and defines the structure of messages used to interface with the 
+module. 
+1.2 Abbreviations 
+ANSI American National Standards Institute. 
+APDU Application Protocol Data Unit. 
+CCITT The International Telegraph & Telephone Consultative Committee. 
+ITU-T International Telecommunication Union (formerly CCITT). 
+MTP Message Transfer Part. 
+SCCP Signaling Connection Control Part. 
+TCAP Transaction Capabilities Application Part. 
+1.3 Related Documentation 
+[1] ITU-T Recommendations Q.771, Q.772, Q.773, Q.774 & Q.775 
+[2] ANSI T1.114-1996 
+[3] U05SSS, SCCP Programmer's Manual 
+[4] U10SSS, Software Environment Programmer's Manual 
+Section  1 Introduction 
+8 
+1.4 Feature Overview 
+Key features of the TCAP module include: 
+• Full implementation of ITU-T Q.771-Q.774 (1992) and ANSI T1.114 
+(1996). 
+• Full implementation of ITU-T Q.771-Q.774 (1997) TCAP recommendations 
+with the exception of TCAP operation timer reset and the inclusion of the 
+originating and destination addresses into TCAP Notice indications. 
+• Inter working with ITU-T 1988 and ANSI 1992 recommendations. 
+• Class 1, 2, 3, and 4 operations. 
+• Dialogue support for application context and user information.  
+• Automatic generation of Transaction ID. 
+• Supports the use of multiple distributed instances of TCAP. 
+• Message oriented interface. 
+• Grouping of dialogue ID ranges for operation with multiple application 
+programs. 
+• Debug tracing of messages exchanged with the TC-User and SCCP. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+9 
+2 General Description 
+2.1 Module Overview 
+The TCAP module is an implementation of the ITU-T recommendations Q.771 
+- Q.774 (1992/1997) and ANSI T1.114-1996, including support for the 
+optional dialogue portion for conveying information relating to application 
+context and user information. Internally, the module is sub-divided into two 
+layers: the Component Sub-Layer (CSL) and the Transaction Sub-Layer 
+(TSL). 
+The component sub-layer accumulates the user-supplied Application Protocol 
+Data Units (APDU) (i.e. components) and stores them in an internal buffer. 
+On receipt of the appropriate dialogue-handling primitive from the user, the 
+components are combined with the (optional) dialogue portion and passed to 
+the transaction sub-layer. An invocation state machine is started for each 
+invoke component. Messages received from the transaction sub-layer are 
+checked and conveyed to the user. The dialogue primitive is issued first 
+(including the optional dialogue portion), followed by each component (in the 
+same order that they were received for transmission at the sending end). 
+The transaction sub-layer receives messages from the component sub-layer 
+and ensures they are valid for the current state of the transaction. Then it 
+adds the transaction portion (containing address and quality of service 
+information) to the message and passes it to the network layer. Messages 
+received from the network layer are validated by the transaction sub-layer; a 
+transaction ID is assigned for each new transaction and the message is 
+conveyed to the component sub-layer. 
+The module is event driven; it has a single input queue into which events 
+from other modules (TC-User, network-layer, management etc.) are written. 
+The module processes each event in turn until the input queue is empty, in 
+which case it will do nothing until the next event is received. Output from the 
+module is directed according to the type of event.  Output messages may be 
+sent to the TC-User module, the network-layer module, the Management 
+module or the Maintenance module. 
+Internally, there are a number of data structures used by the module. The 
+maximum dimensions of these structures are determined by compile time 
+constants. The three constants of importance to the user are: 
+• The maximum number of simultaneous dialogues (and hence 
+transactions) supported by the module. 
+• The maximum number of components internally accumulated by the 
+module awaiting transmission. 
+• The maximum number of invocations active at any time. 
+In addition, the module requires that a periodic timer tick notification is 
+issued to it (using the input queue), typically every tenth of a second. (This 
+can either be generated by a timer module or by using the services of the 
+selected operating system). 
+Section  2 General Description 
+10 
+2.2 Module Configuration 
+The module provides maximum flexibility by allowing a large number of user 
+configuration options to be set up at run time. This allows the users to 
+customize the operation of the module to suit the particular requirements of 
+the final application. All configuration parameters are sent to the module's 
+input event queue in the same manner as other protocol messages. 
+The first message that must be sent to the module is a global configuration 
+message (any messages received prior to the global configuration message 
+will be discarded). This message specifies the operating mode for the TCAP 
+module as being either ITU-T or ANSI. It also contains the module ID for all 
+modules to which TCAP issues messages, user supplied values for the 
+maximum number of dialogues (incoming and outgoing), the maximum 
+number of buffered components and the maximum number of active 
+invocations that are required to be available to the user. The module checks 
+that the values requested are compatible with the values it can support. 
+A second configuration message allows the user to supply default values for a 
+number of protocol parameters (e.g. originating address, destination address, 
+quality of service etc.). These default values will then be used whenever the 
+particular parameter is required by the protocol but is not present in the 
+message received from the user. 
+2.3 Dialogue ID Assignment 
+The TCAP module supports a number of active dialogues at a single instant in 
+time. TC-User primitives are associated with a particular dialogue using a 
+Dialogue ID, which is of purely local significance between the TC-User and 
+TCAP. 
+A dialogue ID is assigned at the start of a dialogue, when the first primitive is 
+exchanged between the TC-User and TCAP. For a dialogue initiated by the 
+TC-User (an ‘outgoing dialogue’) the value is selected by the TC-User. For a 
+dialogue initiated from a remote TCAP (an ‘incoming dialogue’) the value is 
+set by the TCAP module. Once a dialogue has started, all user primitives, 
+both requests and indications that refer to the same dialogue, will include the 
+same dialogue ID value. 
+The dialogue ID is a 16-bit value in the range of 0 to 32767 for outgoing 
+dialogues and from 32768 to 65535 for incoming dialogues (i.e. the most 
+significant bit is set when the dialogue ID refers to an incoming dialogue).  
+The range of valid dialogue ID values to be supported by a particular instance 
+of TCAP is set up at configuration time. Two ranges of dialogue ID must be 
+configured by the user: one for use with outgoing dialogues and the other for 
+use with incoming dialogues. The total number of dialogue IDs must not 
+exceed the maximum number of simultaneous dialogues that the module can 
+support. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+11 
+The dialogue ID selected by the TC-User for an outgoing dialogue must lie 
+within the configured range of outgoing dialogue IDs. Dialogue IDs for 
+incoming dialogues are allocated automatically by the TCAP module (from the 
+configured range of incoming dialogue IDs) so that the dialogue ID that has 
+been unused for the longest period is used next. Setting the most significant 
+bit of the dialogue ID for all incoming dialogues ensures that it is not possible 
+for the TC-User to select an ID for an outgoing dialogue at the same instant 
+that TCAP selects the same ID for use with an incoming dialogue. 
+Internally to the TCAP module, the dialogue ID is used to generate a 
+‘dialogue reference’ which lies in the range of 0 up to one less than the 
+maximum number of simultaneous dialogues supported. The dialogue 
+reference is used by the TCAP module to generate the local transaction ID.  It 
+is the application’s responsibility to close the dialogue on completion of all 
+transactions associated with dialogue. 
+2.4 Dialogue ID Groups 
+A dialogue group enables common attributes to be assigned to a number of 
+dialogues identified by their dialogue IDs, such as user application instance. 
+This enables a unique range of dialogue identifiers to be permanently 
+assigned to different instances of a user application; hence TCAP is able to 
+support a distributed application (this would be used, for example, in a high 
+availability environment). A dialogue group is configured with a single 
+message. The TCAP module supports up to 32 dialogue groups. 
+2.5 Local Transaction ID Format 
+Peer TCAP entities use transaction IDs to associate TCAP protocol data units 
+(PDUs) with a particular transaction. These IDs are included as a parameter 
+in each TCAP PDU sent across the SS7 network. The TCAP module 
+automatically generates the ID used to reference the transaction locally. For 
+an outgoing dialogue, this will be the originating transaction ID in the TCAP 
+PDU, for an incoming dialogue, this will be the destination or responding 
+transaction ID in the TCAP PDU. 
+The local transaction ID is assigned by the TCAP module in such a manner as 
+to ensure that the same transaction ID is not re-allocated until some time 
+after the dialogue has finished. The transaction ID is made up of 4 fields: the 
+instance number, the dialogue reference, a sequence number and a padding 
+field as follows. 
+Padding field 
+MSB   LSB 
+Padding Sequence Number Dialogue reference Instance Number 
+    
+Section  2 General Description 
+12 
+Instance number 
+The ‘instance number’ allows TCAP to be distributed over a number of 
+separate hardware platforms, each running as a separate instance and 
+responsible for handling a different range of dialogue IDs (from the TC-User 
+viewpoint) and using a different instance number within the transaction ID 
+(from the network-layer viewpoint). 
+Dialogue reference 
+The ‘dialogue reference’ has a one-to-one mapping with the dialogue ID at 
+any single instance of TCAP and ranges from 0 up to one less than the total 
+number of dialogues supported.  
+Note:  That the dialogue reference is not the same value as the dialogue ID. 
+Sequence number 
+The ‘sequence number’ is allocated on a cyclic basis for each individual 
+dialogue ID and ensures that the maximum possible time elapses before re- 
+use of a transaction ID. 
+The width of each transaction ID field (in bits) is a run-time configuration 
+option allowing the user to adjust the relative field widths to suit the 
+application. 
+Internally, the size of the transaction ID is rounded up to a multiple of 8 bits 
+(by adding zeros in the padding field). The transaction ID is then converted to 
+an octet string with the first octet containing the most significant 8 bits of the 
+transaction ID. 
+2.6 Constant Definitions 
+To assist you when writing an application, a ‘C’ language header file 
+(tcp_inc.h) is available containing all the definitions and constants necessary 
+to interface with the TCAP module. This file contains definitions for all the 
+mnemonics listed in this Programmer’s Manual. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+13 
+3 Interface to System Services 
+3.1 System Functions 
+In addition to the primitive interface and the management interface to the 
+TCAP module (which are described in later sections) the module requires a 
+few basic system services to be supplied by the underlying operating system. 
+The following functions are required for inter-task communication: 
+GCT_send Sends a message to another task. 
+GCT_receive Accepts the next message from input event queue, blocking the task if no 
+message is ready. 
+GCT_grab Accepts the next message from the input event queue, but does not block the 
+task if no message is ready. 
+The following functions are required for allocation and release of inter task 
+messages: 
+getm Allocates a message. 
+relm Releases a message. 
+These functions are described in the Software Environment Programmer’s 
+Manual∗. 
+3.2 Timer Operation 
+In order to provide internal implementation of the TCAP protocol timers, the 
+module needs to receive a periodic timer tick message. This is usually 
+achieved using either the Enhanced Driver Module or the Timer module, in 
+which case the following messages are used by the TCAP module: 
+KEEP_TIME Issued by TCAP to initialize the timer services. 
+TM_EXP Issued by the timer module to notify of time-out. 
+The format of these messages is described in Appendix A on page 67. 
+Note: While the timer functionality is usually provided by the given modules, the timer 
+functionality required by the TCAP module is very basic (just a single message 
+being issued on a periodic basis). In most cases it is a trivial exercise to 
+implement this functionality using your choice of operating environment, if 
+required. 
+                                                 
+∗ 
+ See Section 1.3 Related Documentation for the full reference to this manual. 
+Section  3 Interface to System Services 
+14 
+ 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+15 
+4 Interface to Network Layer 
+The TCAP module communicates with the network-layer service provider 
+using the following primitives (all of which are defined in CCITT 
+Recommendation Q.711): 
+• N-UNITDATA-REQ 
+• N-UNITDATA-IND 
+• N-NOTICE-IND 
+The message format used to convey these primitives is defined in the SCCP 
+Programmer's Manual∗. The following messages are used: 
+SCP_MSG_TX_REQ Messages issued by TCAP  
+SCP_MSG_RX_IND Messages issued to TCAP 
+The TCAP module is usually used in conjunction with the SCCP module. 
+However, the use of primitives in accordance with Q.711 ensures that it can 
+also be integrated with other network-layer service provider implementations, 
+if required. 
+                                                 
+∗ 
+ See Section 1.3 Related Documentation for the full reference to this manual. 
+Section  4 Interface to Network Layer 
+16 
+ 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+17 
+5 Interface to TC-User 
+5.1 Introduction 
+All primitives at the application interface (i.e. between the TCAP module and 
+the TC-User) are passed by sending messages between the modules. 
+Primitive requests are originated from the TC-User and request TCAP to carry 
+out a specified action. Primitive indications are sent from TCAP to indicate 
+received TCAP PDU data or local protocol events to the TC-User. 
+The following messages are used: 
+TC-COMPONENT-REQ Conveys a component from TC-User to TCAP. 
+TC-DIALOGUE-REQ Conveys a dialogue primitive from TC-User to TCAP. 
+TC-COMPONENT-IND Conveys a component from TCAP to TC-User. 
+TC-DIALOGUE-IND Conveys a dialogue primitive from TCAP to TC-User. 
+The basic structure of each message (irrespective of the TCAP primitive 
+contained within it) is the same and is described in the Software Environment 
+Programmer’s Manual∗. The message contains: a message header, the length 
+of the user data and the user data itself. The message must be contained in a 
+single buffer which should be allocated by the sending module (using the 
+getm function) and either released (using the relm function) or passed to 
+another module by the receiving module. The getm and relm functions are 
+described in Section   3Interface to System Serviceson page 13.  
+The message header contains a ‘type’, the value of this parameter indicating 
+that either a dialogue or component-handling primitive is being conveyed by 
+the message. The following message types are defined: 
+Primitive Message type Value 
+TC-COMPONENT-REQ TCP_MSG_CPT_REQ 0xc781 
+TC-COMPONENT-IND TCP_MSG_CPT_IND 0x8782 
+TC-DIALOGUE-REQ TCP_MSG_DLG_REQ 0xc783 
+TC-DIALOGUE-IND TCP_MSG_DLG_IND 0x8784 
+5.2 Multiple TC-User Applications 
+In a multi-tasking operating system it is possible to have more than one TC- 
+User application program running as a separate task. The message passing 
+environment identifies each task with a unique module identifier (or module 
+ID), used as the destination for any message sent to this task from other 
+processes in the system. TCAP exchanges messages with peer TCAP entities 
+using SCCP format addressing. This assigns a unique sub-system number and 
+point code to each unique TC-User. 
+The TCAP configuration sets a default module ID for dialogue and component 
+indications; this value identifies the destination task (user application) that 
+will receive these indications, if no additional configuration data is supplied. 
+                                                 
+∗ 
+ See Section 1.3 Related Documentation for the full reference to this manual. 
+Section  5 Interface to TC-User 
+18 
+In addition to the default user application module ID, it is possible to set a 
+different module ID for each different local sub-system. In this environment, 
+each unique user application behaves as a unique local sub-system, with a 
+unique sub-system number (used by the SCCP addressing) and also a unique 
+module identifier (used by the inter-process message passing). 
+The association between a locally initiated dialogue and a user application 
+program module ID is made when the first primitive request is sent. The 
+dialogue is associated with the module ID being taken from the ‘source’ field 
+of the first primitive request message. 
+Dialogues initiated from a remote TCAP entity are received by TCAP from 
+SCCP and contain a called address which identifies a local sub-system. The 
+sub-system number in this address is matched to a module ID from a user- 
+provided configuration setting. The association is made using the first SCCP 
+message received for each of these dialogues. If the local sub-system has not 
+been configured, the dialogue is associated with the ‘default’ user application 
+module ID. 
+5.3 Primitive Parameters 
+Each TC-User primitive includes a number of parameters. These parameters 
+are conveyed in the parameter area of the message that conveys the 
+primitive. 
+The first byte in the parameter area is the primitive type octet and the last 
+byte is a zero byte to indicate that there are no further parameters in the 
+parameter area. Any parameters associated with the message are placed 
+between the message type code and the final (zero) byte. Therefore the 
+parameter area is formatted as follows: 
+      
+Primitive Type Parameter Parameter  Parameter Zero 
+      
+The parameters may be placed in any order. The first byte of a parameter is 
+the parameter name, the second byte is the length of the parameter data to 
+follow (excluding the parameter name and the length byte itself), and this is 
+followed by the parameter data. The encoding of the parameter data aligns 
+exactly with the parameter format specified in the appropriate ITU-T 
+recommendation, whenever possible. Therefore each parameter is formatted 
+as follows: 
+   
+Name Length Data 
+1 byte 1 byte ‘Parameter length’ bytes (1 to 255) 
+Within each message, there are mandatory parameters which must always be 
+present, and optional parameters which may or may not be present. In some 
+cases the optional parameters may have default values (set up at 
+configuration time) which are added by the TCAP module if not provided by 
+the user. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+19 
+5.4 Component Primitive Types 
+Component primitives convey a request to perform an operation or a reply. 
+The following component primitive types are provided: 
+Mnemonic Originator Function Value 
+TCPPT_TC_INVOKE TC-User Requests an operation to be performed. 
+This primitive is used for ITU-T Invoke 
+and ANSI Invoke (last). 
+8 
+TCPPT_TC_INVOKE_NL TC-User Requests an operation to be performed. 
+Further components will convey 
+additional information. 
+17 
+TCPPT_TC_RESULT_L TC-User Reports the successful completion of an 
+operation. 9 
+TCPPT_TC_RESULT_NL TC-User Reports a segment of the successful 
+completion of an operation. Further 
+components will convey additional 
+information. 
+10 
+TCPPT_TC_U_ERROR TC-User Reports the unsuccessful completion of 
+an operation. 11 
+TCPPT_TC_U_REJECT TC-User Reports the receipt and rejection of a 
+component (other that a reject). 16 
+TCPPT_TC_U_CANCEL TC-User Terminates an operation initiated from 
+the local TCAP prematurely (local action 
+only). 
+13 
+TCPPT_TC_L_CANCEL TCAP Reports that the response expected to an 
+operation was not received within a 
+specified time.  
+12 
+TCPPT_TC_L_REJECT TCAP Reports that a received component was 
+rejected locally due to protocol error. 14 
+TCPPT_TC_R_REJECT TCAP Reports that a component was rejected 
+by a responding TCAP. 15 
+TCPPT_TC_NULL TCAP Issued where a component is discarded 
+by the TCAP module but when it is still 
+necessary to indicate a component to the 
+TC-User in order to preserve the ‘LAST- 
+COMPONENT’ indication. 
+0 
+TC-User-originated components may be initiated by the local or responding 
+TC-User; hence these primitives may be both TC-User Component Requests 
+and TC-User Component Indications. 
+TCAP-originated components are always TC-User Component Indications. 
+Section  5 Interface to TC-User 
+20 
+5.5 Dialogue Primitive Types 
+Dialogue handling primitives provide the mechanism by which components 
+are exchanged between peer TCAP entities. The following primitive types are 
+provided: 
+Mnemonic Originator Function Value 
+TCPPT_TC_UNI TC-User Unstructured Dialogue 1 
+TCPPT_TC_BEGIN TC-User Begin a structured Dialogue. 2 
+TCPPT_TC_CONTINUE TC-User Continue a dialogue. The responding 
+TCAP may end this dialogue. 3 
+TCPPT_TC_END TC-User End a dialogue. 4 
+TCPT_TC_U_ABORT TC-User Abort a dialogue. 5 
+TCPPT_TC_P_ABORT TCAP Abort a dialogue due to and abnormal 
+protocol event. 6 
+TCPPT_TC_NOTICE TCAP Report that the network layer was unable 
+to deliver a TCAP PDU to the destination. 7 
+TC-User-originated dialogue primitives may be initiated by the local or 
+responding TC-User, hence these primitives may be both TC-User Dialogue 
+Requests and TC-User Dialogue Indications. 
+TCAP originated primitives are always TC-User Dialogue Indications. 
+The following alternate set of definitions is provided for ANSI TCAP users. 
+ANSI Mnemonic Equivalent ITU-T Mnemonic Value 
+TCPPTA_TC_UNI TCPPT_TC_UNI 1 
+TCPPTA_TC_QUERY TCPPT_TC_BEGIN 2 
+TCPPTA_TC_CONVERSATION TCPPT_TC_CONTINUE 3 
+TCPPTA_TC_RESPONSE TCPPT_TC_END 4 
+TCPPTA_TC_U_ABORT TCPT_TC_U_ABORT 5 
+TCPPTA_TC_P_ABORT TCPPT_TC_P_ABORT 6 
+TCPPTA_TC_NOTICE TCPPT_TC_NOTICE 7 
+The following sections define the message format and content of the 
+parameter area for each of the messages exchanged between the TC-User 
+and TCAP. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+21 
+5.6 TC-COMPONENT-REQUEST 
+Synopsis 
+Protocol message sent from the TC-User to TCAP which contains a TC- 
+Component for association with a dialogue. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_CPT_REQ (0xc781) 
+id Dialogue ID 
+src Sending module ID 
+dst TCP_TASK_ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len Number of bytes of user data 
+Parameter Area 
+OFFSET SIZE NAME 
+0 1 Component primitive type octet. 
+1 len - 2 Parameters in Name-Length-Data format. 
+len - 1 1 Set to zero indicating end of message. 
+Description 
+This message is used by the TC-User to send Component sub-layer primitives 
+to TCAP. The primitives are accumulated within TCAP for the specified 
+dialogue ID until the appropriate dialogue handling primitive is issued by the 
+TC-User.  At that point, the component will be assembled into a message and 
+passed to the network-layer service provider. 
+All component request primitives contain a dialogue ID that is encoded in the 
+message header. It does not form part of the parameter area. 
+Section  5 Interface to TC-User 
+22 
+Parameter area contents 
+The component primitive type octet is coded as defined in Section  
+ 
+5.4 
+Component Primitive Typeson page 19. 
+The following parameter names are defined for use in either component 
+request or component indication primitive messages: 
+Parameter Mnemonic Value 
+Component portion TCPPN_COMPONENT 1 
+Last component TCPPN_LAST_CPT 2 
+Class TCPPN_CLASS 3 
+Timeout TCPPN_TIMEOUT 4 
+Invoke ID TCPPN_INVOKE_ID 5 
+Parameters of local significance (i.e. those that do not form part of the 
+transmitted or received network-layer message) are allocated their own 
+parameter names while the remaining parameters (i.e. those that form the 
+‘component portion’ of the transmitted message) are allocated a single 
+parameter name.  
+The data section of the ‘component portion’ parameter is encoded in 
+accordance with the specification for the component as defined by 
+recommendation Q.773 or T1.114.3, commencing with the Component Type 
+Tag. The following table details the component type required for each TC- 
+User component primitive: 
+Primitive Component type 
+TCPPT_TC_INVOKE Invoke, Invoke (last)  
+TCPPT_TC_INVOKE_NL Invoke (not last)  
+TCPPT_TC_RESULT_L Result (last) 
+TCPPT_TC_RESULT_NL Result (not last) 
+TCPPT_TC_U_ERROR Return error 
+TCPPT_TC_U_REJECT Reject 
+TCPPT_TC_L_REJECT Reject 
+TCPPT_TC_R_REJECT Reject 
+Invoke (last) and Invoke (not last) are available for ANSI operation only. For 
+ITU-T operation, Invoke should be used. 
+Note:  While the component portion of a message transferred across the network may 
+contain more than one component, each component primitive message between 
+the TC-User and TCAP must contain exactly one component (except the TC-U- 
+CANCEL request which is not sent to the network. This should contain only the 
+Invoke ID parameter). 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+23 
+The coding for each parameter type is given in the following tables: 
+Parameter name TCPPN_COMPONENT 
+Parameter length Variable, ranging from 1 to 255 
+Parameter data Component data encoded as specified in Q.773 or T1.114.3, commencing 
+with the Component Type tag 
+ 
+Parameter name TCPPN_LAST_CPT 
+Parameter length Fixed, set to 1 
+Parameter data Used by the module to indicate if this is the last component associated with a 
+dialogue indication or if there are more components to follow. The parameter 
+will be set to 1 if this is the last component and set to 0 if more components 
+are to follow. This parameter is not required for component requests. 
+ 
+Parameter name TCPPN_CLASS 
+Parameter length Fixed, set to 1 
+Parameter data Single octet indicating the required class of operation. The following values 
+may be used : 
+1 = Both success and failure are reported. 
+2 = Only failure is reported. 
+3 = Only success is reported. 
+4 = Neither success nor failure are reported. 
+ 
+Parameter name TCPPN_TIMEOUT 
+Parameter length Variable, set to 0 or 2. 
+Set the length to 0 to disable the timer. Set it to 2 to specify the timer value in 
+parameter data. 
+Parameter data The invocation time-out in seconds in the range 0 ... 1800. The first octet is 
+the most significant byte of the time-out. 
+Note that the maximum permitted time-out value is 1800 seconds (i.e.30 
+minutes). 
+ 
+Parameter name TCPPN_INVOKE_ID 
+Parameter length Fixed, set to 1 
+Parameter data A single octet representing the invoke ID, which is in the range of  -128 to 
++127 
+The following table lists the parameters associated with each component 
+request primitive and shows whether the parameter is Mandatory (M), in 
+which case the message will be discarded if the parameter is omitted, 
+Optional (O), in which case the parameter is not essential or Defaulted (D), in 
+which case the parameter will be set to the configured default value by TCAP, 
+if it is not supplied . 
+Section  5 Interface to TC-User 
+24 
+ITU-T and ANSI Primitive 
+Parameter 
+IN 
+VO 
+K 
+E 
+ 
+IN 
+VO 
+K 
+E 
+-N 
+L 
+ 
+R 
+E 
+SU 
+L 
+T 
+-L 
+ 
+R 
+ES 
+U 
+LT 
+-N 
+L 
+ 
+U 
+-E 
+RR 
+O 
+R 
+ 
+U 
+-C 
+A 
+NC 
+E 
+L 
+ 
+U 
+-R 
+E 
+JE 
+C 
+T 
+ 
+Invoke ID       M  
+Class D       
+Timeout D       
+Component M M M M M  M 
+Last 
+Component        
+5.7 TC-COMPONENT-INDICATION 
+Synopsis 
+Protocol message sent from TCAP to the TC-User containing a TC-Component 
+associated with a dialogue. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_CPT_IND (0x8782) 
+id Dialogue ID 
+src TCP_TASK_ID 
+dst TC-User module ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len Number of bytes of user data 
+Parameter Area 
+Offset Size Name 
+0 1 Component primitive type octet. 
+1 len - 2 Parameters in Name-Length-Data format. 
+len - 1 1 Set to zero indicating end of message. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+25 
+Description 
+This message is used by TCAP to send Component sub-layer primitives to the 
+TC-User. On receipt of a dialogue-handling primitive from the network, TCAP 
+first issues a dialogue handling primitive to the TC-User, this is followed by a 
+number of component primitive messages (each containing a single 
+component) until all the components have been conveyed to the user. The 
+last component primitive will have the data in the ‘last component’ parameter 
+set to indicate that there are no further components to follow. 
+All component indication primitives contain a dialogue ID which is encoded in 
+the message header. It does not form part of the parameter area. 
+Parameter Area Contents 
+The parameter area is coded as defined for the TC-COMPONENT-REQUEST 
+message (see Section   5.6TC-COMPONENT-REQUESTon page 21). 
+Note: A TC-NULL-IND is issued where a component is discarded by the TCAP module but 
+when it is still necessary to indicate a component  in order to preserve the ‘LAST- 
+COMPONENT’ indication. 
+The following table lists the parameters associated with each component 
+indication primitive and shows whether the parameter is Mandatory (M), in 
+which case it will always be present in messages issued by TCAP or Optional 
+(O), in which case the parameter may or may not be present depending on 
+the received message data or event being reported. 
+ ITU-T and ANSI Primitive 
+Parameter 
+IN 
+VO 
+K 
+E 
+ 
+IN 
+VO 
+K 
+E 
+-N 
+L 
+ 
+R 
+E 
+SU 
+L 
+T 
+-L 
+ 
+R 
+ES 
+U 
+LT 
+-N 
+L 
+ 
+U 
+-E 
+RR 
+O 
+R 
+ 
+L 
+-C 
+A 
+NC 
+E 
+L 
+ 
+L 
+-R 
+E 
+JE 
+C 
+T 
+ 
+R 
+-R 
+E 
+JE 
+C 
+T 
+ 
+U 
+-R 
+E 
+JE 
+C 
+T 
+ 
+NU 
+LL 
+  
+ 
+Invoke ID       M     
+Class           
+Timeout           
+Component M M M M M  M M M  
+Last Component M M M M M M M M M M 
+Section  5 Interface to TC-User 
+26 
+5.8 TC-DIALOGUE-REQUEST 
+Synopsis 
+Protocol message sent from the TC-User to TCAP containing a dialogue- 
+handling primitive. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_DLG_REQ (0xc783) 
+id Dialogue ID 
+src Sending module ID 
+dst TCP_TASK_ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len Number of bytes of user data 
+Parameter Area 
+Offset Size Name 
+0 1 Dialogue primitive type octet. 
+1 len - 2 Parameters in Name-Length-Data format. 
+len - 1 1 Set to zero indicating end of message. 
+Description 
+This message is used by the TC-User to send component sub-layer primitives 
+relating to dialogue handling to TCAP. The primitives cause the generation of 
+a message for sending to the network layer which contains all the 
+components received for the specified dialogue ID. 
+All dialogue request primitives contain a dialogue ID which is encoded in the 
+message header. It does not form part of the parameter area. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+27 
+Parameter Area Contents 
+The dialogue primitive type octet is coded as defined in Section  
+ 
+5.5Dialogue 
+Primitive Typeson page 20. The following parameter names are defined for 
+use in dialogue handling primitive messages: 
+Parameter Mnemonic Value 
+Quality of service TCPPN_QOS 6 
+Destination address TCPPN_DEST_ADDR 7 
+Originating address TCPPN_ORIG_ADDR 8 
+Termination type TCPPN_TERMINATION 9 
+Abort reason TCPPN_ABORT_REASON 10 
+Report cause TCPPN_REPORT_CAUSE 11 
+Components present TCPPN_CPT_PRESENT 12 
+Application context name TCPPN_APPL_CONTEXT 13 
+User information TCPPN_USER_INFO 14 
+P-Abort TCPPN_P_ABORT 15 
+User Abort Information TCPPN_UABORT_INFO 16 
+Security context TCPPN_SECURITY 17 
+Confidentiality indicator TCPPN_CONFIDENTIALITY 18 
+Permission to release TCPPN_PERMISSION 19 
+Protocol version TCPPN_VERSION 20 
+The coding for each parameter type is given in the following tables: 
+Parameter name TCPPN_QOS 
+Parameter length Either 1, 2 or 3 octets. 
+Parameter data The first octet is an indicator octet, which must always be present. 
+Subsequent octets must only be present if the appropriate bit is set in the 
+indicator octet. The coding is as follows: 
+Indicator Octet 
+• bit 0 - Set to 1 if the return option is selected. 
+• bit 1 - Set to 1 if sequence control is required. 
+• bit 2 - Set to 1 if the SLS key octet is present in the quality of service 
+parameter, in which case it will be the following octet. Otherwise TCAP 
+will generate the SLS key (for passing to SCCP) automatically and the 
+SLS key octet is omitted. 
+• bit 3 - Set to 1 if the message priority octet is included in the quality of 
+service parameter. Otherwise TCAP will insert the default message 
+priority. 
+All other bits are reserved for future use and must be set to zero. 
+SLS Key Octet 
+The SLS key which is used (by SCCP) to determine the SLS value to be 
+used in the resulting message. 
+Message Priority Octet 
+Coded as 0, 1, 2 or 3 to indicate the required message priority. 
+Note:  QOS indications from TCAP contain only the indicator octet. 
+ 
+Section  5 Interface to TC-User 
+28 
+Parameter name TCPPN_DEST_ADDR 
+Parameter length Variable, in the range 2 to 18 
+Parameter data The destination address parameter which is encoded in the format expected 
+by the network layer. 
+When using ITU-T SCCP, it is formatted in accordance with the Q.713 
+definition of ‘Called Party Address’ commencing with the address indicator 
+and containing optionally signaling point code, sub-system number and 
+global title.  
+When using ANSI SCCP, in accordance with T1.112.3 definition of ‘Called 
+party address’. 
+ 
+Parameter name TCPPN_ORIG_ADDR 
+Parameter length Variable, in the range 2 to 18 
+Parameter data The originating address parameter which is encoded in the format expected 
+by the network layer. 
+When using ITU-T SCCP, formatted in accordance with the Q.713 definition 
+of ‘Calling Party Address’ commencing with the address indicator and 
+containing optionally signaling point code, sub-system number and global 
+title.  
+When using ANSI SCCP, in accordance with T1.112.3 definition of ‘Calling 
+Party Address’. 
+ 
+Parameter name TCPPN_TERMINATION 
+Parameter length Fixed, set to 1 
+Parameter data Single octet set to 0 to indicate BASIC end or 1 to indicate PRE- 
+ARRANGED end.  
+A BASIC end will cause a TR-END (ITU-T) or  
+RESPONSE package (ANSI) to be sent via the network layer to the peer 
+TCAP to terminate a transaction.  
+A PRE-ARRANGED is used to inform the local TCAP that the transaction is 
+to be terminated without exchange of messages with the peer TCAP. 
+ 
+Parameter name TCPPN_ABORT_REASON 
+Parameter length Fixed, set to 1 
+Parameter data Single octet set to an appropriate value as below:  
+• 1 - Application Context not supported   
+• 2 - Other user reason.  
+• 3 – Network Context not supported 
+Note: The absence of this parameter in an indication implies ‘Other user 
+reason’ 
+ 
+Parameter name TCPPN_REPORT_CAUSE 
+Parameter length Fixed, set to 1 
+Parameter data Passed transparently from the network layer. When using SCCP, it is coded 
+as specified in Q.713/T1.112.3 ‘Return Cause’ parameter. 
+ 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+29 
+Parameter name TCPPN_CPT_PRESENT 
+Parameter length Fixed, set to 1 
+Parameter data Single octet set to 0 to indicate that there are no components to follow or 1 
+to indicate that there are components to follow. 
+ 
+Parameter name TCPPN_APPL_CONTEXT 
+Parameter length Variable (subject to satisfying message length limits). 
+Parameter data Application Context Name. 
+ITU-T operation 
+Encoded as specified in Q.773, commencing with the Application Context 
+Name tag. 
+ANSI operation 
+Encoded as specified in T1.114.3, commencing with the Integer Application 
+Context or Object Application Context tag. 
+ 
+Parameter name TCPPN_USER_INFO 
+Parameter length Variable (subject to satisfying message length limits). 
+Parameter data User information encoded as an X.208 EXTERNAL, commencing with the 
+EXTERNAL tag. 
+This formatting is not required when the User Information is carried in a User 
+Abort primitive. Any format may be used in this case. 
+ 
+Parameter name TCPPN_P_ABORT 
+Parameter length Fixed, set to 1 
+Parameter data A single octet, coded as follows: 
+ITU-T operation 
+• 0 – Unrecognized message type 
+• 1 – Unrecognized transaction ID 
+• 2 – Badly formatted transaction portion 
+• 3 – Incorrect transaction portion 
+• 4 – Resource limitation 
+• 126 – Abnormal dialogue 
+• 127 – No common dialogue portion 
+ANSI operation 
+• 1 – Unrecognized package type 
+• 2 – Unrecognized transaction portion 
+• 3 – Badly structured transaction portion 
+• 4 – Unassigned responding transaction ID 
+• 5 – Permission to release problem 
+• 6 – Resource unavailable 
+• 7 – Unrecognized dialogue portion ID 
+• 8 – Badly structured dialogue portion 
+• 9 – Missing dialogue portion 
+• 10 – Inconsistent dialogue portion 
+• 126 – Abnormal dialogue. This code is caused by receipt of an invalid or 
+inappropriate dialogue primitive from the local TC-User. 
+Section  5 Interface to TC-User 
+30 
+ 
+Parameter name TCPPN_UABORT_INFO 
+Parameter length A variable (subject to satisfying message length limits). 
+Parameter data User Abort Information in any user defined format. 
+ 
+Parameter name TCPPN_SECURITY 
+Parameter length Variable (subject to satisfying message length limits). 
+Parameter data Security context, encoded as defined in ANSI T1.114.3, starting with the 
+Integer Security Context or Object Security Context tag. 
+ 
+Parameter name TCPPN_CONFIDENTIALITY 
+Parameter length Variable (subject to satisfying message length limits). 
+Parameter data Confidentiality identifier, encoded as defined in ANSI T1.114.3, starting with 
+the Confidentiality Indicator tag. 
+ 
+Parameter name TCPPN_PERMISSION 
+Parameter length Fixed, set to 1. 
+Parameter data Permission to release 
+A single octet, set to 0 or 1 to indicate the following: 
+• 0 = responding TCAP may not terminate the dialogue. 
+• 1 = responding TCAP may release the dialogue. 
+ 
+Parameter name TCPPN_VERSION 
+Parameter length Length 1 or 2 
+Parameter data For ANSI the format of the protocol version is defined in T1.114-1996 - a 
+single octet where each bit relates to a particular protocol version. 
+For ITU the format of the protocol version follows the definition of a bitstring, 
+as defined in X.209.  The low octet is used for the protocol version.  The high 
+octet is used to denote the number of bits not used in the low octet. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+31 
+The following table lists the parameters associated with each dialogue request 
+primitive and shows whether the parameter is Mandatory (M), Optional (O) or 
+Defaulted (D). 
+ ITU-T Primitive ANSI Primitive 
+Parameter 
+UN 
+I 
+B 
+EG 
+IN 
+ 
+CO 
+N 
+T 
+IN 
+U 
+E 
+ 
+EN 
+D 
+ 
+A 
+BO 
+R 
+T 
+ 
+UN 
+I 
+Q 
+U 
+ER 
+Y 
+ 
+CO 
+N 
+VE 
+R 
+SA 
+T 
+IO 
+N 
+ 
+R 
+E 
+S 
+PO 
+N 
+S 
+E 
+ 
+A 
+BO 
+R 
+T 
+ 
+Destination 
+Address D D O 
+1 
+O1 O1 D D O1 O1 O1 
+Originating 
+Address D D O 
+1 
+O1 O1 D D O1 O1 O1 
+Quality of 
+Service D D D D D D D D D D 
+Application 
+Context O O O O O O O O O O 
+User 
+Information O O O  O O O O O O 
+Termination 
+type    D     D  
+Abort reason     O     O 
+Report cause           
+Component 
+present           
+P-Abort           
+User Abort 
+information    O O     O 
+Security 
+Context      O O O O O 
+Confidentiality 
+identifier      O O O O O 
+Permission to 
+release       D D D D 
+Version O O O O O O O O O O 
+O1 indicates that this parameter may only be present if the associated 
+primitive is issued in response to a TC-BEGIN or TC-QUERY. In all other 
+cases, this parameter is discarded by TCAP. 
+Section  5 Interface to TC-User 
+32 
+5.9 TC-DIALOGUE-INDICATION 
+Synopsis 
+Protocol message sent from the TCAP to the TC-User containing a dialogue- 
+handling primitive. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_DLG_IND (0x8784) 
+id Dialogue ID 
+src TCP_TASK_ID 
+dst TC-User module ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+reserved 0 
+len Number of bytes of user data 
+Parameter Area 
+Offset Size Name 
+0 1 Dialogue primitive type octet. 
+1 len – 2 Parameters in Name-Length-Data format. 
+len – 1 1 Set to zero indicating end of message. 
+Description 
+This message is used by TCAP to send component sub-layer dialogue 
+handling primitives to the TC-User. The primitives are issued on receipt from 
+the network of transaction related messages and are followed by any 
+component primitives for components contained within the received message. 
+All dialogue indication primitives contain a dialogue ID which is encoded in 
+the message header. It does not form part of the parameter area. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+33 
+Parameter Area Contents 
+The parameter area is coded as defined for the TC-DIALOGUE-REQUEST 
+message. 
+The following table lists the parameters associated with each dialogue- 
+handling indication primitive and shows whether the parameter is Mandatory 
+or Optional. 
+ ITU-T Primitive ANSI Primitive 
+Parameter 
+UN 
+I 
+B 
+EG 
+IN 
+ 
+CO 
+N 
+T 
+IN 
+U 
+E 
+ 
+EN 
+D 
+ 
+A 
+BO 
+R 
+T 
+ 
+P 
+–A 
+BO 
+R 
+T 
+ 
+NO 
+T 
+IC 
+E 
+ 
+UN 
+I 
+Q 
+U 
+ER 
+Y 
+ 
+CO 
+N 
+VE 
+R 
+SA 
+T 
+IO 
+N 
+ 
+R 
+E 
+S 
+PO 
+N 
+S 
+E 
+ 
+A 
+BO 
+R 
+T 
+ 
+P 
+–A 
+BO 
+R 
+T 
+ 
+NO 
+T 
+IC 
+E 
+ 
+Destination Address O O O1 O1 O1   O O O1 O1 O1   
+Originating Address M M O1 O1 O1   M M O1 O1 O1   
+Quality of Service O O O O O O  O O O O O O  
+Application Context O O O O O   O O O O O   
+User Information O O O O O   O O O O O   
+Termination type               
+Abort reason     O       O   
+Report cause       O       O 
+Component present M M M M    M M M M    
+P-Abort      M       M  
+User Abort 
+information     O       O   
+Security Context        O O O O    
+Confidentiality 
+identifier        O O O O    
+Permission to 
+release         M M     
+Version O O O O O O  O O O O O O  
+O1 indicates that this parameter may only be present if the associated 
+primitive is issued in response to a TC-BEGIN or TC-QUERY. In all other 
+cases, this parameter is discarded by TCAP. 
+Section  5 Interface to TC-User 
+34 
+ 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+35 
+6 Management Interface 
+The management interface allows you to interface with the network-layer 
+management entity. All management messages received by the TCAP module 
+are passed transparently to the network layer. The management messages 
+are described in the SCCP Programmer’s Manual∗. 
+Two messages are currently supported, one for management requests from 
+the user and the other for management indications from the SCCP module. 
+The following management primitives are supported: 
+Management primitives issued to SCCP 
+N-STATE Request User In Service (UIS) 
+N-STATE Request User Out of Service (UOS) 
+N-STATE Request User congestion 
+N-COORD Request User withdrawal request (UOR) 
+N-COORD Response User withdrawal grant (UOG) 
+Management primitives issued by SCCP 
+N-STATE Indication User In Service (UIS) 
+N-STATE Indication User Out of Service (UOS) 
+N-COORD Indication User withdrawal indication (UOR) 
+N-COORD Confirmation User withdrawal confirmation (UOG) 
+N-PCSTATE Indication Signaling point accessible 
+N-PCSTATE Indication Signaling point inaccessible 
+N-PCSTATE Indication Signaling point congested 
+ 
+                                                 
+∗ 
+ See Section 1.3 Related Documentation for the full reference to this manual. 
+Section  6 Management Interface 
+36 
+ 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+37 
+7 Non-Primitive Interface 
+In addition to the primitive interface for passing protocol messages and 
+management messages between the TCAP module and the TC-User, the TCAP 
+module supports a non-primitive interface for implementation-specific 
+functionality. 
+The non-primitive interface is used to support requests by you for 
+configuration and diagnostic purposes and to allow TCAP to report protocol- 
+based and software error events to the local system management module. 
+This section describes the formats of the messages used in the non-primitive 
+interface. 
+When the TCAP module returns a confirmation message containing a status 
+value the status will be one of the following: 
+Mnemonic Value Description 
+none 0 Success 
+TCPE_BAD_ID 1 Inappropriate or invalid ID in the request message 
+TCPE_BAD_MSG 5 Inappropriate or unrecognized message type. 
+TCPE_BAD_PARAM 6 Invalid parameters contained in the message. 
+TCPE_NO_RESOURCES 7 Insufficient internal resources. 
+TCPE_INVALID_NC 8 Invalid Network Context 
+TCPE_INVALID_VERSION 9 Message version is invalid 
+7.1 TCAP Configuration Request 
+Synopsis 
+Message used to configure the TCAP module for operation. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_CONFIG (0x7780) 
+id 0 
+src Sending module ID 
+dst TCP_TASK_ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 40 
+Section  7 Non-Primitive Interface 
+38 
+Parameter Area 
+Offset Size Name 
+0 1 cnf_ver - must be set to zero 
+1 1 Reserved, must be set to zero. 
+2 1 user_id - TC-User module ID 
+3 1 nsap_id - Network-layer module ID 
+4 1 mngt_id – Management module ID 
+5 1 maint_id – Maintenance module ID 
+6 2 flags 
+8 2 nog_dialogues 
+10 2 nic_dialogues 
+12 2 num_invokes 
+14 2 num_components 
+16 2 base_ogdlg_id 
+18 2 base_icdlg_id 
+20 1 tid_ninst 
+21 1 tid_ndref 
+22 1 tid_nseq 
+23 1 tcap_instance 
+24 2 max_data 
+26 2 dlg_hunt 
+28 1 addr_format 
+29 11 Reserved for future use -  set to zero 
+Description 
+This message is used to configure the TCAP module for operation. It should 
+be the first message sent to the module (any messages received before a 
+valid configuration message will be discarded) and should only be issued 
+once. 
+The message contains parameters relating to the environment in which the 
+TCAP module is operating, such as the identity of other modules with which it 
+needs to communicate. It also contains run-time options and run-time 
+dimensioning information. 
+Confirmation Message 
+The module sending the message can optionally request that a confirmation 
+is returned by the TCAP module when the message has been processed. This 
+is achieved by setting the sending layer's bit in the rsp_req field which will 
+cause a confirmation message of the same format to be returned. The status 
+field in this message is zero on success or an error code otherwise. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+39 
+Parameter Description 
+user_id 
+8-bit module identifier defining the default destination for all dialogue and 
+component indications issued by TCAP to the user application program. It is 
+also possible to configure this parameter on a per-local sub-system basis (see 
+TCP_MSG_S_TCU_ID on page 45). 
+nsap_id 
+(network service application part layer ID) 8 bit module identifier defining the 
+destination for all transmit requests made by TCAP to the SS7 network. This 
+will normally be set to the module ID of SCCP (SCP_TASK_ID). 
+mngt_id 
+8-bit module identifier defining the destination for all management indications 
+and trace information (TCP_MSG_ERROR_IND, MGT_MSG_TRACE_EV) from 
+TCAP to the user management entity. In a system that has no separate 
+management task, this may be set to the same value as user_id (above). 
+maint_id 
+8-bit module identifier defining the destination for all maintenance indications 
+(TCP_MSG_MAINT_IND) from TCAP to the user management entity. In a 
+system that has no separate management task, this may be set to the same 
+value as user-id (above). 
+flags 
+A 16 bit value, with each bit having a particular meaning as detailed in the 
+table below: 
+Bit Description 
+0 Set to 1 to trace discarded TC-User primitives to management. 
+1 Used to select between ITU-T and ANSI PDU formats. 
+Set to 1 to select ANSI T1.114 format, or to 0 to select ITU-T Q.773. 
+2 If set, it prevents the invoke timer from being started for each invoke operation 
+issued by this module. 
+3 If set to 1, it enables the result of an operation to be conveyed in an invoke 
+component. If set to zero, receipt of an invoke in response to an invoke will be 
+treated as an abnormal condition. 
+4 If set to 1, unsolicited result components are passed on to the TC-User. If set to 
+zero, unsolicited result components are rejected. 
+5 If set to 1, transmit component type discrimination is disabled for TC-UNI requests. 
+If not set, TCAP will only allow a class 4 Invoke/Invoke-L and Invoke-NL to be sent 
+with a TR-UNI. Any other accumulated component types will be discarded. 
+6 If set to 1, the local sub-system number is not recovered from the destination 
+address for incoming dialogues. All primitives will be delivered to the module 
+‘user_id’ specified by the TCAP Configuration Request. 
+7 If set to 1, operation with dialogue groups is enabled, otherwise configuration of 
+dialogue groups will be rejected by TCAP. 
+Section  7 Non-Primitive Interface 
+40 
+Bit Description 
+8 If set to 1, support for long messages i.e. messages with length greater than 255 
+octets.   
+If long messages are used, the max_data field in this TCP_MSG_CONFIG 
+message should also be increased to allow a longer parameter to be sent by 
+TCAP.  If the value of  the max_data field is not sufficient, a TCAP Maintenance 
+Indication with status TCPEV_DATA_LEN_ERR (0x03) will be reported. 
+9 If set to 1, the dialogue will automatically be closed and subsequently aborted on 
+timer expiry. 
+If not set, the module will send a Maintenance Event Indication with status 
+TCPEV_DLG_TIM_TIMEOUT (0x08), to notify the user that the affected timer has 
+expired. 
+10 If set to 1, messages will be routed using the Destination Transaction ID (DTID) 
+which is required for systems using SUA. 
+14 If set to 1, allocates memory for the High Availability (HA) structures on reception 
+of TCP_MSG_CONFIG. 
+15 If set to 1, disable abort of user error. 
+Other All other bits are reserved for future use and must be set to zero. 
+The combined value of the flags option can be constructed by using a 
+combination of the mnemonics defined in TCP_INC.H and listed below. 
+Value Mnemonic Description 
+0x0001 TCPF_TR_DISC Trace discarded primitives to mngt 
+0x0002 TCPF_ANSI Select ANSI PDU formats if set 
+0x0004 TCPF_DIS_TINV Disable Invoke timer 
+0x0008 TCPF_INVRES Allow an Invoke to convey a result 
+0x0010 TCPF_DIS_RXFILT Disable filtering of Rx component type 
+0x0020 TCPF_DIS_TXFILT Disable filtering of Tx component type 
+0x0040 TCPF_NO_RXUID Disable Rx of destination user ID by SSN 
+0x0080 TCPF_DLGGRP Enable dialogue groups 
+0x0100 TCPF_SEGMENTATION Support for Long messages 
+0x0200 TCPF_DLG_TIM_ABORT Automatic Abort of Dialogue 
+0x0400 TCPF_DTID_ON Enable DTID 
+0x4000 TCPF_HA Enable TCAP High-Availability  
+0x8000 TCPF_NO_ABORT Disable abort 
+nog_dialogues 
+The maximum number of simultaneous outgoing dialogues that the module is 
+required to support. This value is compared with a compile time constant to 
+ensure that the module has sufficient internal resources to handle the 
+requested maximum number of outgoing dialogues. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+41 
+nic_dialogues 
+The maximum number of simultaneous incoming dialogues that the module is 
+required to support. This value is compared with a compile time constant to 
+ensure that the module has sufficient internal resources to handle the 
+requested maximum number of incoming dialogues. 
+num_invokes 
+The maximum number of simultaneous (outgoing) invocations that the 
+module is required to support. This value is compared with a compile time 
+constant to ensure that the module has sufficient internal resources to handle 
+the requested number of simultaneous invokes. 
+num_components 
+The maximum number of buffered components required to be supported by 
+the module at any one time. This value is compared with a compile time 
+constant to ensure that the module has sufficient internal resources to 
+support the requested number of buffered components. 
+base_ogdlg_id 
+The first dialogue ID for outgoing dialogues that the user wishes to be 
+handled by this module. The subsequent (nog_dialogues - 1) dialogue IDs 
+will also be handled by the module. You must ensure that the values used in 
+the dialogue ID field of all protocol messages pertaining to outgoing dialogues 
+lie within the correct range. 
+base_icdlg_id 
+The first dialogue ID for incoming dialogues that the user wishes to be 
+handled by this module. The subsequent (nic_dialogues - 1) dialogue IDs 
+will also be handled by the module. The most significant bit (i.e. bit 15) of the 
+dialogue ID must be set to one for incoming dialogues. The TCAP module 
+allocates the dialogue ID for each incoming dialogue. It uses values in the 
+range  base_icdlg_id .... (base_icdlg_id + nic_dialogues - 1) for this 
+purpose. 
+tid_ninst,  tid_ndref,  tid_nseq 
+TCAP generates a local transaction ID (ltid) for each transaction.  The ltid is 
+made up of three fields, each of variable width as configured by the user. The 
+fields are tcap_instance, dialogue_reference, and sequence_number. 
+• tcap_instance is as supplied by the user in the configuration message, 
+the field occupies tid_ninst bits. (tid_ninst may be set to zero if 
+required). 
+• dialogue_reference is generated internally by the TCAP module and 
+ranges from 0 up to one less than the total number of dialogues 
+supported. The field occupies tid_ndref bits. (tid_ndref must be large 
+enough to allow coding of the dialogue_reference). 
+• tid_nseq is a sequence number assigned (by the TCAP module) to each 
+transaction pertaining to a particular dialogue ID. It ensures that the 
+maximum possible time interval elapses before the transaction ID is re- 
+allocated. The field occupies tid_nseq bits. 
+Section  7 Non-Primitive Interface 
+42 
+tcap_instance 
+The TCAP module supports the use of multiple instances of TCAP for a 
+particular application. This allows for distributed processing across multiple 
+hardware platforms. When this feature is used, each instance handles 
+messages relating to a particular set of transaction IDs. To ensure correct 
+operation each instance of TCAP must be configured with a unique 
+tcap_instance value. 
+max_data 
+The maximum length for the user data parameter in messages sent to the 
+network layer. This will usually be set to 255 and, for longer parameters, a 
+maximum permitted length of 65535 may be specified; however, you can 
+restrict the maximum length if required. You are  responsible for ensuring 
+that the components issued to TCAP do not exceed the configured limit, 
+otherwise TCAP will discard the message. TCAP uses the configured limit 
+when generating reject components to determine if there is sufficient space 
+to include the reject component, or whether it is necessary to store the reject 
+component for transmission in the next message. 
+dlg_hunt 
+Defines how incoming transactions are distributed between dialogue groups. 
+If operation with dialogue ID groups is not enabled this parameter is ignored 
+by TCAP. This parameter should be set to 0, 1 or 2 as shown below: 
+• 0 – Cyclic Selection. Each new incoming dialogue is allocated to the next 
+TCAP group. 
+• 1 – Load Balanced Selection. Each new incoming dialogue is allocated to 
+the group with the least number of active incoming dialogues. 
+• 2 – Sequential Selection. Each new incoming dialogue is allocated to the 
+group containing the first inactive incoming dialogue ID. 
+addr_format 
+Defines how TCAP should interpret address information from messages 
+received from SCCP in order to direct received TCAP primitives to unique 
+SCCP sub-systems (TCAP user applications). The following table shows the 
+values that may be specified for this parameter. 
+addr_format Action 
+0 If configured to use ITU-T PDU formats (options bit 1 not set) use ITU-T Q.713 
+SCCP address format 
+If configured to use ANSI PDU formats (options bit 1 set) use ANSI T1.112 
+SCCP address format 
+1 Use ITU-T Q.713 SCCP address format (14 bit point codes) 
+2 Use ITU-T Q.713 SCCP address format modified for 24 bit point codes 
+3 Use ANSI T1.112 SCCP address format modified for 14 bit point codes 
+4 Use ANSI T1.112 SCCP address format (24 bit point codes) 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+43 
+7.2 Configure NC Request 
+Synopsis 
+Message used to configure additional Network Contexts. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_NC_CONFIG (0x7787) 
+id Network Context ID (value 1 to 3) 
+src Sending module ID 
+dst TCP_TASK_ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 40 
+Parameter Area 
+Offset Size Name 
+0 1 cnf_ver - must be set to zero 
+1 1 user_id - TC-User module ID 
+2 1 nsap_id - Network-layer module ID 
+3 2 flags 
+5 2 max_data 
+7 1 addr_format  
+8 32 Reserved for future use - set to zero 
+Description 
+This message contains parameters to define address format and TCAP specific 
+options allowing different behaviors for the module to be selected depending 
+on the Network Context of the dialogue. 
+The meaning of the parameters in this message is  the same as the 
+equivalent parameters in the TCP_MSG_CONFIG message. When used to 
+support multiple local point codes within the same network, the option 
+settings should typically be the same in both messages. 
+Section  7 Non-Primitive Interface 
+44 
+Confirmation Message 
+The module sending the message can optionally request that a confirmation 
+is returned by the TCAP module when the message has been processed. This 
+is achieved by setting the sending layer's bit in the rsp_req field which will 
+cause a confirmation message of the same format to be returned. The status 
+field in this message is zero on success or an error code otherwise. 
+Parameter Description 
+Network Context ID 
+The Network Context ID will identify the Network Context being defined. The 
+default Network Context (0) is configured using the existing 
+TCAP_MSG_CONFIG message therefore this message should only be used for 
+Network Contexts 1 to 3. This assumes that four Network Contexts are 
+permitted. 
+Note: All other parameters have the equivalent meaning and types as those used in the 
+TCP_MSG_CONFIG message (refer to Section Error! Reference source not 
+found. Error! Bookmark not defined. for details). 
+7.3 Configure Dialogue Group Request 
+Synopsis 
+This message configures a dialogue ID group, and will only be accepted by 
+the TCAP module if the TCPF_DLGGRP configuration flags bit is set. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_CNF_DGRP (0x7785) 
+id dialogue group ID 
+src Sending module ID 
+dst TCP_TASK_ID (0x14) 
+rsp_req Used to request a confirmation 
+class 0 
+status 0 
+err_info 0 
+len 16 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+45 
+Parameter Area 
+Offset Size Name 
+0 2 base_ogdlg_id 
+2 2 nog_dialogues 
+4 2 base_icdlg_id 
+6 2 nic_dialogues 
+8 2 options 
+10 2 user_instance 
+12 4 Reserved for future use - set to zero 
+Description 
+This message is used to configure a TCAP dialogue group. 
+Confirmation Message 
+The module sending the message can optionally request that a confirmation 
+is returned by the TCAP module when the message has been processed. This 
+is achieved by setting the sending layer's bit in the rsp_req field which will 
+cause a confirmation message of the same format to be returned. The status 
+field in this message is zero on success or an error code otherwise. 
+Parameter Description 
+dialogue group ID 
+a logical identifier for this group, the valid range being 0 to 31. 
+base_ogdlg_id 
+The first outgoing dialogue id assigned to this dialogue identifier group. 
+nog_dialogues 
+The number of outgoing dialogues assigned to this group, hence the following 
+outgoing dialogue IDs are assigned to this group: base_ogdlg_id to 
+base_ogdlg_id + nog_dialogues-1 
+base_icdlg_id 
+The first incoming dialogue ID assigned to this dialogue identifier group. 
+nic_dialogues 
+The number of incoming dialogues assigned to this group, hence the following 
+outgoing dialogue IDs are assigned to this group: base_ogdlg_id to 
+base_icdlg_id + nic_dialogues-1 
+options 
+Should currently be set to zero. 
+Section  7 Non-Primitive Interface 
+46 
+user_instance 
+Identifies the instance of the user application to which the defined ranges of 
+dialogues will be sent. 
+The number of dialogues must lie within the limit specified with the TCAP 
+Configuration request message. 
+7.4 Configure TC-User Request 
+Synopsis 
+This message configures a module ID in the message passing environment to 
+be used by TCAP to distribute primitive indications to different local sub- 
+systems. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_S_TCU_ID (0x5793) 
+id Sub-System Number 
+src Sending module ID 
+dst TCP_TASK_ID (0x14) 
+rsp_req Used to request a confirmation 
+class 0 
+status 0 
+err_info 0 
+len 1 0r 3 
+Parameter Area 
+Offset Size Name 
+0 1 module_id 
+1 2 nc – Network Context 
+Description 
+This message is used to set the module ID to be used by TCAP as the 
+destination for dialogue and component indications for incoming dialogues 
+(dialogues initiated from a remote signaling point). 
+Confirmation Message 
+The module sending the message can optionally request that a confirmation 
+is returned by the TCAP module when the message has been processed. This 
+is achieved by setting the sending layer's bit in the rsp_req field which will 
+cause a confirmation message of the same format to be returned. The status 
+field in this message is zero on success or an error code otherwise. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+47 
+Parameter Description 
+sub-system number 
+The sub-system number for the local sub-system in the range of 0 to 255. 
+This is the value that will be matched against the sub-system number in the 
+called address parameter in messages received by TCAP from SCCP (the 
+network transport layer). 
+module_id 
+The module ID used by your application program that will receive dialogue 
+and component indications for the local sub-system, described by the sub- 
+system number.  
+nc 
+Specifies the network context for the application. It is set to 0 where the 
+application context handling is not required. 
+7.5 Configure TC-Instance Request 
+Synopsis 
+This message configures a module ID in the message passing environment to 
+be used by for a given TCAP instance. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_S_TCI_ID (0x5794) 
+id 0 
+src Sending module ID 
+dst TCP_TASK_ID (0x14) 
+rsp_req Used to request a confirmation 
+class 0 
+status 0 
+err_info 0 
+len 1 
+Parameter Area 
+Offset Size Name 
+0 1 module_id 
+Description 
+This message is used to set the instance of the module ID to be used by 
+TCAP. 
+Section  7 Non-Primitive Interface 
+48 
+Confirmation Message 
+The module sending the message can optionally request that a confirmation 
+is returned by the TCAP module when the message has been processed. This 
+is achieved by setting the sending layer's bit in the rsp_req field which will 
+cause a confirmation message of the same format to be returned. The status 
+field in this message is zero on success or an error code otherwise. 
+Parameter Description 
+module_id 
+The module ID used by the users own application program that will receive 
+dialogue and component indications for the local sub-system described by the 
+sub-system number.  
+7.6 TCAP Set Default Parameters Request 
+Synopsis 
+Message used to set up default protocol parameters for use by the TCAP 
+module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_DEF_PARAM (0x7781) 
+id 0 
+src Sending module ID 
+dst TCP_TASK_ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len Number of bytes in parameter area 
+Parameter Area 
+Offset Size Name 
+0 len - 1 Parameters in Name-Length-Data format. 
+len - 1 1 Set to zero indicating end of message. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+49 
+Description 
+This message is used to set up default protocol parameters for use by the 
+TCAP module. The message may be issued at any time after the module 
+configuration message and may be used to change default parameters. 
+The parameter area may contain any of the component parameters or 
+dialogue-handling parameters which can take a default value. The parameters 
+are encoded in the same way as in the TC-COMPONENT-REQUEST and TC- 
+DIALOGUE-REQUEST messages, in Name-Length-Data format. 
+Confirmation Message 
+The module sending the message can optionally request that a confirmation 
+is returned by the TCAP module when the message has been processed. This 
+is achieved by setting the sending layer's bit in the rsp_req field, which will 
+cause a confirmation message of the same format to be returned. The status 
+field in this message is zero on success or an error code otherwise. 
+Parameter Description 
+The parameters in the following tables can be assigned default values. The 
+tables also show the initial default values (were applicable): 
+Parameter name TCPPN_CLASS 
+Default value Class 1 operation 
+ 
+Parameter name TCPPN_TIMEOUT 
+Default value 5 seconds 
+ 
+Parameter name TCPPN_QOS 
+Default value Return option not selected 
+Sequence control not required 
+Default message priority (= 2) selected 
+ 
+Parameter name TCPPN_DEST_ADDR 
+Default value Not assigned 
+ 
+Parameter name TCPPN_ORIG_ADDR 
+Default value Not assigned 
+ 
+Parameter name TCPPN_TERMINATION 
+Default value BASIC end 
+ 
+Parameter name TCPPN_PERMISSION 
+Default value 1 = responding TCAP may release the dialogue 
+Section  7 Non-Primitive Interface 
+50 
+7.7 Read TCAP Statistics Request 
+Synopsis 
+Message used to read the statistics maintained by the TCAP module. 
+Note: This message is reserved for future use. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_R_STATS (0x6792) 
+id 0 
+src 0 
+dst TCP_TASK_ID 
+rsp_req Sending layer's bit must be set 
+hclass 0 
+status 1 to reset all statistics, otherwise 0 
+err_info 0 
+len Reserved for future use 
+Parameter Area 
+Offset Size Name 
+0  Reserved for future use - set to zero 
+Description 
+The TCAP module automatically maintains a number of counters to record the 
+number of occurrences of particular protocol events. The values of the 
+counters can be read using this message. Optionally, the counters can be 
+reset to zero following the read operation. 
+If the status field is set to 1 the counters will be reset. If the counters do not 
+need to be reset, then the status field should be set to zero and the counters 
+will continue to accumulate from the current count after the read operation. 
+Confirmation Message 
+The module sending the message must set the sending layer's bit in the 
+rsp_req field to cause a confirmation message containing the statistics to be 
+returned. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+51 
+7.8 Read TCAP RAM Request 
+Synopsis 
+Message used for diagnostic purposes to return the address of the TCAP 
+modules internal data storage area. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_R_RAM (0x6790) 
+id 0 
+src Sending module ID 
+dst TCP_TASK_ID 
+rsp_req Sending layer's bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 4 
+Parameter Area 
+Offset Size Name 
+0 4 Base address of the TCAP module's global RAM structure written by the 
+TCAP module in the response message. 
+Description 
+This message is provided solely for diagnostic purposes to allow you to locate 
+the base address of the TCAP modules internal data structure. 
+Confirmation Message 
+The module sending the message must set the sending layer's bit in the 
+rsp_req field to cause a confirmation message containing the address to be 
+returned. 
+Section  7 Non-Primitive Interface 
+52 
+7.9 Read TCAP Dialogue Request 
+Synopsis 
+Message used for diagnostic purposes to return the address of the internal 
+dialogue resource structure in the TCAP module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_R_DLG (0x6791) 
+id Dialogue ID 
+src Sending module ID 
+dst TCP_TASK_ID 
+rsp_req Sending layer's bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 4 
+Parameter Area 
+Offset Size Name 
+0 4 Base address of the internal dialogue resource 
+structure written by the TCAP module in the 
+response message. 
+Description 
+This message is provided solely for diagnostic purposes to allow you to locate 
+internal data structures within the TCAP module. 
+Confirmation Message 
+The module sending the message must set the sending layer's bit in the 
+rsp_req field to cause a confirmation message containing the address to be 
+returned. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+53 
+7.10 Read TCAP Module Status Request 
+Synopsis 
+Message used to read the status of the TCAP module and its associated 
+resources. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_R_MOD_STATUS (0x6796) 
+id 0 
+src Sending module ID 
+dst TCP_TASK_ID 
+rsp_req Sending layer's bit must be set 
+class 0 
+status 0 
+err_info 0 
+len 40 
+Parameter Area 
+Offset Size Name 
+0 1 version  Must be set to zero 
+1 4 num_ic_dlg Number of active 
+incoming dialogues 
+5 4 num_og_dlg Number of active 
+outgoing dialogues 
+9 4 num_act_invokes Number of active invokes 
+13 4 num_alloc_cpt Number of allocated 
+CPTs 
+17 4 num_alloc_dbuf Number of allocated 
+DBUFs 
+21 19 Reserved for future use - set to zero 
+Section  7 Non-Primitive Interface 
+54 
+Description 
+This message allows the user to read the dialogue usage statistics for the 
+TCAP module. The user should send the message with the version initialized, 
+as shown above, and all other fields set to zero. The TCAP module 
+automatically maintains a number of counters to record the number of each 
+resource allocated. The message returned by the TCAP module will contain a 
+snapshot of the status of the module. 
+version 
+Only version zero is supported. 
+num_ic_dlg 
+The number of active incoming dialogues. These are dialogues that are 
+initiated by the remote node. 
+num_og_dlg 
+The number of active outgoing dialogues. These are dialogues that are 
+initiated by the local node. 
+num_act_invokes  
+The number of active invokes. An invoke structure is stored for each invoke 
+sent and is not required for incoming invokes. 
+num_alloc_cpt 
+The number of allocated component structures. These are used temporarily 
+for pending component requests until an appropriate dialogue request is 
+received. 
+num_alloc_dbuf 
+The number of allocated dialogue buffers. These are used temporarily for 
+building dialogue request messages from pending components. 
+Confirmation Message 
+The module sending the message must set the sending layer's bit in the 
+rsp_req field to cause a confirmation message containing the statistics to be 
+returned. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+55 
+7.11 Read TCAP Dialogue Status Request 
+Synopsis 
+Message used to read the status of an individual dialogue in the TCAP 
+module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_R_DLG_STATUS (0x6797) 
+id Dialogue ID 
+src Sending module ID 
+dst TCP_TASK_ID 
+rsp_req Sending layer's bit must be set 
+class 0 
+status 0 
+err_info 0 
+len 40 
+Parameter Area 
+Offset Size Name 
+0 1 version Must be set to zero. 
+1 1 DHA_state Dialogue handler state 
+2 1 TSM_state Dialogue transaction state 
+machinestate 
+3 1 DLG_state Dialogue control structure state 
+4 4 num_invokes Number of active invokes in 
+dialogue 
+8 4 ltid Local transaction ID 
+12 4 rtid Remote transaction ID 
+16 24 Reserved for future use - set to zero 
+Section  7 Non-Primitive Interface 
+56 
+Description 
+This message allows the user to read the state of an individual dialogue 
+within the TCAP module. The message should be issued by the user with the 
+version initialized as shown above, including setting the dialogue ID in the 
+message header ID field. All other fields should be set to zero. The message 
+returned by the TCAP module will contain the appropriate information. 
+Version 
+Only version zero supported. 
+DHA_state 
+Dialogue handler state.  
+See the TCAP specifications for details of the meaning of the states (Q.773). 
+State Value 
+DHA _S_IDLE 0 
+DHA _S_INIT_RXD 1 
+DHA _S_INIT_SENT  2 
+DHA _S_ACTIVE 3 
+TSM_state 
+Dialogue transaction state machine state.  
+See the TCAP specifications for details of the meaning of the states (Q.773). 
+State Value 
+TSM_S_IDLE 0 
+TSM_S_INIT_RXD 1 
+TSM_S_INIT_SENT  2 
+TSM_S_ACTIVE 3 
+DLG_state 
+Main dialogue control structure state.  
+The value of this state variable shows if the dialogue is in use. The dialogue is 
+in the DLG_CPT_PENDING state while accumulating components at the start 
+of a dialogue. The DLG_S_DHA_ACTIVE state shows that the dialogue is fully 
+active and the DLG_S_PENDING_ISM state indicates that the dialogue is 
+waiting for invoke state machines to finish. 
+State Value 
+DLG_S_FREE 0 
+DLG_S_CPT_PENDING 1 
+DLG_S_DHA_ACTIVE 2 
+DLG_S_PENDING_ISM 3 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+57 
+num_cpts 
+The number of active components in the dialogue 
+ltid 
+Local transaction ID for associated the dialogue 
+rtid 
+Remote transaction ID for associated the dialogue 
+Confirmation Message 
+The module sending the message must set the sending layer's bit in the 
+rsp_req field to cause a confirmation message containing the statistics to be 
+returned. 
+7.12 Maintenance Event Indication 
+Synopsis 
+Message used by TCAP to indicate a protocol-related event to the local 
+maintenance module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_MAINT_IND (0x07a1) 
+id See Maintenance Event Code on page 58 
+src TCP_TASK_ID 
+dst Maintenance module ID (maint_id) 
+rsp_req Sending layer's bit must be set 
+hclass 0 
+status Maintenance event code (see Maintenance Event Code on page 58) 
+err_info 0 
+len 0 
+Description 
+This message is used by TCAP to indicate a protocol-related event to the 
+maintenance module. 
+Section  7 Non-Primitive Interface 
+58 
+Maintenance Event Code 
+The Maintenance event code contained in the status field of the message 
+indicates the type of event. Possible values are listed in the following table 
+which also lists the meaning of the ID field in each case: 
+Mnemonic Code ID Description 
+TCPEV_CPT_REQ_DISCARD 1 dialogue_ID The component request primitive 
+has been discarded due to: bad 
+format, inappropriate state or lack of 
+internal resources. 
+TCPEV_DLG_REQ_DISCARD 2 dialogue_ID The dialogue request primitive has 
+been discarded due to: bad format, 
+inappropriate state or lack of internal 
+resources. 
+TCPEV_DATA_LEN_ERR 3 dialogue_ID The message has been discarded 
+due to exceeding the maximum 
+length for user data. 
+TCPEV_UNREC_TYPE 4 0 An unrecognized TCAP message 
+type has been received. 
+TCPEV_UNREC_TID 5 0 A message received relating to an 
+unknown local transaction ID. 
+TCPEV_SYNTAX_ERR 6 0 There is a syntax error in the 
+transaction portion of the received 
+message. 
+TCPEV_BAD_REJ_RXD 7 dialogue_ID A badly formatted reject component 
+has been received. 
+TCPEV_DLG_TIM_TIMEOUT 8 dialogue_ID The timer on the dialogue has 
+expired. 
+7.13 Software Event Indication 
+Synopsis 
+Message used by TCAP to indicate an implementation-specific software- 
+related event to the local management module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_ERROR_IND (0x07a2) 
+id See  Software Event Codeon page 59 
+src TCP_TASK_ID 
+dst Management module ID (mngt_id) 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Software event code (see Software Event Code on page 59) 
+err_info 0 
+len 0 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+59 
+Description 
+This message is issued by the TCAP module to notify system management of 
+various software events which, under normal operating conditions, should not 
+occur. These events may be due to lack of system resources or errors within 
+the software. 
+Software Event Code 
+The Software event code contained in the status field of the message 
+indicates the type of event. Possible values are listed in the following table 
+which also lists the meaning of the ID field in each case. 
+Mnemonic Code ID Description 
+TCPSWE_NO_TCPT 1 0 Internal component resources 
+have been exhausted. 
+TCPSWE_NO_TISM 2 0 The maximum number of active 
+invocations has been exceeded. 
+TCPSWE_NO_DLG 3 0 There is no internal resource to 
+handle dialogue. 
+TCPSWE_NO_TCPM 4 0 The internal pool of structured 
+messages is exhausted. 
+TCPSWE_TCPM_LOW 5 0 The internal pool of structured 
+messages is running low. 
+TCPSWE_BAD_MSG 6 message 
+type An unrecognized inter-task message has been received. 
+TCPSWE_TX_FMT_ERR 7 0 An internal error occurred during 
+message formatting. 
+TCPSWE_ISM_ERR 8 0 An internal error occurred in the 
+invocation state machine. 
+TCPSWE_BAD_NSAP_FMT 9 0 A badly formatted message was 
+received from network layer. 
+TCPSWE_DBUF_LOW 10 0 TCAP is running short of 
+resources to accumulate 
+components. 
+TCPSWE_NO_DBUF 11 0 No more resources are available 
+to accumulate component 
+requests 
+TCPSWE_DBUF_ABMT 12 0 The number of resources 
+available for component 
+accumulation has recovered. 
+TCPSWE_HA_SYNC_LOST 13 0 TCP_MSG_HA_SYNC messages 
+received before 
+TCP_MSG_CONFIG have been 
+discarded 
+TCPSWE_HA_SYNC_UNEXPECTED 14 0 Unexpected 
+TCP_MSG_HA_SYNC have been 
+received 
+Note: The TCAP will send this 
+message once even if several HA 
+sync messages were previously 
+received. 
+Section  7 Non-Primitive Interface 
+60 
+7.14 TCAP Dialogue Discard Indication 
+Synopsis 
+If a dialogue request message is discarded by the TCAP module the following 
+message is used to send useful information to the TCAP management 
+module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_DIS_DLG_IND (0x07a3) 
+id 0 
+src TCAP_TASK_ID 
+dst Management module ID (mngt_id) 
+rsp_req 0 
+hclass 0 
+status Message discard code (Message Discard Code on page 61) 
+err_info 0 
+len length of discarded message 
+Parameter Area 
+Offset Size Name 
+0 len Trace of discarded message 
+Description 
+The parameter area of the message contains the parameter area of the 
+message that has been discarded. The status field shows the message discard 
+code that indicates the reason the message was discarded. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+61 
+Message Discard Code 
+The message discard event code contained in the status field of the message 
+indicates the reason for the discard of the dialogue or component message. 
+Possible values are listed in the following table: 
+Mnemonic Code Description 
+TCPPD_UNREC_ID 1 Dialogue ID is not in configured range 
+TCPPD_INACTIVE_DLG 2 Specified dialogue is inactive 
+TCPPD_BAD_FORMAT 3 Primitive request formatted incorrectly 
+TCPPD_UNEX_PRIM 4 Primitive request not allowed in current state 
+TCPPD_INVALID_PRO 5 Primitive request not allowed by protocol rules 
+TCPPD_INTERNAL_FAIL 6 Internal failure 
+TCPPD_INVALID_REQ_TYPE 7 Component or Dialogue primitive type is invalid 
+TCPPD_CPT_SYNTAX_ERR 8 Syntax error (e.g. missing ASN parameter) 
+TCPPD_CPT_ENCODE_ERR 9 Encoding error (e.g. bad length) 
+TCPPD_CPT_UNREC_TYPE 10 Unrecognized ASN type in context 
+TCPPD_CPT_MISSING_PARAM 11 Missing mandatory parameter 
+7.15 TCAP Component Discard Indication 
+Synopsis 
+If a component request message is discarded by the TCAP module, the 
+following message is used to send useful information to the TCAP 
+management module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_DIS_CPT_IND (0x07a4) 
+id 0 
+src TCAP_TASK_ID 
+dst Management module ID (mngt_id) 
+rsp_req 0 
+hclass 0 
+status Message discard code  
+(See table of codes in TCP_MSG_DIS_ DLG_IND message definition) 
+err_info 0 
+len length of discarded message 
+Parameter Area 
+Offset Size Name 
+0 len Message Trace of discarded message 
+Section  7 Non-Primitive Interface 
+62 
+Description 
+The parameter area of the message contains the parameter area of the 
+message that has been discarded. The status field shows the message discard 
+code which indicates the reason that the message was discarded. 
+7.16 Read Revision Request 
+Synopsis 
+Message used to request the module type and software revision number. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type GEN_MSG_MOD_IDENT (0x6111) 
+id 0 
+src Originating module ID 
+dst TCAP_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 28 
+Parameter Area 
+Offset Size Name  
+0 2 type Currently undefined 
+2 1 maj_rev  Major version number 
+3 1 min_rev  Minor version number 
+4 24 text  Null terminated string giving textual module identity 
+Description 
+This message is used to request a reply providing the software version for 
+module under test. The parameter areas are filled in by the TCAP module and 
+do not need to be included by the user. On receipt of this request, the module 
+returns the message with a status of "SUCCESS" to the sender, including the 
+information requested. 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+63 
+7.17 Management Event Indication 
+Synopsis 
+This message is issued by the TCAP module to notify system management of 
+general software events that, under normal operating conditions, should not 
+occur. These events may be due to a lack of system resources or errors 
+within the software. 
+Message Format 
+Message Header  
+Field Name Meaning 
+type MGT_MSG_EVENT_IND (0x0008) 
+id 0 
+src TCAP_TASK_ID 
+dst Management module ID (mngt_id) 
+rsp_req 0 
+hclass 0 
+status Management event code (see Management 
+Event Code below) 
+err_info Time-stamp 
+reserved 0 
+len 0 
+Management Event Code 
+The Management event code contained in the status field of the message 
+indicates the type of event.  Possible values are listed in the following table 
+which also lists the meaning of the ID field in each case. 
+Mnemonic Value ID Description  
+ERR_SDLSIG_LOW 47 0x2f 0 The internal signal queue is running 
+short of entries. If this fault persists 
+the software should be re-built with 
+more signals allocated to the signal 
+queue. 
+ERR_NO_SDLSIG 46 0x2e 0 The internal signal queue has been 
+exhausted. If this event occurs then 
+correct operation of the module is 
+not guaranteed. 
+Section  7 Non-Primitive Interface 
+64 
+7.18 Set Trace Mask Request 
+Synopsis 
+Message sent to TCAP to trace primitives exchanged between TCAP and the 
+TC-User and/or SCCP. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_TRACE_MASK (0x5795) 
+id 0 
+src Sending module ID 
+dst TCP_TASK_ID (0x14) 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 12 
+Parameter Area 
+Offset Size Name 
+0 4 op_evt_mask 
+4 4 ip_evt_mask 
+8 4 mng_evt_mask 
+This message causes a copy of transmit or receive TCAP primitives to be 
+taken and sent to the mngt_id specified in the TCAP Configuration request, 
+facilitating the examination of the raw transaction messages for diagnostic 
+purposes. The format of the traced data is given in the section ‘Trace Event 
+Indication’. 
+The events traced are specified by setting bits in the three event masks, as 
+shown below. In each case, bit 0 is the least significant bit: 
+op_evt_mask 
+• bit 0 Trace all Dialogue Indications to the TC-User 
+• bit 1 Trace all Component Indications to the TC-User 
+• bit 2 Trace all UDT Request sent by TCAP to SCCP 
+• all other bits must be set to zero 
+ip_evt_mask 
+• bit 0 Trace all Dialogue Requests from the TC-User 
+• bit 1 Trace all Component Request from the TC-User 
+• bit 2 Trace all UDT Indications received from SCCP 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+65 
+• bit 3 Trace all UDTS Indications received from SCCP 
+• all other bits must be set to zero 
+mgmt_evt_mask 
+None currently defined, all bits must be set to zero. 
+7.19 Trace Event Indication 
+Synopsis 
+The TCAP module may be configured to report to management primitives 
+exchanged with the TC-User and SCCP. This is useful for trace and debug 
+purposes. Tracing is enabled by specifying individual bits in trace masks in 
+the set trace masks request message issued to TCAP. The traced primitives 
+are reported as event indications as shown below: 
+Message Format 
+Message Header 
+Field Name Meaning 
+type MGT_MSG_TRACE_EV (0x0003) 
+id 0 
+src TCP_TASK_ID (0x14) 
+dst Management module ID (mgmt_id) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 18 + length of traced data 
+Parameter Area 
+Offset Size Name 
+0 1 source module ID 
+1 1 destination module ID 
+2 2 id 
+4 2 type 
+6 2 status 
+8 4 timestamp 
+12 4 pointer to the message being traced 
+16 2 data length 
+18 0 .. 280 data – Data taken from the MSG parameter area. 
+Section  7 Non-Primitive Interface 
+66 
+7.20 Module Reset Request 
+Synopsis 
+This message returns the TCAP module to an un-configured state and allows 
+a new SCCP Configure Module Request to be sent with new parameters. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TCP_MSG_RESET (0x7768) 
+id 0 
+src Sending module ID 
+dst TCP_TASK_ID  
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+Description 
+This message enables the configuration parameters set at run-time in the 
+TCP_MSG_CONFIG to be changed without requiring a restart of gctload. 
+ 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+67 
+Appendix A 
+A.1 Timer Services 
+The notion of time in the TCAP module is based on a periodic timer tick 
+received from every 100ms. This ‘tick’ is used to run all TCAP protocol timers. 
+This appendix details the messages that are used by the TCAP module to 
+control timer services. 
+A.2 Keep Time 
+Synopsis 
+This message is issued by TCAP to request the timer module to issue a 
+periodic timer tick (TM_EXP) message to the TCAP module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type KEEP_TIME (0x7006) 
+id 0 
+src TCAP module ID (TCP_TASK_ID) 
+dst Timer module ID (0x00) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 6 
+Parameter Area 
+Offset Size Name 
+0 4 Reserved, should be set to zero if issued by the user and are discarded 
+when received by the timer module 
+4 2 Resolution 
+Parameter Description 
+resolution 
+The number of operating system ticks between timer expiry messages being 
+issued to the TCAP module. This parameter is set from the timer_res 
+parameter in the TCAP module configuration message. 
+Appendix A 
+68 
+A.3 Timer Expiry 
+Synopsis 
+Periodic timer tick message issued by the timer module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TM_EXP (0xc002) 
+id index of timer in table 
+src Timer module ID (0x00) 
+dst TCAP module ID (TCP_TASK_ID) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 4 
+Parameter Area 
+Offset Size Name 
+0 4 reserved – must be set to zero 
+ 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+69 
+Appendix B 
+B.1 Message Type Reference 
+The following table provides a reference of all the message types used by the 
+TCAP module. 
+Value Mnemonic Description 
+0x07a1 TCP_MSG_MAINT_IND Maintenance event indication 
+0x07a2 TCP_MSG_ERROR_IND Software event indication 
+0x07a3 TCP_MSG_DIS_DLG_IND TCAP Dialogue Discard Indication 
+0x07a4 TCP_MSG_DIS_CPT_IND TCAP Component Discard Indication 
+0x2790  Confirmation to TCP_MSG_R_RAM (0x6790) 
+0x2791  Confirmation to TCP_MSG_R_DLG (0x6791) 
+0x2792  Confirmation to TCP_MSG_R_STATS (0x6792) 
+0x2796  Confirmation to TCP_MSG_R_MOD_STATUS (0x6796) 
+0x2797  Confirmation to TCP_MSG_R_DLG_STATUS (0x6797) 
+0x3780  Confirmation to TCP_MSG_CONFIG (0x7780) 
+0x3781  Confirmation to TCP_MSG_DEF_PARAM (0x7781) 
+0x3785  Confirmation to TCP_MSG_CNF_DGRP (0x7785) 
+0x5793 TCP_MSG_S_TCU_ID Set local TC-User/sub-system module ID 
+0x5794 TCP_MSG_S_TCI_ID Set TC-Instance 
+0x5795 TCP_MSG_TRACE_MASK Set TCAP trace mask 
+0x6790 TCP_MSG_R_RAM Read address of internal ram structure (debug) 
+0x6791 TCP_MSG_R_DLG Read dialogue address (debug only) 
+0x6792 TCP_MSG_R_STATS Read global statistics 
+0x6796 TCP_MSG_R_MOD_STATUS Read module resource status 
+0x6797 TCP_MSG_R_DLG_STATUS Read dialogue resource status 
+0x7006 KEEP_TIME Request timer services from TCAP 
+0x7780 TCP_MSG_CONFIG Module configuration message 
+0x7781 TCP_MSG_DEF_PARAM Set default parameters 
+0x7785 TCP_MSG_CNF_DGRP Configure dialogue ID group 
+0x7786 TCP_MSG_RESET Module Reset 
+0x7787 TCP_MSG_NC_CONFIG TCAP Configure NC Request 
+0x8002  Confirmation to TM_EXP (0xc002) 
+0x8740  Confirmation to SCP_MSG_TX_REQ (0xc740) 
+0x8741  Confirmation to SCP_MSG_RX_IND (0xc741) 
+0x8744  Confirmation to SCP_MSG_SCMG_REQ (0xc744) 
+0x8745 SCP_MSG_SCMG_IND SCCP management indication to TC-User 
+0x8781  Confirmation to TCP_MSG_CPT_REQ (0xc781) 
+Appendix B 
+70 
+Value Mnemonic Description 
+0x8782 TCP_MSG_CPT_IND Component indication from TCAP 
+0x8783  Confirmation to TCP_MSG_DLG_REQ (0xc783) 
+0x8784 TCP_MSG_DLG_IND Dialogue indication to TC-user 
+0xc002 TM_EXP Timer expiry (tick) to TCAP 
+0xc740 SCP_MSG_TX_REQ Transmit request from TCAP to SCCP 
+0xc741 SCP_MSG_RX_IND Receive indication from SCCP to TCAP 
+0xc744 SCP_MSG_SCMG_REQ SCCP management request from User 
+0xc781 TCP_MSG_CPT_REQ Component request from TC-User 
+0xc783 TCP_MSG_DLG_REQ Dialogue request from TC-User 
+Note: If a confirmation to a request message is required, the message type of the 
+confirmation message will correspond to the request message but instead bit 14 
+of the message type will be set to 0.  For example, the confirmation to the TCAP 
+module configuration message, 0x7780 will be received by the application as 
+message type 0x3780. 
+ 
+ 
+Dialogic® SS7 Protocols TCAP Programmer's Manual Issue 10 
+71 
+Index 
+A 
+Abbreviations, 7 
+C 
+Constant definitions, 12 
+D 
+Dialogue ID 
+Assignment, 10 
+Groups, 11 
+Document 
+Introduction, 7 
+Overview, 7 
+F 
+Features, 8 
+I 
+Interface to network layer, 15 
+Interface to TC-user, 17 
+Component primitive types, 19 
+Dialogue primitive types, 20 
+Multiple applications, 17 
+Primitive parameters, 18 
+K 
+Keep Time, 67 
+L 
+Local transaction ID format, 11 
+M 
+Management interface, 35 
+Message type reference, 69 
+Module 
+Configuration, 10 
+Overview, 9 
+Module, 9 
+N 
+Non-primitive interface, 37 
+Configure Dialogue Group Request, 44 
+Configure NC Request, 43 
+Configure TC-Instance Request, 47 
+Configure TC-User Request, 46 
+Maintenance Event Indication, 57 
+Management Event Indication, 63 
+Module Reset Request, 66 
+Read Revision Request, 62 
+Read TCAP Dialogue Request, 52 
+Read TCAP Dialogue Status Request, 55 
+Read TCAP Module Status Request, 53 
+Read TCAP RAM Request, 51 
+Read TCAP Statistics Request, 50 
+Set Trace Mask Request, 64 
+Software Event Indication, 58 
+TCAP Component Discard Indication, 61 
+TCAP Configuration Request, 37 
+TCAP Dialogue Discard Indication, 60 
+TCAP Set Default Parameters Request, 48 
+Trace Event Indication, 65 
+R 
+Related documentation, 7 
+Revision history, 5 
+S 
+System services 
+Interfaces to, 13 
+System functions, 13 
+Timer operation, 13 
+T 
+TC-COMPONENT-INDICATION, 24 
+TC-COMPONENT-REQUEST, 21 
+TC-DIALOGUE-INDICATION, 32 
+TC-DIALOGUE-REQUEST, 26 
+Timer Expiry, 68 
+Timer Services, 67 
+ 
+ 
+ 
+ 
+ 
