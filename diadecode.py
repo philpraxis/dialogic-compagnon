@@ -5,6 +5,12 @@ diadecode.py
 
 Created by Philippe Langlois on 2009-11-11.
 Copyright (c) 2009 P1 Security. All rights reserved.
+
+Issues / TODO / Questions:
+* Currently, the IS41 PDF is password protected and I canot copy/paste from it. :(
+   There will be no support for IS41 messages decoding ;-)
+* Will Dialogic like this project?
+* Will SS7 developpers use this project?
 """
 
 import sys
@@ -21,6 +27,29 @@ class Usage(Exception):
 	def __init__(self, msg):
 		self.msg = msg
 
+class message_definition(object):
+   """docstring for message_definition"""
+   def __init__(self, msg_type):
+      super(message_definition, self).__init__()
+      self.msg_type = msg_type
+      self.db = ""
+      self.db_content = ""
+      self.definition_start_index = -1
+      self.offset_size_index = -1
+
+   def decompose(self, param):
+      """docstring for decompose"""
+      print "decompose(%s)" % param
+      ahead_index = self.offset_size_index + 1
+      while self.db_content[ahead_index].strip() != "Description":
+         #print "Offset + description: %s" % self.db_content[ahead_index].strip()
+         x = self.db_content[ahead_index].strip().split(' ')
+         p_offset = int(x[0]) * 2
+         p_size = int(x[1]) * 2
+         ahead_index += 1
+         print " %s[]= 0x%s \t (%s)" % ( x[2], param[p_offset : p_offset + p_size ], ' '.join(x[2:]))
+
+
 class db(object):
    """Class that stores the Definition DB of Dialogic documents.
    The Definition DB are cut and paste directly from the PDF into XXX.db file.
@@ -30,11 +59,11 @@ class db(object):
       super(db, self).__init__()
       self.list = glob.glob("*.db")
       self.contents = {}
-      
-   def find_msg(self, msg_type):
-      """docstring for db_find_msg"""
+   
+   def find_definition(self, msg_type):
+      """docstring for find_definition"""
       for db in self.list:
-         if self.debug: print db
+         #if self.debug: print db
          content = open(db).readlines()
 
          self.contents[db] = content            # Cache the read content so that we can accelerate access later
@@ -42,19 +71,36 @@ class db(object):
          for index,line in enumerate(content):
             # print line
             if "(0x%s)"%msg_type in line:
-               print line
+               # print line
                if line.split(' ')[0] == "type":
                   print "Found definition: %s in %s" % (line, db)
-                  if  "FIELD NAME MEANING" in content[index-1]:
-                     print "This is a name-list definition"
+                  # if  "FIELD NAME MEANING" in content[index-1]:
+                  #    print "This is a name-list definition"
+                  # else:
+                  #    print "This is possible a position definition: %s" % content[index-1]
+
+                  # XXX fill msg_def
+                  msg_def = message_definition(msg_type)
+                  msg_def.db = db
+                  msg_def.db_content = content
+                  msg_def.definition_start_index = index
+                  
+                  ahead_index = index
+                  while "Parameter Area".lower() not in content[ahead_index].lower():
+                     print "Field description: %s" % content[ahead_index].strip()
+                     ahead_index += 1
+                  # while "Description" not in content[ahead_index]
+                  if "Offset Size Name".lower() in content[ahead_index+1].lower():
+                     ahead_index += 1
+                     msg_def.offset_size_index = ahead_index
+                     return msg_def
                   else:
-                     print "This is possible a position definition: %s" % content[index-1]
-                  return
+                     return False
 
 
 class Message(object):
    """Process Messages from Dialogic stack"""
-   def __init__(self, message, arg_debug=False):
+   def __init__(self, message, arg_debug=True):
       super(Message, self).__init__()
       if arg_debug == True:
          self.debug = True
@@ -82,25 +128,25 @@ class Message(object):
    #    """docstring for db_list"""
    #    self.db = glob.glob("*.db")
    
-   def db_find_msg(self, msg_type = False):
-      """docstring for db_find_msg"""
-      if msg_type == False:
-         msg_type = self.elements['t']
-
-      for db in self.db.list:
-         if self.debug: print db
-         content = open(db).readlines()
-         for index,line in enumerate(content):
-            # print line
-            if "(0x%s)"%msg_type in line:
-               print line
-               if line.split(' ')[0] == "type":
-                  print "Found definition: %s in %s" % (line, db)
-                  if  "FIELD NAME MEANING" in content[index-1]:
-                     print "This is a name-list definition"
-                  else:
-                     print "This is possible a position definition: %s" % content[index-1]
-                  return
+   # def db_find_msg(self, msg_type = False):
+   #    """docstring for db_find_msg"""
+   #    if msg_type == False:
+   #       msg_type = self.elements['t']
+   # 
+   #    for db in self.db.list:
+   #       if self.debug: print db
+   #       content = open(db).readlines()
+   #       for index,line in enumerate(content):
+   #          # print line
+   #          if "(0x%s)"%msg_type in line:
+   #             print line
+   #             if line.split(' ')[0] == "type":
+   #                print "Found definition: %s in %s" % (line, db)
+   #                if  "FIELD NAME MEANING" in content[index-1]:
+   #                   print "This is a name-list definition"
+   #                else:
+   #                   print "This is possible a position definition: %s" % content[index-1]
+   #                return
 
 def main(argv=None):
 	if argv is None:
@@ -128,11 +174,11 @@ def main(argv=None):
 		print >> sys.stderr, "\t for help use --help"
 		return 2
 
-	# Do stuff here?
-	print "Payload:" + message
-	msg.db_find_msg()
-	print "NEW>>>>>"
-	msg.db.find_msg(msg.elements['t'])
+   # print "Payload:" + message
+   # msg.db_find_msg()
+	msg_def = msg.db.find_definition(msg.elements['t'])
+	if msg_def != False:
+	   msg_def.decompose(msg.elements['p'])
 
 if __name__ == "__main__":
 	sys.exit(main())
