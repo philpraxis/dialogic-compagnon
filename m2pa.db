@@ -1,0 +1,1788 @@
+ www.dialogic.com 
+Dialogic® SS7 Protocols 
+M2PA Programmer’s Manual
+2 
+Copyright© 2004-2007 Dialogic Corporation. All Rights Reserved. You may not reproduce this document in 
+whole or in part without permission in writing from Dialogic Corporation. 
+All contents of this document are furnished for informational use only and are subject to change without notice and do not represent a commitment on the part 
+of Dialogic Corporation or its subsidiaries (“Dialogic”). Reasonable effort is made to ensure the accuracy of the information contained in the document. 
+However, Dialogic does not warrant the accuracy of this information and cannot accept responsibility for errors, inaccuracies or omissions that may be 
+contained in this document. 
+INFORMATION IN THIS DOCUMENT IS PROVIDED IN CONNECTION WITH DIALOGIC® PRODUCTS. NO LICENSE, EXPRESS OR IMPLIED, 
+BY ESTOPPEL OR OTHERWISE, TO ANY INTELLECTUAL PROPERTY RIGHTS IS GRANTED BY THIS DOCUMENT. EXCEPT AS PROVIDED 
+IN A SIGNED AGREEMENT BETWEEN YOU AND DIALOGIC, DIALOGIC ASSUMES NO LIABILITY WHATSOEVER, AND DIALOGIC 
+DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTY, RELATING TO SALE AND/OR USE OF DIALOGIC PRODUCTS INCLUDING LIABILITY 
+OR WARRANTIES RELATING TO FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR INFRINGEMENT OF ANY 
+INTELLECTUAL PROPERTY RIGHT OF A THIRD PARTY. 
+Dialogic products are not intended for use in medical, life saving, life sustaining, critical control or safety systems, or in nuclear facility applications. 
+It is possible that the use or implementation of any one of the concepts, applications, or ideas described in this document, in marketing collateral produced by 
+or on web pages maintained by Dialogic may infringe one or more patents or other intellectual property rights owned by third parties. Dialogic does not 
+provide any intellectual property licenses with the sale of Dialogic products other than a license to use such product in accordance with intellectual property 
+owned or validly licensed by Dialogic and no such licenses are provided except pursuant to a signed agreement with Dialogic. More detailed information 
+about such intellectual property is available from Dialogic’s legal department at 9800 Cavendish Blvd., 5th Floor, Montreal, Quebec, Canada H4M 2V9. 
+Dialogic encourages all users of its products to procure all necessary intellectual property licenses required to implement any concepts or 
+applications and does not condone or encourage any intellectual property infringement and disclaims any responsibility related thereto. These 
+intellectual property licenses may differ from country to country and it is the responsibility of those who develop the concepts or applications to be 
+aware of and comply with different national license requirements. 
+Dialogic is a registered trademark of Dialogic Corporation. Dialogic's trademarks may be used publicly only with permission from Dialogic. Such permission 
+may only be granted by Dialogic’s legal department at 9800 Cavendish Blvd., 5th Floor, Montreal, Quebec, Canada H4M 2V9. Any authorized use of 
+Dialogic's trademarks will be subject to full respect of the trademark guidelines published by Dialogic from time to time and any use of Dialogic’s trademarks 
+requires proper acknowledgement. 
+The names of actual companies and products mentioned herein are the trademarks of their respective owners. 
+Publication Date: August 2007 
+Document Number: 05-2407-002, Issue 3
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3 
+Contents 
+1 Introduction.............................................................................................................5 
+1.1 Related Documentation.......................................................................................5 
+2 Functional Overview.................................................................................................6 
+2.1 M2PA Module Overview........................................................................................6 
+2.2 Feature Overview................................................................................................6 
+2.3 General Description.............................................................................................7 
+3 Message Reference...................................................................................................8 
+3.1 Protocol Requests from M2PA to SCTP...................................................................8 
+3.1.1 SCTP_MSG_ACTIVATE – SCTP Activate Association Request...........................9 
+3.1.2 SCTP_MSG_SHUTDOWN – SCTP Shutdown Association Request....................10 
+3.1.3 SCTP_MSG_ABORT – SCTP Abort Association Request..................................11 
+3.1.4 SCTP_MSG_TX_REQ – SCTP Data Transfer Request.....................................12 
+3.2 Protocol Indications from SCTP to M2PA................................................................13 
+3.2.1 SCTP_MSG_STATUS_CHANGE – STCP Association Status Change..................14 
+3.2.2 SCTP_MSG_RX_IND – STCP Association Data Transfer Indication..................15 
+3.2.3 SCTP_MSG_NETWORK_STATUS – STCP Association Network Status...............16 
+3.2.4 SCTP_MSG_CONG_STATUS – STCP Association Congestion Status.................17 
+3.3 Protocol Requests from MTP3 to M2PA..................................................................18 
+3.3.1 API_MSG_TX_REQ – Message for Transmission Request...............................19 
+3.3.2 SS7_MSG_START – M2PA Link Start Request..............................................20 
+3.3.3 SS7_MSG_STOP – M2PA Link Stop Request................................................21 
+3.3.4 SS7_MSG_EMGCY – M2PA Set Emergency Request.....................................22 
+3.3.5 SS7_MSG_EMGCY_CLRD – M2PA Cancel Emergency Request........................22 
+3.3.6 SS7_MSG_RTV_BSNT – M2PA BSNT Retrieval Request.................................23 
+3.3.7 SS7_MSG_RTVL_REQ – M2PA Retrieval Request..........................................24 
+3.3.8 SS7_MSG_LOC_PR_OUT – M2PA LPO Request............................................25 
+3.3.9 SS7_MSG_LOC_PR_OK – MTP2 LPO Recovered Request...............................25 
+3.4 Protocol Indications from M2PA to MTP3................................................................26 
+3.4.1 API_MSG_RX_IND – Received Message Indication.......................................27 
+3.4.2 SS7_MSG_IN_SVC – M2PA In Service Indication.........................................28 
+3.4.3 SS7_MSG_OUT_SVC – M2PA Out of Service Indication.................................29 
+3.4.4 SS7_MSG_REM_PR_OUT – M2PA RPO Indication.........................................29 
+3.4.5 SS7_MSG_REM_PR_OK – M2PA RPO Cleared Indication...............................30 
+3.4.6 SS7_MSG_RXD_BSNT – M2PA BSNT Indication...........................................31 
+3.4.7 API_MSG_RTVD_MSG – M2PA Retrieved Message Indication.........................32 
+3.4.8 SS7_MSG_RTVL_COMPL – M2PA Retrieval Complete Indication.....................33 
+3.4.9 MTP_MSG_RTVL_NOT_POS – M2PA Retrieval Failure Indication.....................34 
+3.4.10 MTP_MSG_LINK_CONG – M2PA Link Congested Indication............................35 
+3.4.11 MTP_MSG_LINK_UNCONG – M2PA Congestion Cleared Indication..................36 
+3.4.12 MTP_MSG_FLUSH_ACK – M2PA Flush Acknowledgement Indication................37 
+4 Non-Primitive Interface...........................................................................................38 
+4.1 Confirmation Message Status Values....................................................................38 
+4.2 Non-Primitive Interface Messages........................................................................38 
+4.2.1 M2P_MSG_CONFIG – Configure M2PA Module.............................................39 
+4.2.2 M2P_MSG_CNF_LINK – M2PA Link Configuration Request.............................40 
+4.2.3 M2P_MSG_END_LINK – M2PA Link End Request..........................................42 
+4.2.4 M2P_MSG_TRACE_MASK – TRACE MASK Set Request..................................43 
+4.2.5 M2P_MSG_R_STATE – READ STATE Read Request.......................................45 
+4.2.6 M2P_MSG_R_STATS – READ STATISTICS Read Request...............................47 
+4.2.7 M2P_MGT_MSG_EVENT_IND – EVENT Indication.........................................49 
+4.2.8 M2P_MSG_ERROR_IND – ERROR Indication................................................50 
+4.2.9 M2P_MGT_MSG_LINK_STATE – M2PA Link STATE Indication.........................51 
+5 Typical Configuration Values....................................................................................52 
+6 Message Types.........................................................................................................53 
+6.1 Message Type Table...........................................................................................53 
+7 Timer Serivces.........................................................................................................54 
+7.1 Introduction......................................................................................................54 
+7.1.1 KEEP_TIME – Keep Time..........................................................................54
+4 
+Contents 
+7.1.2 TM_EXP – Timer Expiry............................................................................55 
+A Network Address Representation.............................................................................56 
+A.1 Network Address Structure for an Invalid Address..................................................56 
+A.2 Network Address Structure for Internet Protocol Version 4.......................................56 
+Glossary...................................................................................................................57 
+Index...............................................................................................................................58 
+Tables 
+1 Typical Configuration Values.......................................................................................52 
+2 Message Types.........................................................................................................53 
+Revision History 
+Note: The latest released issue of this guide can be found at: 
+http://www.dialogic.com/support/helpweb/signaling 
+Date Part No. Issue No. Description of Changes 
+18-Apr-07 05-2407-002 3 
+Changed to Dialogic format. 
+Updated the parameters in Section4.2.4, “M2P_MSG_TRACE_MASK” on 
+page43. 
+Supports configuration of the RFC version and a per link option for the 
+support of Draft Version 9. 
+This manual is applicable to M2PA Software Core V1.04 or later. 
+14-Apr-05 05-2407-001 2 Supports the production release of MP2A software core revision V1.02. Updated the Event Codes table in Section4.2.7 
+M2P_MGT_MSG_EVENT_IND - EVENT Indication. 
+17-Dec-04 05-2407-001-01 1 Applicable to MP2A software core revision V1.01. 
+5 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+Chapter 1:  Introduction 
+The M2PA module is an implementation of the IETF SIGTRAN, SS7 MTP2-User Peer-to-Peer Adaptation Layer 
+(M2PA). This Programmer's Manual is intended for users developing their own application programs that 
+interface with or use the functionality offered by the M2PA module. 
+The module uses the services offered by the Stream Control Transmission Protocol (SCTP) to exchange 
+signaling messages with remote signaling points. It supports a number of links, each separately configurable 
+allowing the user flexibility in configuring the module. 
+The M2PA module is intended to be used in conjunction with the Dialogic® SS7 Protocols SCTP and MTP3 
+modules, either on hardware platforms from Dialogic or on user-supplied hardware. However, the software is 
+portable and the well-defined interface of the module allows it to be used with alternative SCTP and MTP3 
+implementations as required. 
+This manual provides an overview of the operation of the M2PA module, defines the structure of all messages 
+that can be sent to, or issued by, the module and describes all configuration parameters. 
+1.1 Related Documentation 
+The following documents provide information that is related to the information in this manual: 
+•IETF Internet draft SS7 MTP2-User Peer-to-Peer Adaptation Layer 
+•IETF RFC 2960 Stream Control Transmission Protocol 
+•SCTP Programmer's Manual 
+•Software Environment Programmer's Manual 
+•SS7 Programmer's Manual for SigTran Host Software 
+•ITU-T Q.703 Message Transfer Part Layer 2 
+6 
+Chapter 2 Functional Overview 
+Chapter 2:  Functional Overview 
+2.1 M2PA Module Overview 
+The services offered by M2PA and SCTP are used to replace those offered by MTP2. The services offered by 
+MTP2 can be divided into high- and low-level functions: 
+•The high-level functions include: 
+—Link state control 
+—Initial alignment control 
+—Transmission control 
+—Reception control 
+•The low-level functions include: 
+—Signal unit delimitation and alignment 
+—Error detection 
+—Signal unit error monitoring. 
+M2PA may be considered to replace the high-level functions, and SCTP the low-level functions. 
+The M2PA module is a full implementation including the following services: 
+•Link alignment (normal and emergency) 
+•Generation of level 2 header information 
+•Buffering transmission and retrieval of Message Signal Units (MSU) 
+•Validation and acknowledgement of received signal units 
+•Generation and transmission of Link Status Signal Units (LSSU) 
+•Congestion control 
+M2PA services MTP3 requests and issues indications to MTP3 and to management. The module supports level 
+2 monitoring and measurement features. 
+2.2 Feature Overview 
+Features of the M2PA module include: 
+•Implementation of IETF Internet draft M2PA Version 09 
+•Configuration options on an M2PA Link basis 
+•User interface common with other Dialogic® SS7 Protocols 
+•Message oriented interface 
+•Full user control of link supervisory functions; reset, blocking and unblocking 
+•Support for 24-bit and 7-bit sequence numbers 
+•Optional support for multiple congestion levels 
+•Support for message retrieval 
+•Support for per link statistics 
+•Support for normal and emergency proving 
+•Support for local and remote processor outage 
+•Debug tracing of messages exchanged with SCTP and MTP3 
+7 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+2.3 General Description 
+The interface to the M2PA module is entirely message-based, using the structured messages documented in 
+the Software Environment Programmer’s Manual. The M2PA module is capable of working in conjunction with 
+the Dialogic® SS7 Protocols MTP3 module, or, using the interface specified in this manual, M2PA can be used 
+in conjunction with third-party MTP3 implementations if required. 
+The M2PA module supports multiple logical M2PA links. Each link is maintained independently of the others. 
+Links are identified by a level 2 logical link identifier (l2_llid).The l2_llid values are in the range from 0 to 
+one less than the number of links supported and are used to identify the link in all messages sent to the 
+M2PA module. At configuration time, a level 3 link identifier is associated with each link and this is used in 
+indications issued to the MTP3 module. 
+8 
+Chapter 3 Message Reference 
+Chapter 3:  Message Reference 
+This chapter describes the individual messages and associated parameters that may be sent or received 
+when interfacing to the M2PA module. 
+The interface is a message based interface using messages of type MSG as defined in the Software 
+Environment Programmer’s Manual. 
+These messages are used for the primitive protocol interface with the MTP3 and SCTP modules, and for the 
+non-primitive interface to management for the purposes of configuring and managing M2PA signaling links. 
+The messages are grouped into the following categories: 
+•Protocol Requests from M2PA to SCTP 
+•Protocol Indications from SCTP to M2PA 
+•Protocol Requests from MTP3 to M2PA 
+•Protocol Indications from M2PA to MTP3 
+•Management Requests sent to M2PA 
+•Management Indications issued by M2PA 
+3.1 Protocol Requests from M2PA to SCTP 
+Primitive protocol requests are sent from M2PA to SCTP in accordance with published M2PA 
+recommendations. 
+Note: This section of the manual is applicable only to users intending to write or interface to their own 
+SCTP implementation. When using SCTP from the Dialogic® SS7 Protocols, this interface is 
+already implemented by the SCTP module. 
+The list of protocol requests sent from M2PA to SCTP includes: 
+•SCTP Activate Association Request - Servers wait for incoming association or client attempt association 
+•SCTP Shutdown Association Request - Gracefully close down association 
+•SCTP Abort Association Request - Abort an association 
+•SCTP Data Transfer Request - Transmit a data packet 
+9 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.1.1 SCTP_MSG_ACTIVATE – SCTP Activate Association Request 
+Synopsis 
+Move the association from the Configuration state into the Active state. 
+Message Format 
+Description 
+The association is moved from the Configuration state to the Active state, allowing the association to accept 
+incoming or start outgoing connection procedures with its peer. 
+The module sending the message should request a response and check that all configuration information was 
+accepted and that the activation has succeeded. 
+At least one peer IP address must be configured prior to activation. 
+Once the association has been activated, if the host port is zero, it is configured to an ephemeral port. 
+If the association has been configured with a peer port (set to non zero), the association attempts to initiate 
+an association with its peer and is indicated to the user by the reception of an association status change 
+message detailing a state of Connecting. 
+If the association has been configured without a peer port (set to zero), the activated association awaits an 
+incoming association from the configured peer. 
+Established associations are indicated to the user via the association status message detailing a state of 
+Connected. 
+Message Header 
+Field Name Meaning 
+Type SCTP_MSG_ACTIVATE (0x728a) 
+Id Association ID 
+Src Originating Module ID 
+Dst SCTP Module 
+rsp_req Used to request a confirmation 
+Hclass 0 
+Status Non zero on error 
+err_info 0 
+Len 0
+10 
+Chapter 3 Message Reference 
+3.1.2 SCTP_MSG_SHUTDOWN – SCTP Shutdown Association Request 
+Synopsis 
+Attempt to shutdown an association after all outstanding data has been acknowledged. 
+Message Format 
+Description 
+Once shutdown starts, the status of the connection is indicated to the user via the 
+SCTP_MSG_ASSOC_STATUS message. 
+Once the user has successfully requested that the association be shutdown, all further attempts to send data 
+on the association are rejected. 
+Once the shutdown has completed, SCTP sends the user an association status message with a status of 
+CLOSED and reenters the Unconfigured state. 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_SHUTDOWN (0x728b) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 0
+11 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.1.3 SCTP_MSG_ABORT – SCTP Abort Association Request 
+Synopsis 
+Initiates the abortion of an association with the loss of all outstanding data. 
+Message Format 
+Description 
+Once an association is aborted, new data is not accepted for transmission and all outstanding data is lost. 
+Once the association has shutdown, it sends the user an association status message with a status of CLOSED 
+and reenters the Unconfigured state. 
+Parameters 
+•error 
+Error code sent to the peer to indicate the reason for the abort. See RFC2960, Section 3.3.10 for detailed 
+descriptions of the possible error codes. 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_ABORT (0x728c) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 2 
+Parameter Area 
+Offset Size Name 
+0 2 error
+12 
+Chapter 3 Message Reference 
+3.1.4 SCTP_MSG_TX_REQ – SCTP Data Transfer Request 
+Synopsis 
+Queue a data packet for transmission on an association. 
+Message Format 
+Description 
+Data packets with more than 300 octets are not supported. 
+Data packets are rejected if the association is not currently established or an invalid stream ID is used. 
+If a response message has been requested, it is returned when either the packet is rejected (see above) or 
+the packet has been queued for transmission. The user has no method of determining when its peer has 
+acknowledged a specific data packet. 
+If the user attempts to send data faster than the peer can accept, SCTP buffers the data. If the amount of 
+data exceeds a predetermined value, the user is notified by a congestion status message that indicates 
+congestion has occurred. Once the amount of data is dropped to a lower predetermined level, a second 
+congestion status message is sent to the user indicating that congestion has abated. If the user continues to 
+send data after being notified that congestion has occurred and a second level has been passed, the user will 
+be informed that the data sent is being discarded. 
+Parameters 
+•data 
+Octets of data for transmission 
+•flags 
+SCTP transmission flags. 
+•stream 
+SCTP stream number for transmission. 
+•ppid 
+SCTP Payload Protocol Identifier (PPID) 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_TX_REQ (0xc280) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len data len + 8 
+Parameter Area 
+Offset Size Name 
+0 data len data 
+data len 2 flags 
+data len +2 2 stream 
+data len + 4 4 ppid 
+Status Description 
+SCTP_UNBUNDLED Do not bundle the packet for first transmission 
+SCTP_UNORDERED Use unsequenced delivery
+13 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.2 Protocol Indications from SCTP to M2PA 
+Primitive protocol indications are sent from SCTP to M2PA in accordance with published M2PA 
+recommendations. 
+This section of the manual is applicable only to users intending to write or interface to their own SCTP 
+implementation. When using SCTP from the Dialogic® SS7 Protocols, this interface is already implemented 
+within the SCTP module. 
+The full list of protocol requests sent from SCTP to M2PA includes: 
+•STCP Association Status Change - Association status change 
+•STCP Association Data Transfer Indication - Received data packet 
+•STCP Association Network Status - Change in network status 
+•STCP Association Congestion Status - Change in the congestion status of the association
+14 
+Chapter 3 Message Reference 
+3.2.1 SCTP_MSG_STATUS_CHANGE – STCP Association Status Change 
+Synopsis 
+A change in the association status has occurred. 
+Message Format 
+Description 
+This message is sent to the user application to indicate a change in state of the association. The status field 
+can be one of the values in the following table: 
+Parameters 
+•i_streams 
+Number of SCTP streams allocated for peer to host data transfer 
+•o_streams 
+Number of SCTP streams allocated for host to peer data transfer 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_STATUS_CHANGE (0x028d) 
+id Association ID 
+src Originating Module ID 
+dst User Application 
+rsp_req 0 
+hclass 0 
+status status 
+err_info 0 
+len 4 
+Parameter Area 
+Offset Size Name 
+0 2 i_streams 
+2 2 o_streams 
+Status Description 
+STATUS_CLOSED Association has entered the closed state. 
+STATUS_CONNECTING Association is attempting to connect to a peer. 
+STATUS_CONNECTED Association is available for data transfer. 
+STATUS_CLOSING Association is attempting a graceful shutdown. 
+STATUS_RESTART The peer has restarted the association. Data queued by the association 
+before it was restarted will be lost.
+15 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.2.2 SCTP_MSG_RX_IND – STCP Association Data Transfer Indication 
+Synopsis 
+Indicates the arrival of a data packet from the peer. 
+Message Format 
+Description 
+In the event of a data chunk of more then 300 octets being received from its peer, SCTP acknowledges the 
+packet as normal. However, the packet is then discarded (the user never sees the packet) and a 
+management message is generated. 
+Parameters 
+•data 
+Actual octets of data received. 
+•flags 
+Combinable SCTP transmission flags. 
+•stream 
+SCTP stream number for transmission 
+•ppid 
+SCTP Payload Protocol Identifier (PPID) 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_RX_IND (0x8281) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len data len + 8 
+Parameter Area 
+Offset Size Name 
+0 data len data 
+data len 2 flags 
+data len + 2 2 stream 
+data len + 4 4 ppid 
+Status Description 
+SCTP_UNORDERED Packet used unsequenced delivery
+16 
+Chapter 3 Message Reference 
+3.2.3 SCTP_MSG_NETWORK_STATUS – STCP Association Network Status 
+Synopsis 
+Indicates a status change has occurred on a network address within the association. 
+Message Format 
+Description 
+Indicates to the user that either a network address that was previous available is now being marked as 
+inactive, or vice versa. The definition of an inactive address is one that has failed to respond to a 
+configurable number of sequential heartbeat requests. The status field can be one of the values in the 
+following table: 
+Parameters 
+•ip_type 
+The IP address format. See AppendixA, “Network Address Representation”. 
+•ip_addr 
+The IP address. See AppendixA, “Network Address Representation”. 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_NETWORK_STATUS (0x028e) 
+id Association ID 
+src Originating Module ID 
+dst User Application 
+rsp_req 0 
+hclass 0 
+status status 
+err_info 0 
+len 17 
+Parameter Area 
+Offset Size Name 
+0 1 ip_type 
+1 16 ip_addr 
+Status Description 
+ADDRESS_INACTIVE Network address has been marked inactive. 
+ADDRESS_ACTIVE Network address has been marked as available for data transfer.
+17 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.2.4 SCTP_MSG_CONG_STATUS – STCP Association Congestion Status 
+Synopsis 
+Indicates a status change has occurred with regard to transmitting congestion on an association. 
+Message Format 
+Description 
+Sent to the user to indicate the level of congestion on the association has changed. The status field can be 
+one of the values in the following table: 
+On reception of an SCTP_TX_CONG_ONSET message, the user should reduce the rate at which messages are 
+sent to SCTP. If the congestion clears, then an SCTP_TX_CONG_ABATE message is sent and the user can 
+continue as before. However, if the level of congestion rises after a SCTP_TX_CONG_ONSET message has 
+been sent, the system may send the user an SCTP_TX_CONG_DISCARD message. At this point, SCTP 
+discards any data messages sent by the user until the level of congestion has dropped to a safe level and an 
+SCTP_TX_CONG_ABATE message is sent. 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_CONG_STATUS (0x028f) 
+id Association ID 
+src Originating Module ID 
+dst User Application 
+rsp_req 0 
+hclass 0 
+status status 
+err_info 0 
+len 0 
+Status Description 
+SCTP_TX_CONG_ABATE Transmission queue is free to accept more messages 
+SCTP_TX_CONG_ONSET Transmission queue is experiencing congestion 
+SCTP_TX_CONG_DISCARD Transmission queue has been filled to capacity and has started to 
+discard messages queued for transmission
+18 
+Chapter 3 Message Reference 
+3.3 Protocol Requests from MTP3 to M2PA 
+Primitive protocol requests are sent from MTP3 to M2PA in accordance with published M2PA 
+recommendations. The primitive names used for the M2PA module are closely aligned with the terminology 
+used in ITU-T Recommendation Q.703. 
+This section of the manual is applicable only to users intending to write or interface to their own MTP3 
+implementation. When using MTP3 from the Dialogic® SS7 Protocols, this interface is already implemented 
+within the MTP3 module. 
+The full list of protocol requests sent from MTP3 to MTP2 includes: 
+•API_MSG_TX_REQ – Message for Transmission Request 
+•SS7_MSG_START – M2PA Link Start Request 
+•SS7_MSG_STOP – M2PA Link Stop Request 
+•SS7_MSG_EMGCY – M2PA Set Emergency Request 
+•SS7_MSG_EMGCY_CLRD – M2PA Cancel Emergency Request 
+•SS7_MSG_RTV_BSNT – M2PA BSNT Retrieval Request 
+•SS7_MSG_RTVL_REQ – M2PA Retrieval Request 
+•SS7_MSG_LOC_PR_OUT – M2PA LPO Request 
+•SS7_MSG_LOC_PR_OK – MTP2 LPO Recovered Request 
+When sending messages to M2PA, the user should ensure that the message is sent to the correct 
+module_id and the correct Layer 2 Logical Link ID (l2_llid). 
+The hdr->id field of the message should be set to the correct l2_llid, which is in the range from zero up to 
+one less than the number of signaling links supported by the M2PA instance. 
+The hdr->rsp_req field may optionally be used to request a confirmation. If requested, the M2PA module 
+confirms acceptance of the primitive by sending the message back to its originator with bit14 cleared in the 
+type field of the message. This mechanism is described in detail in the Software Environment Programmer’s 
+Manual. 
+Note: Normal MTP3 operation does not require a response from M2PA for these primitives. The 
+mechanism is useful however when debugging an application. 
+19 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.3.1 API_MSG_TX_REQ – Message for Transmission Request 
+Synopsis 
+Message issued to a board by MTP3 containing SS7 Message Signal Unit (MSU) tor transmission to the 
+network on specified signaling link. 
+Message Format 
+Description 
+This primitive is issued by MTP3 to request that M2PA transmit an MTP3 Message on the specified link. The 
+parameter area should commence with the MTP Routing Label. 
+Parameters 
+•MSU data 
+MSU data in binary format commencing with the Service Information Octet (SIO). 
+Message Header 
+Field Name Meaning 
+type API_MSG_TX_REQ  (0xcf00) 
+id l2_llid 
+src Originating module_id 
+dst M2PA module_id 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len Number of octets in MSU 
+Parameter Area 
+Offset Size Name 
+0 len MSU data 
+20 
+Chapter 3 Message Reference 
+3.3.2 SS7_MSG_START – M2PA Link Start Request 
+Synopsis 
+Request to start the initial alignment procedure for the specified link. 
+Message Format 
+Description 
+This primitive is issued by MTP3 to request that M2PA commence the initial alignment procedure. If the 
+procedure is successful, an In Service indication is issued. If alignment fails, an Out of Service indication is 
+issued. 
+If an EMERGENCY condition exists, then MTP3 should send an SS7_MSG_EMGCY message to M2PA prior to 
+sending the M2PA Link Start Request. 
+Changes of EMERGENCY condition can be notified by MTP3 to M2PA both prior to sending the M2PA Link Start 
+Request and during link alignment. 
+Note: Receipt of a confirmation message (if requested) does not imply that the initial alignment 
+procedure has been completed, merely that M2PA has recognized the request to start the 
+procedure. 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_START  (0xc204) 
+id l2_llid 
+src Originating module_id 
+dst M2PA module_id 
+rsp_req Sending layer’s bit set if response required 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+21 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.3.3 SS7_MSG_STOP – M2PA Link Stop Request 
+Synopsis 
+Request to stop a signaling link. 
+Message Format 
+Description 
+This primitive is issued by MTP3 to request that M2PA stop the operation of a signaling link. The link is taken 
+to the Out of Service state without further indications being issued to MTP3. 
+Once a link has been stopped, MTP3 may request the Backward Sequence Number Transmitted (BSNT) and 
+initiate message retrieval if required. 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_STOP  (0xc205) 
+id l2_llid 
+src Originating module_id 
+dst M2PA module_id 
+rsp_req Sending layer’s bit set if response required 
+hclass 0 
+Status 0 
+err_info 0 
+Len 0
+22 
+Chapter 3 Message Reference 
+3.3.4 SS7_MSG_EMGCY – M2PA Set Emergency Request 
+Synopsis 
+Request to use the emergency proving period on the next attempt at link alignment. 
+Message Format 
+Description 
+This primitive is issued by MTP3 prior to issuing the M2PA Link Start Request or during initial alignment to 
+cause the next attempt at link alignment to use the emergency proving period instead of the normal proving 
+period. 
+3.3.5 SS7_MSG_EMGCY_CLRD – M2PA Cancel Emergency Request 
+Synopsis 
+Request to cancel a previous M2PA Set Emergency Request. 
+Message Format 
+Description 
+This primitive is issued by MTP3 prior to canceling any previous Emergency requests and causes the next 
+attempt at link alignment to use the normal proving period. 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_EMGCY  (0xc207) 
+id l2_llid 
+src Originating module_id 
+dst M2PA module_id 
+rsp_req Sending layer’s bit set if response required 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_EMGCY_CLRD  (0xc208) 
+id l2_llid 
+src Originating module_id 
+dst M2PA module_id 
+rsp_req Sending layer’s bit set if response required 
+hclass 0 
+status 0 
+len 0
+23 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.3.6 SS7_MSG_RTV_BSNT – M2PA BSNT Retrieval Request 
+Synopsis 
+Request for BSNT retrieval. 
+Message Format 
+Description 
+This primitive is issued by MTP3 to request the sequence number of the last signal unit to be acknowledged, 
+the Backward Sequence Number Transmitted (BSNT). The response is issued by M2PA as an 
+SS7_MSG_RXD_BSNT indication. 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_RTV_BSNT  (0xc209) 
+id l2_llid 
+src Originating module_id 
+dst M2PA module_id 
+rsp_req Sending layer’s bit set if response required. 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+24 
+Chapter 3 Message Reference 
+3.3.7 SS7_MSG_RTVL_REQ – M2PA Retrieval Request 
+Synopsis 
+Request retrieval of unacknowledged messages. 
+Message Format 
+Description 
+This primitive is issued by MTP3 to request retrieval of all unacknowledged messages from the 
+retransmission buffer and the transmission buffer, commencing with the message containing a sequence 
+number immediately following the Forward Sequence Number Confirmed (FSNC) provided in the parameter 
+area of the message. These messages can then be retransmitted by MTP3 over an alternative signaling link. 
+M2PA responds with zero, one or more API_MSG_RTVD_MSG indications followed by an 
+SS7_MSG_RTVL_COMPL indication. Only messages with a FSN greater than the given FSNC are retrieved. 
+Parameters 
+•FSNC 
+Forward Sequence Number Confirmed. This is the sequence number of the first message to be retrieved. 
+If this is set to 0x80, then the extended_FSNC field is valid. 
+•reserved 
+Reserved for future use. 
+•extended_FSNC 
+Extended Forward Sequence Number Confirmed. A 32-bit value; MSB first. This field is used when 24-bit 
+sequence numbers are in use. 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_RTVL_REQ  (0xc20a) 
+id l2_llid 
+src Originating module_id 
+dst M2PA module_id 
+rsp_req Sending layer’s bit set if response required. 
+hclass 0 
+status 0 
+err_info 0 
+len 6 
+Parameter Area 
+Offset Size Name 
+0 1 FSNC 
+1 1 reserved 
+2 4 extended_FSNC 
+25 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.3.8 SS7_MSG_LOC_PR_OUT – M2PA LPO Request 
+Synopsis 
+Request to notify M2PA of a local processor outage condition. 
+Message Format 
+Description 
+This primitive is issued either by MTP3 or by management to notify M2PA of a local processor outage 
+condition and to request that M2PA take the appropriate action to deal with such a condition. 
+3.3.9 SS7_MSG_LOC_PR_OK – MTP2 LPO Recovered Request 
+Synopsis 
+Request to notify M2PA that the local processor outage condition has cleared. 
+Message Format 
+Description 
+This primitive is issued either by MTP3 or by management to notify M2PA that the local processor outage 
+condition has cleared and to request that M2PA take the appropriate action to deal with such a condition. 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_LOC_PR_OUT  (0xc20b) 
+id l2_llid 
+src Originating module_id 
+dst M2PA module_id 
+rsp_req Sending layer’s bit set if response required. 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_LOC_PR_OK  (0xc20c) 
+id l2_llid 
+src Originating module_id 
+dst M2PA module_id 
+rsp_req Sending layer’s bit set if response required. 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+26 
+Chapter 3 Message Reference 
+3.4 Protocol Indications from M2PA to MTP3 
+Primitive protocol indications are sent from M2PA to MTP3 in accordance with published M2PA 
+recommendations. The primitive names used for the M2PA module are closely aligned with the terminology 
+used in ITU-T Recommendation Q.703. 
+Note: This section of the manual is applicable only to users intending to write or interface to their own 
+SCTP implementation. When using the Dialogic® SS7 protocols SCTP module, this interface is 
+already implemented by the SCTP module. 
+The list of protocol requests sent from M2PA to MTP3 includes: 
+•API_MSG_RX_IND – Received Message Indication 
+•SS7_MSG_IN_SVC – M2PA In Service Indication 
+•SS7_MSG_OUT_SVC – M2PA Out of Service Indication 
+•SS7_MSG_REM_PR_OUT – M2PA RPO Indication 
+•SS7_MSG_REM_PR_OK – M2PA RPO Cleared Indication 
+•SS7_MSG_RXD_BSNT – M2PA BSNT Indication 
+•API_MSG_RTVD_MSG – M2PA Retrieved Message Indication 
+•SS7_MSG_RTVL_COMPL – M2PA Retrieval Complete Indication 
+•MTP_MSG_RTVL_NOT_POS – M2PA Retrieval Failure Indication 
+•MTP_MSG_LINK_CONG – M2PA Link Congested Indication 
+•MTP_MSG_LINK_UNCONG – M2PA Congestion Cleared Indication 
+•MTP_MSG_FLUSH_ACK – M2PA Flush Acknowledgement Indication 
+All primitives generated by the M2PA module are sent to the “upper” module, as defined at configuration 
+time for each link. This should be set to the correct module_id for the MTP3 module. 
+The hdr->id field is always set to the l3_link_id as configured for the link at configuration time. Note that 
+this need not be the same as the l2_llid. The use of the l3_link_id means that it is not necessary for the 
+receiving module (for example, MTP3) to examine the sending module_id from which the message was 
+received. 
+The MTP3 (or “upper”) module is responsible for releasing the message using the relm() library function. 
+27 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.4.1 API_MSG_RX_IND – Received Message Indication 
+Synopsis 
+Containing received Message Signal Unit (MSU) destined to MTP3. 
+Message Format 
+Parameters 
+•MSU data 
+MSU data in binary format commencing with the Service Indicator Octet (SIO). 
+Message Header 
+Field Name Meaning 
+type API_MSG_RX_IND  (0x8f01) 
+id l3_link_id 
+src M2PA module_id 
+dst upper module_id (eg. MTP3) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len Number of octets in MSU 
+Parameter Area 
+Offset Size Name 
+0 len MSU data 
+28 
+Chapter 3 Message Reference 
+3.4.2 SS7_MSG_IN_SVC – M2PA In Service Indication 
+Synopsis 
+Indicates that the signaling link is in service. 
+Message Format 
+Description 
+This primitive is issued by M2PA to the “upper” module to indicate the successful completion of the link 
+alignment procedure. 
+Note: The id field of this message (and all indications to the “upper” module) contains the l3_link_id, 
+which is a configuration parameter for the link and need not be the same as the l2_llid, which is 
+used in messages sent to M2PA. 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_IN_SVC  (0x8303) 
+id l3_link_id 
+src M2PA module_id 
+dst upper module_id (eg. MTP3) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+29 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.4.3 SS7_MSG_OUT_SVC – M2PA Out of Service Indication 
+Synopsis 
+Indicates that the signaling link has failed. 
+Message Format 
+Description 
+This primitive is issued by M2PA to the “upper” module to indicate that the signaling link is Out of Service, 
+either due to an excessive error rate or a failure to complete the alignment operation. 
+3.4.4 SS7_MSG_REM_PR_OUT – M2PA RPO Indication 
+Synopsis 
+Indicates a Remote Processor Outage (RPO) condition. 
+Message Format 
+Description 
+This primitive is issued by M2PA to the “upper” module to indicate that a Remote Processor Outage (RPO) 
+condition has been detected. 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_OUT_SVC  (0x8304) 
+id l3_link_id 
+src M2PA module_id 
+dst upper module_id (eg. MTP3) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_REM_PR_OUT  (0x8305) 
+id l3_link_id 
+src M2PA module_id 
+dst upper module_id (eg. MTP3) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+30 
+Chapter 3 Message Reference 
+3.4.5 SS7_MSG_REM_PR_OK – M2PA RPO Cleared Indication 
+Synopsis 
+Indicates the clearing of a Remote Processor Outage (RPO) condition. 
+Message Format 
+Description 
+This primitive is issued by M2PA to the “upper” module to indicate that a signaling link that was previously in 
+the Remote Processor Outage (RPO) condition has now recovered. 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_REM_PR_OK  (0x8306) 
+id l3_link_id 
+src M2PA module_id 
+dst upper module_id (eg. MTP3) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+31 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.4.6 SS7_MSG_RXD_BSNT – M2PA BSNT Indication 
+Synopsis 
+Indicates the BSNT. 
+Message Format 
+Parameters 
+•BSNT 
+Backward Sequence Number Transmitted. Set to 0x80 to indicate extended BSNT. 
+•reserved 
+Reserved for future use. Set to zero. 
+•extended_BSNT 
+Extended Backward Sequence Number Transmitted. A 32-bit value; MSB first. 
+Description 
+This primitive is issued by M2PA in response to a M2PA BSNT Retrieval Request. It contains the BSNT in the 
+parameter area of the message. 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_RXD_BSNT  (0x8307) 
+id l3_link_id 
+src M2PA module_id 
+dst upper module_id (eg. MTP3) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 1 
+Parameter Area 
+Offset Size Name 
+0 1 BSNT 
+1 1 reserved 
+2 4 extended_BSNT 
+32 
+Chapter 3 Message Reference 
+3.4.7 API_MSG_RTVD_MSG – M2PA Retrieved Message Indication 
+Synopsis 
+Primitive issued by M2PA to MTP3 to indicate the next MSU retrieved from the transmission or retransmission 
+buffer. 
+Message Format 
+Description 
+This primitive is used to pass retrieved messages from M2PA to MTP3 to allow them to be retransmitted 
+down another link. 
+Parameters 
+•MSU data 
+MSU data in binary format commencing with the Service Indicator Octet (SIO). 
+Message Header 
+Field Name Meaning 
+type API_MSG_RTVD_MSG  (0x8f08) 
+id l2_llid 
+src M2PA module_id 
+dst Destination module (M2PA upper_id) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len Number of octets in MSU 
+Parameter Area 
+Offset Size Name 
+0 len MSU data 
+33 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.4.8 SS7_MSG_RTVL_COMPL – M2PA Retrieval Complete Indication 
+Synopsis 
+Indicates the completion of the message retrieval procedure. 
+Message Format 
+Description 
+This primitive is issued by M2PA to the “upper” module to indicate that any messages for retrieval have been 
+conveyed using M2PA Retrieved Message Indication messages, so the retrieval procedure is complete. 
+Message Header 
+Field Name Meaning 
+type SS7_MSG_RTVL_COMPL  (0x8309) 
+id l3_link_id 
+src M2PA module_id 
+dst upper module_id (eg. MTP3) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+34 
+Chapter 3 Message Reference 
+3.4.9 MTP_MSG_RTVL_NOT_POS – M2PA Retrieval Failure Indication 
+Synopsis 
+Indicates that it is not possible to carry out message retrieval. 
+Message Format 
+Description 
+This primitive is issued by M2PA to the “upper” module to indicate that for some reason it is not possible to 
+carry out or complete the message retrieval procedure. Any retrieved messages issued to MTP3 should 
+therefore be discarded. The message is issued instead of a M2PA Retrieval Complete Indication. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_RTVL_NOT_POS  (0x8315) 
+id l3_link_id 
+src M2PA module_id 
+dst upper module_id (eg. MTP3) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+35 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.4.10 MTP_MSG_LINK_CONG – M2PA Link Congested Indication 
+Synopsis 
+Provides notification of signaling link congestion. 
+Message Format 
+Description 
+This primitive is issued by M2PA on detection of link congestion or a change in the congestion status of a link. 
+Congestion is detected when the total number of messages stored in the transmit and retransmit buffers 
+exceeds a configurable congestion onset threshold. The module can be configured with either a single 
+congestion threshold or multiple congestion onset thresholds. 
+Parameters 
+•Congestion status 
+Indicates the level of congestion on the link.  
+Message Header 
+Field Name Meaning 
+type MTP_MSG_LINK_CONG  (0x8312) 
+id l3_link_id 
+src M2PA module_id 
+dst upper module_id (eg. MTP3) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 1 
+Parameter Area 
+Offset Size Name 
+0 1 Congestion status
+36 
+Chapter 3 Message Reference 
+3.4.11 MTP_MSG_LINK_UNCONG – M2PA Congestion Cleared Indication 
+Synopsis 
+Provides notification of the clearing of link congestion. 
+Message Format 
+Description 
+This primitive is issued by M2PA when a link which has been congested returns to the uncongested state. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_LINK_UNCONG  (0x8313) 
+id l3_link_id 
+src M2PA module_id 
+dst upper module_id (eg. MTP3) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+37 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+3.4.12 MTP_MSG_FLUSH_ACK – M2PA Flush Acknowledgement Indication 
+Synopsis 
+Provides acknowledgement of the completion of buffer flushing. 
+Message Format 
+Description 
+This primitive is issued by M2PA in response to an MTP_MSG_FLUSH message after all messages have been 
+flushed by M2PA from the transmission and retransmission buffers. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_FLUSH_ACK  (0x8316) 
+id l3_link_id 
+src M2PA module_id 
+dst upper module_id (eg. MTP3) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+38 
+Chapter 4 Non-Primitive Interface 
+Chapter 4:  Non-Primitive Interface 
+In addition to the primitive interface for passing protocol messages and management messages between the 
+M2PA module and the user modules, the M2PA module supports a non-primitive interface for implementation 
+specific functionality. 
+The non-primitive interface is used by the user for configuration and diagnostic purposes and to allow M2PA 
+to report protocol-based and software error events to the local system management module. 
+This chapter describes the formats of all the messages used in the non-primitive interface. 
+4.1 Confirmation Message Status Values 
+When the M2PA module returns a confirmation message containing a status value, the status is one of the 
+following: 
+4.2 Non-Primitive Interface Messages 
+The non-primitive interface comprises the following messages: 
+•M2P_MSG_CONFIG - Configure M2PA Module 
+•M2P_MSG_CNF_LINK - M2PA Link Configuration Request 
+•M2P_MSG_END_LINK - M2PA Link End Request 
+•M2P_MSG_TRACE_MASK - TRACE MASK Set Request 
+•M2P_MSG_R_STATE - READ STATE Read Request 
+•M2P_MSG_R_STATS - READ STATISTICS Read Request 
+•M2P_MGT_MSG_EVENT_IND - EVENT Indication 
+•M2P_MSG_ERROR_IND - ERROR Indication 
+•M2P_MGT_MSG_LINK_STATE - M2PA Link STATE Indication 
+Mnemonic Value Description 
+none 0 Success 
+M2PE_BAD_ID 1 Inappropriate or invalid id in request message 
+M2PE_BAD_MSG 5 Inappropriate or unrecognized message type. 
+M2PE_BAD_PARAM 6 Invalid parameters contained in message.
+39 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+4.2.1 M2P_MSG_CONFIG – Configure M2PA Module 
+Synopsis 
+Configure the M2PA module for operation. 
+Message Format 
+Description 
+This message is used to configure the M2PA module for operation. It should be the first message sent to the 
+module (any message received prior to this are discarded) and should only be sent once. 
+Parameters 
+•mngt_mod_id 
+Module identifier that defines the destination for non-link specific management indications 
+•trace_mod_id 
+Module identifier that defines the destination for non-link specific trace indications 
+•max_links 
+Maximum number of links that the module is required to handle 
+•Reserved 
+Should be set to zero 
+Message Header 
+Field Name Meaning 
+type M2P_MSG_CONFIG (0x7220) 
+id 0 
+src Sending module ID 
+dst M2PA MODULE_ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+Len 16 
+Parameter Area 
+Offset Size Name 
+0 1 mngt_mod_id 
+1 1 trace_mod_id 
+2 2 max_links 
+4 12 Reserved 
+40 
+Chapter 4 Non-Primitive Interface 
+4.2.2 M2P_MSG_CNF_LINK – M2PA Link Configuration Request 
+Synopsis 
+Configures an M2PA link. 
+Message Format 
+Description 
+This message must be sent once for each link being configured. 
+Message Header 
+Field Name Meaning 
+type M2P_MSG_CNF_LINK (0x7221) 
+id M2PA Link ID 
+src Sending module ID 
+dst M2PA MODULE_ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 60 
+Parameter Area 
+Offset Size Name 
+0 4 options 
+4 1 l3_mod_id 
+5 2 l3_link_id 
+7 1 sctp_mod_id 
+8 2 sctp_link_id 
+10 1 mngt_mod_id 
+11 1 trace_mod_id 
+12 2 T1 
+14 2 T2 
+16 2 T3 
+18 2 T4n 
+20 2 T4e 
+22 2 T6 
+24 2 T7 
+26 2 co1 
+28 2 co2 
+30 2 co3 
+32 2 ca1 
+34 2 ca2 
+36 2 ca3 
+38 2 cd1 
+40 2 cd2 
+42 2 cd3 
+44 16 reserved
+41 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+Parameters 
+•Options 
+One of the values in the following table: 
+•l3_mod_id 
+Module identifier for the L3 module using this link 
+•l3_link_id 
+Link identifier used by the L3 module for this link 
+•sctp_mod_id 
+Module identifier for the SCTP module used for this link 
+•sctp_link_id 
+Link identified used by SCTP for this link 
+•mngt_mod_id 
+Module identifier for Management module for this link 
+•trace_mod_id 
+Module identifier for Trace module for this link 
+•T1 
+“Alignment Ready” timer value in the range of 40 to 50 seconds. Units are in seconds. 
+•T2 
+“Not Aligned” timer value in the range of 5 to 50 seconds. Units are in seconds. 
+•T3 
+“Aligned” timer value in the range of 1 to 2 seconds. Units are in seconds. 
+•T4n 
+“Normal Proving” timer value in the range of 7 to 10 seconds. Units are in seconds. 
+•T4e 
+“Emergency Proving” timer value in the range of 400 to 600 milliseconds. Units are in 100milliseconds. 
+•T6 
+“Remote Congestion” timer value in the range of 3 to 6 seconds. Units are in seconds. 
+•T7 
+“Excessive Delay Of Acknowledgement” timer value in the range of 0.5 to 2 seconds. Units are in 
+100milliseconds. 
+•co1 
+Congestion onset MSU threshold 1  
+•co2 
+Congestion onset MSU threshold 2  
+•co3 
+Congestion onset MSU threshold 3  
+•ca1 
+Congestion abatement MSU threshold 1  
+•ca2 
+Congestion abatement MSU threshold 2  
+•ca3 
+Congestion abatement MSU threshold 3  
+Option Bit Description 
+M2PA_LCFG_MCONG 0 Use Multiple Congestion levels 
+M2PA_LCFG_7BIT 1 Use 7-bit sequence numbers instead of default 24-bit sequence numbers. Use if MTP3 does not support Extended Changeover 
+Procedures. 
+M2PA_LCFG_VER_9 2 This bit enables support for Draft Version 9 of the M2PA 
+Specification.  Default operation supports the RFC specification.
+42 
+Chapter 4 Non-Primitive Interface 
+•cd1 
+Congestion discard MSU threshold 1  
+•cd2 
+Congestion discard MSU threshold 2  
+•cd3 
+Congestion discard MSU threshold 3  
+•Reserved 
+Should be set to zero 
+4.2.3 M2P_MSG_END_LINK – M2PA Link End Request 
+Synopsis 
+Ends an M2PA link. 
+Message Format 
+Description 
+This message must be sent once for each link being ended. 
+Message Header 
+Field Name Meaning 
+type M2P_MSG_END_LINK (0x7222) 
+id M2PA Link ID 
+src Sending module ID 
+dst M2PA MODULE_ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+43 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+4.2.4 M2P_MSG_TRACE_MASK – TRACE MASK Set Request 
+Synopsis 
+Sets trace masks on a per M2PA link basis. 
+Message Format 
+Description 
+The M2PA module supports comprehensive tracing options on a per-link and per-primitive basis. The module 
+can be configured to trace any message received or transmitted and a number of management events. This 
+message is used to selectively enable tracing of events. It can be used at any time during operation and 
+continues to be effective until the next TRACE MASK Set Request is received for the same link. 
+Traced events are indicated to the management module using the TRACE_EV Event Indication. 
+Parameters 
+•op_evt_mask 
+The output event mask. This is a 32-bit value with bits as described below. Once the appropriate bit is 
+set, a trace message is sent to the management module whenever a message is issued by M2PA for the 
+event indicated. 
+Message Header 
+Field Name Meaning 
+type M2P_MSG_TRACE_MASK (0x7223) 
+id M2PA Link ID 
+src Sending module ID 
+dst M2PA MODULE_ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 16 
+Parameter Area 
+Offset Size Name 
+0 4 op_evt_mask 
+4 4 ip_evt_mask 
+8 4 mgmt_evt_mask 
+12 4 reserved 
+Bit Number Mnemonic Description 
+0 M2POEM_SCTP_ACT_REQ ACTIVATE ASC 
+1 M2POEM_SCTP_ABORT_REQ ABORT ASC 
+2 M2POEM_MTP_IN_SVC_IND IN SVC 
+3 M2POEM_MTP_OUT_SVC_IND OUT SVC 
+4 M2POEM_MTP_RPO_IND REM PROCESSOR OUT 
+5 M2POEM_MTP_RPO_OK_IND REM PROCESSOR OUT OK 
+6 M2POEM_MTP_RXD_BSNT_IND RXD BSNT 
+7 M2POEM_MTP_CONG_IND LINK CONG 
+8 M2POEM_UNCONG_IND LINK UNCONG 
+9 M2POEM_MTP_RTV_FAIL_IND RTVL FAIL 
+10 M2POEM_MTP_RTV_MSG_IND RTVD MSG 
+11 M2POEM_MTP_RTVLCOMP_IND RTVL COMPL
+44 
+Chapter 4 Non-Primitive Interface 
+•ip_evt_mask 
+The input event mask. This is a 32-bit value with bits as described below. When the appropriate bit is 
+set, a trace message is sent to the management module whenever a message is issued by M2PA for the 
+event indicated. 
+•mgt_evt_mask 
+The management event mask. This is a 32-bit value with bits as described below. When the appropriate 
+bit is set, a trace message is sent to the management module whenever a message is issued by M2PA for 
+the event indicated. 
+12 M2POEM_SCTP_TX_REQ ASC DATA REQ 
+13 M2POEM_MTP_RX_IND RX IND 
+14 M2POEM_MTP_FLUSH_ACK Flush Ack 
+Bit Number Mnemonic Description 
+0 M2PIEM_MTP_TX_REQ Message for transmission request 
+1 M2PIEM_SCTP_RX_IND Receive message Indication 
+2 M2PIEM_SCTP_ACT_FAIL Activate fail 
+3 M2PIEM_SCTP_ASC_STATUS ASC Status 
+4 M2PIEM_SCTP_ASC_CONG ASC Cong Status 
+5 M2PIEM_MTP_START_REQ Start request 
+6 M2PIEM_MTP_STOP_REQ Stop request 
+7 M2PIEM_MTP_EMGCY_IND Emergency indication 
+8 M2PIEM_MTP_EMGCY_CLEAR_IND Emergency cleared indication 
+9 M2PIEM_MTP_RTV_REQ Retrieve request 
+10 M2PIEM_MTP_RTV_BSNT_REQ Retrieve BSNT 
+11 M2PIEM_MTP_LPO_IND Local Processor Outage Indication 
+12 M2PIEM_MTP_LPO_CEASES_IND Local Processor Outage ceases indication 
+13 M2PIEM_UNEX_MSG Unexpected Message received 
+14 M2PIEM_MTP_FLUSH Flush Request 
+15 M2PIEM_MTP_CONTINUE Continue Request 
+Bit Number Mnemonic Description 
+0 M2PMEM_SCTP Report SCTP Mngt events 
+1 M2PMEM_M2P Report M2PA Peer events 
+2 M2PMEM_MTP Report MTP3 Mngt Events 
+3 M2PMEM_STATE Report Link State Events 
+4 M2PMEM_UNEX Report Unexpected Message received 
+Bit Number Mnemonic Description
+45 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+4.2.5 M2P_MSG_R_STATE – READ STATE Read Request 
+Synopsis 
+Reads the current internal state of an M2PA link. 
+Message Format 
+Description 
+This message may be sent by Layer Management or other module to request the state of a particular link. 
+Parameters 
+•la_state 
+Current Link Alignment state, which can take one of the following values: 
+•tx_cong_status 
+Current congestion status. This takes a non-zero value if congested. If multiple congestion levels are 
+being used, then values of 1, 2 and 3 indicate the current level of congestion. 
+•tx_buf_occ 
+Total number of buffered MSUs 
+•RPO_status 
+If set, the link is currently in a Remote Processor Outage (RPO) condition. 
+•LPO_status 
+If set, the link is currently in a Local Processor Outage (LPO) condition. 
+Message Header 
+Field Name Meaning 
+type M2P_MSG_R_STATE (0x6224) 
+id M2PA Link id 
+src Sending module ID 
+dst M2PA MODULE_ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 16 
+Parameter Area 
+Offset Size Name 
+0 1 la_state 
+1 1 tx_cong_status 
+2 2 tx_buf_occ 
+4 1 RPO_status 
+5 1 LPO_status 
+6 1 remote_cong_status 
+7 1 receive_cong_status 
+8 1 emergency_status 
+9 7 reserved 
+Value Mnemonic Description 
+1 S7S_IN_SERVICE IN SERVICE state 
+2 S7S_OUT_SERVICE OUT OF SERVICE state 
+3 S7S_INIT_ALIGN INITIAL ALIGNMENT state 
+4 S7S_ALIGN_NOT_RDY ALIGNED NOT READY state 
+5 S7S_ALIGN_READY ALIGNED READY state 
+6 S7S_PROC_OUTAGE Local or Remote Processor Outage state
+46 
+Chapter 4 Non-Primitive Interface 
+•remote_cong_status 
+If set, the link is currently in a Remote Congestion condition. 
+•receive_cong_status 
+If set, the link is currently in a Receive Congestion condition. 
+•emergency_status 
+If set, the link is currently in Emergency Alignment mode. 
+47 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+4.2.6 M2P_MSG_R_STATS – READ STATISTICS Read Request 
+Synopsis 
+Read the current statistics on a particular M2PA link. 
+Message Format 
+Description 
+This message may be sent by Layer Management or other module to read statistics for the link.  The internal 
+statistics can be reset or left unchanged depending on the setting of the status field. 
+Parameters 
+•insvc_duration 
+Duration link in service (seconds) 
+•stats_duration 
+Time since stats last reset (seconds) 
+•align_failures 
+Number of failed alignment attempts 
+•txd_octets 
+Number of SIF and SIO octets transmitted 
+•tx_msu_count 
+Number of MSU's transmitted 
+•rxd_octets 
+Number of SIF and SIO octets received 
+•rx_msu_count 
+Number of MSU's received 
+•cong_count 
+Number of congestion events 
+Message Header 
+Field Name Meaning 
+type M2P_MSG_R_STATS (0x6225) 
+id M2PA Link id 
+src Sending module ID 
+dst M2PA MODULE_ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 = Leave statistics unchanged 
+1 = Reset statistics after reading 
+err_info 0 
+len 60 
+Parameter Area 
+Offset Size Name 
+0 4 insvc_duration 
+4 4 stats_duration 
+8 2 align_failures 
+10 4 txd_octets 
+14 4 tx_msu_count 
+18 4 rxd_octets 
+22 4 rx_msu_count 
+26 4 cong_count 
+30 4 cong_duration 
+34 4 discard_count 
+38 4 discard_events 
+42 18 reserved
+48 
+Chapter 4 Non-Primitive Interface 
+•cong_duration 
+Duration of link congestion (seconds) 
+•discard_count 
+Number of MSU's discarded due to congestion 
+•discard_events 
+Number of congestion events leading to MSU discard 
+•reserved 
+Reserved for future use. Should be set to zero. 
+49 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+4.2.7 M2P_MGT_MSG_EVENT_IND – EVENT Indication 
+Synopsis 
+Provides an indication of events occurring within the M2PA module. 
+Message Format 
+Description 
+This message is issued by M2PA to the management module (as configured in the configuration message) to 
+advise of events occurring within M2PA. Specific indications are only issued if the corresponding EVENT bit of 
+the management Trace event mask is set. 
+The EVENT_CODE and id field are coded as shown in the following table: 
+Message Header 
+Field Name Meaning 
+Type M2P_MGT_MSG_EVENT_IND (0x0227) 
+Id ID (see table below) 
+Src M2P module id 
+Dst Management module id 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Event Code (see table below) 
+err_info 0 
+len 0 
+Value Mnemonic id Description 
+1 M2P_EVT_MSG_TYPE 0 Unknown Message Type Received 
+2 M2P_EVT_UNEX_EVENT l2_llid An unexpected event has been received on this link 
+3 M2P_EVT_SCTP_BAD_LEN l2_llid An SCTP message has been received with an invalid 
+length 
+4 M2P_EVT_SCTP_BAD_ASC_ID 0 An SCTP message has been received with an invalid 
+Association ID 
+5 M2P_EVT_MTP_BAD_LINK_ID l2_llid A User message has been received with an invalid link id 
+6 M2P_EVT_SCTP_ASC_EST l2_llid SCTP Association has entered the Established State 
+7 M2P_EVT_SCTP_ASC_FAIL l2_llid SCTP Association has entered the Failed State 
+8 M2P_EVT_SCTP_ASC_CONG l2_llid SCTP Association has entered the Congested State 
+9 M2P_EVT_UNEX_PEER l2_llid An Unexpected Message has been received from the 
+Peer M2PA 
+10 M2P_EVT_UNEX_SCTP l2_llid An Unexpected Message has been received from SCTP 
+11 M2P_EVT_UNEX_MTP l2_llid An Unexpected Message has been received from MTP 
+12 M2P_EVT_UNEX_MGT l2_llid An Unexpected Message has been received from 
+Management 
+13 M2P_EVT_MTP_EMGCY l2_llid MTP has requested the Link use emergency proving 
+14 M2P_EVT_MTP_EMGCY_CLR l2_llid MTP requests the link use normal proving 
+15 M2P_EVT_M2P_BAD_FSNR l2_llid A message has been received with an invalid FSN 
+16 M2P_EVT_M2P_BAD_BSNR l2_llid A message has been received with an invalid BSN 
+17 M2P_EVT_RTV_FAIL l2_llid A Retrieval Attempt has failed 
+18 M2P_EVT_CONG_DISCARD l2_llid Excess Congestion has resulted in the discard of a 
+message 
+19 M2P_EVT_MTP_FMT_ERROR l2_llid A badly formatted message has been received from MTP 
+20 M2P_EVT_SCTP_FMT_ERROR l2_llid A badly formatted message has been received from 
+SCTP
+50 
+Chapter 4 Non-Primitive Interface 
+4.2.8 M2P_MSG_ERROR_IND – ERROR Indication 
+Synopsis 
+Notifies system management of various software errors occurring within the module which under normal 
+operating conditions should not occur. 
+Message Format 
+Description 
+This message is issued by M2PA to the management module (as configured in the configuration message) to 
+advise of general software events. These events may be due to lack of system resources or errors within the 
+software. Individual indications are issued dependant on the bits set in the management event trace mask. 
+The ERROR_CODE, id field, Parameter 1 and Parameter 2 definitions are as shown in the following table: 
+Message Header 
+Field Name Meaning 
+type M2P_MSG_ERROR_IND (0x0228) 
+id ID (see below) 
+src M2P module id 
+dst Management module id 
+rsp_req 0 
+hclass 0 
+status ERROR CODE (see below) 
+err_info 0 
+len 4 
+Parameter Area 
+Offset Size Name 
+0 2 Parameter 1 (see below) 
+2 2 Parameter 2 (see below) 
+Value Mnemonic id Parameter 1 Parameter 2 Description 
+0 M2P_ERR_TIM_START link id timer_type timer_id Failed to start Timer 
+1 M2P_ERR_LNK_END link id asc_id 0 Failed to end link 
+2 M2P_ERR_UNEX_INT_EVT link id state 
+machine id state id Unexpected event generated internally 
+3 M2P_ERR_BUFF_FAIL link id sequence 
+number 0 Failed to buffer MSU
+51 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+4.2.9 M2P_MGT_MSG_LINK_STATE – M2PA Link STATE Indication 
+Synopsis 
+Informs Management of changes in the current internal state of the M2PA link. 
+Message Format 
+Description 
+This primitive is used by M2PA to indicate to local management changes of state within the Link State Control 
+function. These indications are only given if the S7_STATUS bit of the management event trace mask is set. 
+Note: This message is intended for diagnostic and maintenance purposes and does not form part of the 
+protocol specified primitives. 
+The LINK STATE is coded as shown in the following table: 
+Message Header 
+Field Name Meaning 
+type M2P_MGT_MSG_LINK_STATE (0x0226) 
+id M2PA Link id 
+src M2PA module id 
+dst Management module id 
+rsp_req 0 
+hclass 0 
+status LINK STATE (see below) 
+err_info Timestamp 
+len 0 
+Value Mnemonic Description 
+1 S7S_IN_SERVICE Entered IN SERVICE state 
+2 S7S_OUT_SERVICE Entered OUT OF SERVICE state 
+3 S7S_INIT_ALIGN Entered INITIAL ALIGNMENT state 
+4 S7S_ALIGN_NOT_RDY Entered ALIGNED NOT READY state 
+5 S7S_ALIGN_READY Entered ALIGNED READY state 
+6 S7S_PROC_OUTAGE Entered PROCESSOR OUTAGE state
+52 
+Chapter 5 Typical Configuration Values 
+Chapter 5:  Typical Configuration Values 
+Table1 gives typical values to be used in the configuration messages for correct operation of M2PA to quickly 
+get the system up and running. 
+To ensure the appropriate values are being used for a specific installation, refer to the detailed message 
+definitions in this manual. 
+Table 1. Typical Configuration Values 
+Parameter Typical Setting (for ITU-T operation) 
+options 0x0000 
+upper_id 0x22 (MTP3 module) 
+lower_id 0x00 
+mgmt_id 0x8e (Management module) 
+monitor_id 0 
+max_SIF_len 272 
+cong_onset 50 
+cong_abate 20 
+pcr_n1 0 
+pcr_n2 0 
+rtv_attempts 4 
+t1 450 (giving T1 = 45 seconds) 
+t2 300 (giving T2 = 30 seconds) 
+t3 12 (giving T3 = 1.2 seconds) 
+t4n 82 (giving T4 
+N = 8.3 seconds) 
+t4e 5 (giving T4E = 0.5 seconds) 
+t5 1 (giving T5 = 100 ms) 
+t6 55 (giving T6 = 5.5 seconds) 
+t7 15 (giving T7 = 1.5 seconds) 
+t_suerm 10 
+t_rtv 1 
+cong_discard 128 
+l3_link_id Set to the MTP3 link_id 
+co1 40 
+co2 60 
+co3 80 
+ca1 30 
+ca2 50 
+ca3 70 
+cd1 45 
+cd2 65 
+cd3 80 
+53 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+Chapter 6:  Message Types 
+6.1 Message Type Table 
+Table2 lists, by message type, all the new messages defined in this manual. 
+Note: The message type for the confirmation message is set as described in the System Software 
+Environment Programmer's Manual, in the paragraph describing the rsp_req field. 
+Table 2. Message Types 
+Message Type Mnemonic Description 
+0x0226 M2P_MGT_MSG_LINK_STATE M2PA Link STATE Indication 
+0x0227 M2P_MGT_MSG_EVENT_IND EVENT Indication 
+0x0228 M2P_MSG_ERROR_IND ERROR Indication 
+0x6224 M2P_MSG_R_STATE READ STATE Read Request 
+0x6225 M2P_MSG_R_STATS READ STATISTICS Read Request 
+0x7220 M2P_MSG_CONFIG Configure M2PA Module 
+0x7221 M2P_MSG_CNF_LINK M2PA Link Configuration Request 
+0x7222 M2P_MSG_END_LINK M2PA Link End Request 
+0x7223 M2P_MSG_TRACE_MASK TRACE MASK Set Request 
+0x2224 - Confirm Link State Request 
+0x2225 - Confirm Link Stats Request 
+0x3220 - Confirm M2PA Module Configuration 
+0x3221 - Confirm M2PA Link Configuration Request 
+0x3222 - Confirm M2PA Link End Request 
+0x3223 - Confirm M2PA Link Trace Mask Set Request
+54 
+Chapter 7 Timer Services 
+Chapter 7:  Timer Services 
+7.1 Introduction 
+The notion of time in the M2PA module is based on a periodic timer tick received from the timer module 
+every 100 milliseconds. This “tick” is used to run all M2PA protocol timers. This chapter details the message 
+formats that are used by the M2PA module to control timer services. 
+Timer messages include: 
+•KEEP_TIME - Keep Time 
+•TM_EXP - Timer Expiry 
+7.1.1 KEEP_TIME – Keep Time 
+Synopsis 
+Message sent to request the timer module to issue a periodic timer tick (TM_EXP) message to the M2PA 
+module. 
+Message Format 
+Parameters 
+•reserved 
+Should be set to zero if issued by the user and is discarded when received by the timer module. 
+•resolution 
+The number of operating system ticks between timer expiry messages being issued to the M2PA module. 
+Message Header 
+Field Name Meaning 
+type KEEP_TIME (0x7006) 
+id 0 
+src Sending module’s ID 
+dst Timer module ID 
+rsp_req 0 
+class 0 
+status 0 
+err_info 0 
+len 6 
+Parameter Area 
+Offset Size Name 
+0 4 Reserved 
+4 2 resolution
+55 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+7.1.2 TM_EXP – Timer Expiry 
+Synopsis 
+Periodic timer tick message issued by the timer module. 
+Message Format 
+Parameters 
+•reserved 
+Must be set to zero. 
+Message Header 
+Field Name Meaning 
+type TM_EXP (0xc002) 
+id index of timer in table 
+src Timer module ID 
+dst Destination module ID 
+rsp_req 0 
+class 0 
+status 0 
+err_info 0 
+len 4 
+Parameter Area 
+Offset Size Name 
+0 4 reserved 
+56 
+Appendix A Network Address Representation 
+Appendix A: Network Address Representation 
+The SCTP module is designed to facilitate future support for IP V6 addresses. Currently only IPV4 addresses 
+are supported, but the interface to the module is designed to accommodate V6 addresses in the future. 
+A.1 Network Address Structure for an Invalid Address 
+An invalid or “not present” network address is represented in the following way: 
+•Address Type - ADR_NONE 
+•Address Value - Undefined 
+A.2 Network Address Structure for Internet Protocol Version 4 
+IPV4 network addresses are represented in the following way: 
+•Address Type - ADR_IPV4 
+•Address Value - 16 octets containing the following: 
+—Octet 0 - MSB of network address 
+—... 
+—Octet 3 - LSB of network address 
+—Octet 4 - undefined 
+—... 
+—Octet 15 - undefined 
+57 
+Dialogic® SS7 Protocols M2PA Programmer’s Manual Issue 3 
+Glossary 
+BSNT Backward Sequence Number Transmitted 
+FSNC Forward Sequence Number Confirmed 
+M2PA An implementation of the IETF SIGTRAN, SS7 MTP2-User Peer-to-Peer Adaptation Layer 
+(M2PA). 
+MTP2 Message Transfer Part Level 2. An SS7 stack layer that provides link-layer functionality. 
+Ensures that two end points of a signaling link can reliably exchange signaling messages. 
+It provides error checking, flow control and sequence checking. 
+MTP3 Message Transfer Part Level 3. An SS7 stack layer that provides network-layer 
+functionality. Ensures that messages can be delivered between signaling points across 
+the SS7 network regardless of whether the signaling points are directly connected. It 
+provides node addressing, routing, alternate routing and congestion control. 
+LSSU Link Status Signal Units. A signal unit that provides link status indications (for example, 
+normal, out of alignment, out of service, emergency status) to the remote end of the 
+signaling link. 
+MSU Message Signal Unit. A data unit that carries signaling information for call control, 
+transaction processing, network management and maintenance. Typically, the MSU is 
+carried in the Signaling Information Field (SIF) of SS7 messages. 
+PPID Payload Processor Identifier 
+Q.703 ITU-T Recommendation Q.703, Message Transfer Part Layer 2 
+RPO Remote Processor Outage 
+SCTP Stream Control Transmission Protocol 
+SIF Signaling Information Field 
+SIGTRAN The IETF Signaling Transport Group 
+SIO Service Information Octet 
+SS7 Signaling System Number 7 
+SSF Sub-Service Field 
+SU Signal Unit 
+58 
+Index 
+Index 
+C 
+configuration 
+typical values 52 
+D 
+documentation 
+related information 5 
+I 
+indication messages 
+M2PA to MTP3 26 
+SCTP to M2PA 13 
+M 
+M2PA 
+features 6 
+overview 6 
+M2PA link 
+configuration request 40 
+end request 42 
+reading statistics 47 
+reading the state 45 
+setting the trace mask 43 
+M2PA module 
+configuration of 39 
+providing notification of errors 50 
+providing notification of events 49 
+providing notification of M2PA link state change 51 
+M2PA to MTP3 indications 
+M2PA BSNT Indication 31 
+M2PA Congestion Cleared Indication 36 
+M2PA Flush Acknowledgement Indication 37 
+M2PA In Service Indication 28 
+M2PA Link Congested Indication 35 
+M2PA Out of Service Indication 29 
+M2PA Retrieval Complete Indication 33 
+M2PA Retrieval Failure Indication 34 
+M2PA Retrieved Message Indication 32 
+M2PA RPO Cleared Indication 30 
+M2PA RPO Indication 29 
+Received Message Indication 27 
+M2PA to SCTP requests 
+SCTP Association Abort Request 11 
+SCTP Association Activate Request 9 
+SCTP Association Data Transfer Request 12 
+SCTP Association Shutdown Request 10 
+message interface 
+non-primitive 38 
+primitive 8 
+MP2A 
+definition of 5 
+MTP3 to M2PA requests 
+M2PA BSNT Retrieval Request 23 
+M2PA Cancel Emergency Request 22 
+M2PA Link Start Request 20 
+M2PA Link Stop Request 21 
+M2PA LPO Recovered Request 25 
+M2PA LPO Request 25 
+M2PA Retrieval Request 24 
+M2PA Set Emergency Request 22 
+Message for Transmission Request 19 
+R 
+request messages 
+M2PA to SCTP 8 
+MTP3 to M2PA 18 
+S 
+SCTP to M2PA indications 
+SCTP Association Congestion Status 17 
+SCTP Association Data Transfer Indication 15 
+SCTP Association Network Status 16 
+SCTP Association Status Change 14

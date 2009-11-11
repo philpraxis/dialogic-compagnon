@@ -1,0 +1,2571 @@
+ 
+www.dialogic.com 
+Dialogic® SS7 Protocols 
+SUA Programmer's Manual 
+ 
+ 
+ 
+2 
+Copyright© 2007-2008 Dialogic Corporation. All Rights Reserved. You may not reproduce this document in whole or in part without 
+permission in writing from Dialogic Corporation at the address provided below. 
+All contents of this document are subject to change without notice and do not represent a commitment on the part of Dialogic 
+Corporation or its subsidiaries. Reasonable effort is made to ensure the accuracy of the information contained in the document. 
+However, due to ongoing product improvements and revisions, Dialogic Corporation and its subsidiaries do not warrant the accuracy of 
+this information and cannot accept responsibility for errors or omissions that may be contained in this document. 
+INFORMATION IN THIS DOCUMENT IS PROVIDED IN CONNECTION WITH DIALOGIC® PRODUCTS. NO LICENSE, EXPRESS OR IMPLIED, 
+BY ESTOPPEL OR OTHERWISE, TO ANY INTELLECTUAL PROPERTY RIGHTS IS GRANTED BY THIS DOCUMENT. EXCEPT AS EXPLICITLY 
+SET FORTH BELOW OR AS PROVIDED IN A SIGNED AGREEMENT BETWEEN YOU AND DIALOGIC, DIALOGIC ASSUMES NO LIABILITY 
+WHATSOEVER, AND DIALOGIC DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTY, RELATING TO SALE AND/OR USE OF DIALOGIC 
+PRODUCTS INCLUDING LIABILITY OR WARRANTIES RELATING TO FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR 
+INFRINGEMENT OF ANY INTELLECTUAL PROPERTY RIGHT OF A THIRD PARTY. 
+Dialogic products are not intended for use in medical, life saving, life sustaining, critical control or safety systems, or in nuclear facility 
+applications. 
+It is possible that the use or implementation of any one of the concepts, applications, or ideas described in this document, in marketing 
+collateral produced by or on web pages maintained by Dialogic Corporation or its subsidiaries may infringe one or more patents or other 
+intellectual property rights owned by third parties. Dialogic Corporation or its subsidiaries do not provide any intellectual property 
+licenses with the sale of Dialogic products other than a license to use such product in accordance with intellectual property owned or 
+validly licensed by Dialogic Corporation or its subsidiaries. More detailed information about such intellectual property is available from 
+Dialogic Corporation's legal department at 9800 Cavendish Blvd., 5th Floor, Montreal, Quebec, Canada H4M 2V9. The software referred 
+to in this document is provided under a Software License Agreement. Refer to the Software License Agreement for complete details 
+governing the use of the software. 
+Dialogic Corporation encourages all users of its products to procure all necessary intellectual property licenses required to implement 
+any concepts or applications and does not condone or encourage any intellectual property infringement and disclaims any responsibility 
+related thereto. These intellectual property licenses may differ from country to country and it is the responsibility of those who develop 
+the concepts or applications to be aware of and comply with different national license requirements.  
+Dialogic, Dialogic Pro, Brooktrout, Cantata, SnowShore, Eicon, Eicon Networks, Eiconcard, Diva, SIPcontrol, Diva ISDN, TruFax, 
+Realblocs, Realcomm 100, NetAccess, Instant ISDN, TRXStream, Exnet, Exnet Connect, EXS, ExchangePlus VSE, Switchkit, N20, 
+Powering The Service-Ready Network, Vantage, Connecting People to Information, Connecting to Growth, Making Innovation Thrive, 
+and Shiva, among others as well as related logos, are either registered trademarks or trademarks of Dialogic. 
+Windows is a registered trademark of Microsoft Corporation in the United States and/or other countries. Other names of actual 
+companies and products mentioned herein are the trademarks of their respective owners. 
+This document discusses one or more open source products, systems and/or releases. Dialogic is not responsible for your decision to 
+use open source in connection with Dialogic products (including without limitation those referred to herein), nor is Dialogic responsible 
+for any present or future effects such usage might have, including without limitation effects on your products, your business, or your 
+intellectual property rights. 
+Publication Date: April 2008 
+Document Number: U07STN, Issue 3 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+3 
+Contents 
+Revision History............................................................................................................7 
+1 Introduction........................................................................................................9 
+1.1 Manual and Module Overview...................................................................................................9 
+1.1 Abbreviations.........................................................................................................................9 
+1.2 Related Documentation.........................................................................................................10 
+1.3 Feature Overview.................................................................................................................10 
+1.4 Applicability.........................................................................................................................11 
+2 Functional Overview..........................................................................................13 
+2.1 Module Overview..................................................................................................................13 
+2.2 Modes of Operation...............................................................................................................13 
+2.2.1 ASP Operation..........................................................................................................14 
+2.2.2 IPSP Operation.........................................................................................................15 
+2.3 Internal Data Structures........................................................................................................15 
+2.3.1 Global Data Structure...............................................................................................16 
+2.3.2 Application Server (AS).............................................................................................16 
+2.3.3 Application Server Process (ASP)................................................................................16 
+2.3.4 Signaling Gateway (SG)............................................................................................16 
+2.3.5 Routing Key (RK).....................................................................................................17 
+2.3.6 Association (ASC).....................................................................................................17 
+2.4 Configuration Model..............................................................................................................17 
+2.5 Message Interface................................................................................................................18 
+2.6 Global Title Translation..........................................................................................................19 
+2.7 Licensing.............................................................................................................................19 
+2.8 Migration to SUA from SCCP..................................................................................................20 
+3 Interface to System Services.............................................................................23 
+3.1 System Functions.................................................................................................................23 
+3.2 Timer Operation...................................................................................................................23 
+4 Message Reference............................................................................................25 
+4.1 Return Codes.......................................................................................................................25 
+4.2 Configuration Messages.........................................................................................................26 
+4.2.1 Module Configuration Message...................................................................................26 
+4.2.2 Local Application Server Process Configuration.............................................................28 
+4.2.3 Association Configuration..........................................................................................29 
+4.2.4 Local Application Server Configuration........................................................................31 
+4.2.5 Bind Local Application Server Configuration.................................................................33 
+4.2.6 Remote Application Server Configuration.....................................................................34 
+4.2.7 Bind Remote Application Server Configuration..............................................................35 
+4.2.8 Remote Signaling Gateway Configuration....................................................................36 
+4.2.9 Routing Key Configuration.........................................................................................37 
+4.2.10 Bind Routing Key Configuration..................................................................................38 
+4.2.11 Trace Mask Configuration Request..............................................................................39 
+4.3 Management Messages..........................................................................................................42 
+4.3.1 Activate Association..................................................................................................42 
+4.3.2 Activate Local Application Server Process....................................................................43 
+4.3.3 Deactivate Association..............................................................................................44 
+4.3.4 Deactivate Local Application Server Process.................................................................45 
+4.4 Maintenance Messages..........................................................................................................46 
+4.4.1 Maintenance Event Indication....................................................................................46 
+4.5 Status Messages...................................................................................................................48 
+4.5.1 Read Association Status Request................................................................................48 
+4.5.2 Read Local Application Server Process Status Request..................................................49 
+Contents 
+4 
+4.5.3 Read Remote Application Server Process Status Request...............................................50 
+4.5.4 Read Local Application Server Status Request..............................................................51 
+4.5.5 Read Remote Application Server Status Request...........................................................52 
+4.5.6 Error Message Indication...........................................................................................53 
+4.5.7 Notify Indication.......................................................................................................55 
+4.5.8 Association Status Indication......................................................................................56 
+4.5.9 Local Application Server Process Status Indication........................................................57 
+4.5.10 Remote Application Server Process Status Indication....................................................58 
+4.5.11 Local Application Server Status Indication....................................................................59 
+4.5.12 Remote Application Server Status Indication................................................................60 
+4.5.13 Routing Key Status Indication....................................................................................61 
+4.6 Statistics Messages...............................................................................................................63 
+4.6.1 Read Server Statistics...............................................................................................63 
+4.6.2 Read Routing Key Statistics.......................................................................................64 
+4.6.3 Read Association Statistics.........................................................................................65 
+4.7 Other Messages....................................................................................................................70 
+4.7.1 Read Revision Request..............................................................................................70 
+4.7.2 License Event Indication............................................................................................71 
+4.7.3 Request Licensing State............................................................................................72 
+5 External Message Definitions: SCTP Interface...................................................75 
+5.1 Primitives from SUA to SCTP..................................................................................................75 
+5.2 Primitives from SCTP to SUA..................................................................................................75 
+6 External Message Definitions: SCCP Interface...................................................77 
+6.1 Management Messages..........................................................................................................77 
+6.1.1 Read Global Q.752 (previously Q.791) Statistics...........................................................77 
+6.1.2 Management Indication.............................................................................................80 
+6.2 Protocol Messages.................................................................................................................82 
+6.3 Global Title Translation Messages............................................................................................82 
+7 Example Configurations....................................................................................83 
+7.1 IPSP Peer-to-Peer.................................................................................................................83 
+7.2 ASP to Signaling Gateway......................................................................................................86 
+Appendix A: Message Types........................................................................................89 
+A.1 Message Type Table..............................................................................................................89 
+Appendix B: Additional Services.................................................................................91 
+B.1 Timer Services......................................................................................................................91 
+B.1.1 Keep Time ..........................................................................................................91 
+B.1.2 Timer Expiry ..........................................................................................................92 
+Figures 
+Figure 1. ASP Operation.........................................................................................................14 
+Figure 2. IPSP Operation........................................................................................................15 
+Figure 3. Internal Data Structures...........................................................................................16 
+Figure 4. Configuration Model.................................................................................................17 
+Figure 5. Message Interface....................................................................................................18 
+Figure 6. Different Module Relationships when used in a Configuration based on SCCP or SUA........20 
+Figure 7. IPSP Configuration...................................................................................................83 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+5 
+Tables 
+Table 1. Maintenance Event Codes.........................................................................................47 
+Table 2. Parameter Values....................................................................................................54 
+Table 3. Error Codes............................................................................................................54 
+Table 4. Status Type............................................................................................................56 
+Table 5. Primitive Types and Format Identifiers.......................................................................81 
+ 
+Contents 
+6 
+ 
+DialogicTP®TP SS7 Protocols SUA Programmer's Manual Issue 3 
+7 
+Revision History 
+Issue Date Description 
+3 April 2008 Minor updates. 
+2 February 2008 Minor changes since the initial release. 
+1 December 2007 Initial release 
+Note: The latest release issue of this guide can be found at:  
+http://www.dialogic.com/support/helpweb/signaling 
+ 
+Revision History 
+8 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+9 
+ 1 Introduction 
+This section contains: 
+• An overview of the manual and of the SUA module.  See Manual and 
+Module Overview below. 
+• Abbreviations used in this manual.  See Abbreviations below.  
+• Related documentation. See Related Documentation on page 10. 
+• An overview of the features of the SUA module.  See Feature Overview on 
+page 10. 
+• A statement about what this manual covers.  See Applicability on page 
+11. 
+1.1 Manual and Module Overview 
+The Dialogic® SS7 Protocols SUA module is a portable software 
+implementation of the IETF SIGTRAN, SS7 SCCP User Adaptation Layer 
+(SUA). This Programmer's Manual is intended for users who choose to 
+develop their own application programs that will interface with and use the 
+functionality provided by the SUA module.  
+The module uses the services provided by the Stream Control Transmission 
+Protocol (SCTP) to exchange signaling messages with a number of SUA 
+Signaling Gateway Processes (SGP) or remote SUA Application Server 
+Processes (ASP).  As such, it can be used as part of either an ASP or in an 
+IPSP mode.  
+The SUA module is event driven and uses standard structured message 
+types. It is intended to be used in conjunction with other Dialogic® SS7 
+Protocols such as SCTP and TCAP. This manual provides an overview of the 
+internal operation of the SUA module, defines the structure of messages that 
+can be sent to, or issued by, the module and also describes all the 
+configuration parameters. 
+1.1 Abbreviations 
+The following table contains a list of abbreviations used in this manual. 
+Abbreviation Description 
+AS Application Server 
+ASP Application Server Process 
+IETF The Internet Engineering Task Force 
+ITU The International Telecommunication Union (Previously CCITT) 
+IPSP IP Signaling Point 
+L Local (e.g. L_AS is Local Application Server) 
+M3UA SS7 MTP3 User Adaptation Layer 
+MTP2 Message Transfer Part Layer 2 
+MTP3 Message Transfer Part Layer 3 
+DPC Destination Point Code 
+Section  T 1T Introduction 
+10 
+Abbreviation Description 
+OPC Originating Point Code 
+R Remote (e.g. R_AS is Remote Application Server) 
+SCTP Stream Control Transmission Protocol 
+SG Signaling Gateway 
+SGP Signaling Gateway Process 
+SIGTRAN The IETF Signaling Transport Group 
+SS7 Signaling System Number 7 
+SUA SS7 SCCP User Adaptation Layer 
+1.2 Related Documentation 
+• IETF RFC 3868 SUA-User Adaptation Layer. 
+• IETF RFC 2960 Stream Control Transmission Protocol. 
+• Dialogic® SS7 Programmer's Manual for SPCI2S, SPCI4 and CPM8. 
+• Dialogic® SCTP Programmer's Manual. 
+• Dialogic® Software Environment Programmer's Manual. 
+1.3 Feature Overview 
+Features of the SUA module include: 
+• Implementation of IETF RFC 3868 Signaling Connection Control Part User 
+Adaptation Layer (SUA). 
+• User interface common with other Dialogic® Signaling Protocols. 
+• Message-oriented interface. 
+• May be used as part of an ASP or IPSP node. 
+• Support for Connection-less SCCP services 
+• Full user control of ASP / AS Registration and Activation. 
+• Supports 14, 16 and 24 bit Point Codes for ITU-T and ANSI networks. 
+• Supports simultaneous connection to multiple networks. 
+• Supports SCCP User interface 
+• Supports Routes via multiple SGs. 
+• Debug tracing of messages exchanged with SCTP and SUA User 
+• Multiple local application servers.  
+• Multiple local application server processes.  
+• For each route, load-sharing across two SGPs or ASPs is supported.  
+• Routing based upon TCAP Transaction ID.  
+• Generation of DAUD messages.  
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+11 
+• Single Exchange and Double Exchange registration.  
+• Controlled Changeover during network failures.  
+• Global Title Translation 
+1.4 Applicability 
+This documentation covers the Dialogic® SUA host binaries for use on 
+Windows®, Linux and Solaris operating systems for both ASP and IPSP 
+operation. 
+Section  T 1T Introduction 
+12 
+ 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+13 
+2 Functional Overview 
+This section provides a module overview (see Module Overview below).   
+In addition, it contains information about: 
+• Modes of Operation.  See below. 
+• Internal  DataStructures.  See page 15. 
+• Configuration Model. See page 17. 
+• Global  TitleTranslation. See page 19. 
+• Message Interface.  See page 18. 
+• Licensing.  See page 19. 
+2.1 Module Overview 
+The Dialogic® SUA module implements the SS7 SCCP-User Adaptation Layer 
+as defined in the IETF RFC.  The module interface is message-based. The 
+module reads messages from a single message input queue and sends 
+responses and indications to the message input queues of the other modules 
+in the system. 
+This implementation may be used in either an ASP or IPSP mode of operation.  
+Different services are offered by the module accordingly. 
+Irrespective of whether it is used as an ASP or IPSP the SUA module 
+interfaces with SCTP using the User Primitives defined in the Dialogic® SCTP 
+Programmer's Manual.  These Primitives may be used to interface to another 
+SCTP implementation if required. 
+2.2 Modes of Operation 
+The two main modes of operation for SUA are either when connected via a 
+Signaling Gateway or directly to another peer end point. These are referred to 
+in this documentation as either Application Server Process (ASP) or IP 
+Signaling Point (IPSP) operation. The SUA protocol can also be used within a 
+Signaling Gateway but this mode of operation is not supported. 
+Section  2 Functional Overview 
+2.2.1 ASP Operation 
+Figure 1. ASP Operation 
+ 
+When used as part of an ASP, SUA offers an SCCP Interface to its Users.  It 
+does not offer SCCP services directly; rather, it offers connection to Signaling 
+Gateways where these services are offered.  Because the interface is based 
+on the ITU-T or ANSI recommended primitives, it allows easy interfacing of 
+the SUA module to SCCP User Parts.  Furthermore, the module will interface 
+directly to other Dialogic® Signaling Protocol Modules.  This allows existing 
+applications running with a local MTP3/SCCP to be easily ported to running 
+over SUA. 
+14 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+2.2.2 IPSP Operation 
+Figure 2. IPSP Operation 
+ 
+Allows two peer ASPs to communicate without the need for a Signaling 
+Gateway. They communicate directly over IP, and no TDM-based SS7 
+messages are sent. The protocol message API for IPSP operation is the same 
+as for ASP Operation. The differences are largely in configuration and 
+management. 
+2.3 Internal Data Structures 
+This section describes the internal data structures used by the SUA module. 
+This description is intended to assist the user in understanding the operation 
+of the module. It is not necessary to acquire detailed knowledge of these 
+structures in order to use the module. 
+15 
+Section  2 Functional Overview 
+Figure 3. Internal Data Structures 
+ 
+2.3.1 Global Data Structure 
+The entire data storage used by the module is contained in a single 
+contiguous data structure. This structure contains global configuration 
+settings, per ASP, AS, SG configuration, statistics and state.  It also contains 
+internal event queues, timer control structures and internal buffers for 
+message processing. 
+2.3.2 Application Server (AS) 
+A logical grouping of one or more Application Server Processes, which 
+together provide a specific service for a particular defined Routing Key. These 
+may either be local or remote Application Servers and are referred to in this 
+manual as either L_AS or R_AS respectively. 
+2.3.3 Application Server Process (ASP) 
+These can be considered to be processing resources on which services are 
+offered by Logical Application Servers. An ASP has an SCTP end-point. An 
+ASP may service one or more Application Servers. 
+2.3.4 Signaling Gateway (SG) 
+A logical entity that sits between a TDM SS7 network and an IP-based Sigtran 
+network and allows messages to be carried between the networks. 
+16 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+2.3.5 Routing Key (RK) 
+Defines one or more SS7 parameters that uniquely identify traffic which 
+should be handled by a particular Application Server. For SUA, this may be, 
+as an example, a point code and sub-system combination. 
+2.3.6 Association (ASC) 
+An SCTP association over which SUA protocol and data messages can be sent. 
+2.4 Configuration Model 
+The User configures the module for operation using the configuration 
+messages in Section  4on page 25. The first message sent to the module 
+must be a global configuration message. This configures environment- 
+dependent parameters. In general, these parameters will be fixed for any 
+single application. The configuration messages may then be used as required.   
+The figure below shows the set of SUA entities which may need to be 
+configured together with the relationships between them. In addition, for 
+each entity the list of parameters needing to be configured is denoted as well 
+as the appropriate messages that manage the entity. For example, the 
+Remote AS entity takes only one parameter (r_as_id). The Remote AS only 
+has one relevant configuration or management message (represented as a 
+function call Configure()). 
+Figure 4. Configuration Model 
+17 
+ 
+Section  2 Functional Overview 
+2.5 Message Interface 
+Figure 5. Message Interface 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+SUA 
+Module 
+ 
+ 
+ 
+ 
+SCCP/SUA 
+User 
+Management Interface Non-Primitive 
+Interface 
+Services 
+IP Stack 
+SCTP 
+ 
+SUA has four main message interfaces: 
+• SCTP Interface: User data messages to and from the SCTP user interface 
+• SCCP/SUA User Interface: User data messages to and from SCCP or SUA. 
+SUA has been developed to match the existing interface of the SCCP 
+module. 
+• Management Interface: Messages to control the state of configured 
+entitles 
+• Non-primitive Interface: Message to offer configuration, maintenance 
+operations, status and statistics. 
+18 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+19 
+2.6 Global Title Translation 
+SUA can perform global title translation in the same manner as SCCP. The 
+user interface is unchanged from the messages used to configure SCCP. The 
+only change required is to the destination module id. 
+2.7 Licensing 
+The module can be enabled via a number of different licenses. Each license 
+permits a different number of associations and a throughput to be used. The 
+initial set of licenses supported by the module is given below. 
+License Number of associations Throughput 
+SS7SBHSTSUAU 4 associations  4 link equivalent throughput   
+(312 Kbps) 
+SS7SBHSTSUAS 16 associations  
+ 
+16 link equivalent throughput  
+(1232 Kbps) 
+SS7SBHSTSUAR 32 associations  32 link equivalent throughput  
+(2464 Kbps) 
+SS7SBHSTSUAL 64 associations  64 link equivalent throughput  
+(4920 Kbps) 
+The module can also be run in trial mode to permit evaluation of the product. 
+When run in this mode, the module will run for up to ten (10) hours with 
+dimensioning equivalent to the SS7SBHSTSUAS license. 
+Section  2 Functional Overview 
+2.8 Migration to SUA from SCCP 
+The figure below shows the different module relationships between modules 
+when used in a configuration based on either SCCP or SUA. 
+Figure 6. Different Module Relationships when used in a Configuration based on 
+SCCP or SUA 
+ 
+TCAP Configuration 
+The migration of an application from use of SCCP to SUA requires little 
+changes to the protocol messages. If using the Dialogic® TCAP module, then 
+the configuration option TCPF_DTID_ON is required in order to permit 
+distribution of traffic based on transaction id. 
+20 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+21 
+System Configuration 
+A new message queue for SUA will be required. 
+Sigtran Configuration 
+The other changes required are largely based on the different configuration 
+requirements of the Sigtran protocols - in other words, the SUA and SCTP 
+specific configuration message. 
+Section  2 Functional Overview 
+22 
+ 
+ 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+23 
+3 Interface to System Services 
+This section provides information about: 
+• System Functions.  See below. 
+• Timer Operation.  See below. 
+3.1 System Functions 
+In addition to the primitive interface and the management interface to the 
+Dialogic® SUA module (which are described in later sections), the module 
+requires a few basic system services to be supplied by the underlying 
+operating system. This functionality is usually supplied by the appropriate 
+Development package. 
+The following functions are required for inter-task communication: 
+Function Description 
+GCT_send Sends a message to another task. 
+GCT_receive Accepts next message from input event queue, blocking the task if no 
+message is ready. 
+GCT_grab As for GCT_receive but not blocking if no message is ready. 
+The following functions are required for allocation of inter-task messages: 
+Function Description 
+getm Allocate a message. 
+relm Release a message. 
+3.2 Timer Operation 
+In order to provide internal implementation of the SUA protocol timers, the 
+module needs to receive a periodic timer tick message. This is usually 
+achieved using either the Enhanced Driver Module or the Timer module, in 
+which case the following messages are used by the SUA module: 
+Message Description 
+KEEP_TIME Issued by the module to initialize the timer services 
+TM_EXP Issued by the timer module to notify of time-out. 
+ 
+Section  3 Interface to System Services 
+24 
+ 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+25 
+4 Message Reference 
+The interface to the user application is a superset of messages defined for the 
+Dialogic® SCCP Protocol Message API, with the addition of SUA specific 
+configuration and management messages.  
+The list of messages defined and inherited from other protocol modules is 
+given in: 
+• Section :  5 External Message Definitions: SCTP Interfaceon page 75. 
+• Section :  6 External Message Definitions: SCCP Interfaceon page 77. 
+In this section 
+This section contains information about: 
+• Return Codes.  See below. 
+• Configuration Messages.  See page 26. 
+• Management Messages.  See page 42. 
+• Maintenance Messages.  See page 46. 
+• Status Messages.  See page 48. 
+• Statistics Messages.  See page 63. 
+• Other Messages.  See page 70. 
+4.1 Return Codes 
+Unless otherwise noted, when the SUA module returns a confirmation 
+message containing a status value the status will be one of the following: 
+Mnemonic Value Description 
+SDE_MSG_OK  0x00 Success.  
+SDE_BAD_ID 0x01 Inappropriate or invalid id in request message. 
+SDE_BAD_STATE 0x02 Message received in wrong state.  
+SDE_BAD_SIG 0x03 Bad signal received. 
+SDE_UNEX_SIG 0x04 Unexpected signal received.  
+SDE_BAD_MSG  0x05 Unsupported message received.  
+SDE_BAD_PARAM 0x06 Invalid parameters contained in message.  
+SDE_NO_RESOURCES 0x07 Insufficient internal message resources.  
+SDE_INVALID_NC 0x08 Invalid Network Context.  
+SDE_INVALID_VERSION   0x09 Message version is invalid.  
+SDE_BAD_MSG_LEN  0x0b Invalid message length. 
+SDE_LICENCE_ERR  0x0e Command failed due to a licensing restriction.  
+SDE_INTERNAL_ERR 0x0f Command failed due to an internal error. 
+Section  4 Message Reference 
+26 
+4.2 Configuration Messages 
+This section contains information about the following messages: 
+• Module Configuration Message.  See below. 
+• Bind   RoutingKeyConfiguration.  See page 38. 
+• Local Application Server Process Configuration.  See page 28. 
+• Association Configuration.  See page 29. 
+• Bind Local Application Server Configuration.  See page 33. 
+• Local   ApplicationServerConfiguration.  See page 31. 
+• Bind    RemoteApplicationServerConfiguration.  See page 35. 
+• Remote   ApplicationServerConfiguration.  See page 34. 
+• Remote   SignalingGatewayConfiguration.  See page 36. 
+• Routing  KeyConfiguration.  See page 37. 
+• Bind Routing Key Configuration.  See page .38 
+• Trace Mask Configuration Request  See page 39. 
+4.2.1 Module Configuration Message 
+Synopsis 
+Module-wide configuration message identifying default module Ids and 
+resource allocation. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_CONFIG (0x739c) 
+id 0 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 19 
+ 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+27 
+Parameter Area 
+Offset Size Name 
+0 1 sctp_mod_id 
+1 1 mgt_mod_id 
+2 1 trace_mod_id 
+3 2 max_assocs 
+5 2 Reserved (set to 0) 
+7 2 max_routes 
+9 4 max_gtt 
+13 1 maint_mod_id 
+14 3 reserved (set to 0) 
+17 2 max_throughput 
+Description 
+This message is used to configure the SUA module for operation. It should be 
+the first message sent to the module (any messages received before a valid 
+configuration message will be discarded) and should only be issued once. 
+The message contains parameters relating to the environment in which the 
+module is operating, such as the identity of other modules with which it 
+needs to communicate. 
+Parameters 
+sctp_mod_id 
+Module identifier for the SCTP module being used 
+mgt_mod_id 
+Module identifier defining the destination for all management indications 
+trace_mod_id 
+Module identifier defining the destination for all traced messages 
+max_assocs 
+Set to configure the maximum number of associations to be used. 
+max_routes 
+Set to configure the maximum number of routes expected. 
+max_gtt 
+Set to configure the maximum number of Global Title Translations required. 
+Section  4 Message Reference 
+28 
+maint_mod_id 
+Module identifier defining the destination for all maintenance indications.  If 
+zero the mgt_mod_id will be used. 
+max_throughput 
+Set to zero (0) to permit the module to run at the licensed rate. 
+4.2.2 Local Application Server Process Configuration 
+Synopsis 
+Message used to configure a Local Application Server Process. 
+Message Format 
+Message Header 
+Field Name Meaning 
+Type SUA_MSG_CFG_LASP (0x739d) 
+id L_ASP id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 4 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 asp_identifier 
+Description 
+This message configures the Local Application Server Process. The id field of 
+the message header will define the logical identifier to be used in other 
+configuration messages. This message must be sent prior to configuring 
+associations or Local Application Servers. 
+Parameters 
+asp_identifier 
+Transmitted to the remote SGP or ASP and used to identify this ASP in 
+NOTIFY messages.  
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+29 
+4.2.3 Association Configuration 
+Synopsis 
+Message used to configure an Association for use with SUA. 
+Message Format 
+Message Header 
+Field Name Meaning 
+Type SUA_MSG_CFG_ASC (0x739e,) 
+Id Asc ID 
+Src Originating module ID 
+Dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+Hclass 0 
+Status 0 
+err_info 0 
+Len 14 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 sctp_ASC_id 
+2 2 default_nc 
+4 2 lasp_id 
+6 2 lsgp_id 
+8 2 rsg_id 
+10 4 options 
+Description 
+This message configures the SUA level parameters required to operate a 
+previously configured SCTP association. The Local Application Server Process 
+and, where applicable, the Remote Signaling Gateways must already be 
+configured. 
+Section  4 Message Reference 
+30 
+Parameters 
+sctp_ASC_id 
+Used to specify the logical identifier used by SCTP for this association. 
+default_nc 
+Sets the default network context for the association. 
+lasp_id 
+Used to specify the Local Application Server Process attached to the 
+association. 
+lsgp_id 
+Not required for ASP or IPSP operation. Set to 0. 
+rsg_id 
+Used to specify the Remote Signaling Gateway at the remote end of the 
+association. 
+options 
+A bit field to allow one or more per-association options to be set. 
+Bit Mnemonic Description 
+0 SUA_CFG_ASC_OPTIONS_R_ASP There is an ASP on the remote end.  
+Set to 1 for IPSP operation. If not set, 
+then ASP to SG operation is assumed. 
+1 SUA_CFG_ASC_OPTIONS_SE_MODE Operate in single-exchange mode (for 
+IPSP) 
+Set to 1 for single exchange 
+registration. If not set, then double 
+exchange registration is used. 
+2 SUA_CFG_ASC_OPTIONS_L_ASP_PRESENT Set if the local side is an ASP 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+31 
+4.2.4 Local Application Server Configuration 
+Synopsis 
+Message used to configure a Local Application Server. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_CFG_LAS (0x739f) 
+id L_AS Id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 17 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 rc 
+4 1 tr_mode 
+5 1 user_mod_id 
+6 2 lasp_id 
+8 1 tid_start 
+9 1 tid_end 
+10 2 tid_value 
+12 4 options 
+16 1 format 
+Description 
+This message configures the Local Application Server and attaches it to a 
+Local Application Server Process. It also configures the properties sent to 
+Remote Application Server to permit them to load-share traffic appropriately. 
+The Local Application Server Process must already have been configured. 
+Section  4 Message Reference 
+32 
+Parameters 
+rc 
+Routing Context. 
+tr_mode 
+The traffic mode parameter can take one of three values specified below. This 
+instructs the Remote AS how to distribute traffic to the Local AS. 
+Value Mnemonic Description 
+0 SUA_CFG_LAS_TR_MODE_OVERRIDE  Traffic should be sent to the L_ASP 
+which last sent an ASP Activate. 
+1 SUA_CFG_LAS_TR_MODE_LOADSHARE Traffic should be load-shared amongst 
+L_ASP 
+2 SUA_CFG_LAS_TR_MODE_BROADCAST  Traffic should be sent to all associated 
+L_ASP 
+user_mod_id 
+Module to which traffic for this L_AS should be sent. This is typically TCAP 
+(0x14). 
+lasp_id 
+Set to match the id field of the Local ASP configuration message. 
+tid_start 
+Indicates the start of the bits in the destination transaction id which should be 
+used for load-sharing. To enable transaction id based distribution the option 
+SUA_CFG_LAS_OPTIONS_TID_PRESENT should also be set. 
+tid_end 
+Indicates the last bit in the destination transaction id which should be used 
+for load-sharing. To enable transaction id based distribution the option 
+SUA_CFG_LAS_OPTIONS_TID_PRESENT should also be set. 
+tid_value 
+Indicates the value that should be used to indicate the L_ASP on the L_AS. To 
+enable transaction id based distribution the option 
+SUA_CFG_LAS_OPTIONS_TID_PRESENT should also be set. 
+options 
+A bit field specifying to allow one or more per-L_AS options to be set. 
+Bit Mnemonic Description 
+0 SUA_CFG_LAS_OPTIONS_BIND_ALL Bind to all associations automatically 
+1 SUA_CFG_LAS_OPTIONS_TID_PRESENT Set to 1 to request the Transaction id 
+based distribution. 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+33 
+format 
+Definition of L_AS address format. This parameter should be set to the same 
+value as for TCAP Configuration Message. 
+Value Mnemonic Description 
+0 SUA_CFG_LAS_ADDR_FMT_DEFAULT Default: ITU-T format, 14 bit point 
+codes (same as 1 below) 
+1 SUA_CFG_LAS_ADDR_FMT_ITU14 ITU-T format, 14 bit point codes 
+2 SUA_CFG_LAS_ADDR_FMT_ITU24 ITU-T format, 24 bit point codes 
+3 SUA_CFG_LAS_ADDR_FMT_ANSI14 ANSI format, 14 bit point codes 
+4 SUA_CFG_LAS_ADDR_FMT_ANSI24 ANSI format, 24 bit point codes 
+4.2.5 Bind Local Application Server Configuration 
+Synopsis 
+Bind a Local Application Server to an association. 
+Note: This command is not required if the SUA_CFG_LAS_OPTIONS_BIND_ALL flag is 
+specified in the Local Application Server Configuration on page 31. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_CFG_BIND_LAS (0x73a0) 
+id L_AS id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 2 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 asc_id 
+Description 
+Binds together previously configured association and Local Application Server 
+entities.  
+Section  4 Message Reference 
+34 
+Parameters 
+asc_id 
+Identifier of the association to be bound. 
+4.2.6 Remote Application Server Configuration 
+Synopsis 
+Configures a Remote Application Server. 
+Message Format 
+Message Header 
+Field Name Meaning 
+Type SUA_MSG_CFG_RAS (0x73a1) 
+id R_AS id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+Description 
+Configures a Remote Application Server and defines the R_AS id in the id field 
+of the message. This id must be used in the SUA_MSG_CFG_BIND_RAS 
+message. This message is not required for ASP-SG operation. 
+Parameters 
+No parameters defined. 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+35 
+4.2.7 Bind Remote Application Server Configuration 
+Synopsis 
+Binds a Local Application Server to a Remote Application Server via an 
+Association.  
+Message Format 
+Message Header 
+Field Name Meaning 
+Type SUA_MSG_CFG_BIND_RAS (0x73a2) 
+Id R_AS id 
+Src Originating module ID 
+Dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+Hclass 0 
+Status 0 
+err_info 0 
+Len 13 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 asc_id 
+2 2 l_as_id 
+4 4 Rc 
+8 1 tr_mode 
+9 4 Reserved 
+Description 
+This message joins Local and Remote Application Servers. The Application 
+Servers and association must have already been configured. This message is 
+not required for ASP-SG operation. 
+Parameters 
+asc_id 
+Identifier of the association to be bound. 
+l_as_id 
+The identifier of the Local AS. 
+rc 
+Routing Context. 
+Section  4 Message Reference 
+36 
+tr_mode 
+A bit-field to indicate which modes of operation should be supported. 
+Bit Mnemonic Description 
+0 SUA_CFG_BIND_RAS_TR_MODE_OVERRIDE  Permit sending to last Activated 
+ASP 
+1 SUA_CFG_BIND_RAS_TR_MODE_LOADSHARE Permit load-sharing across ASP 
+2 SUA_CFG_BIND_RAS_TR_MODE_BROADCAST Permit sending to all ASP 
+A value of 0x7 is recommended and will therefore permit all traffic modes to 
+be used. 
+4.2.8 Remote Signaling Gateway Configuration 
+Synopsis 
+Configures a Remote Signaling Gateway. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_CFG_RSG (0x73a3) 
+id R_SG id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+Description 
+Message used to configure a Remote Signaling Gateway which must later be 
+bound to a Routing Key. This message is not required for IPSP operation. 
+Parameters 
+No parameters defined. 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+37 
+4.2.9 Routing Key Configuration 
+Synopsis 
+Defines a routing key for a local AS 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_CFG_RK (0x73a4) 
+id Routing Key id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 13 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 Spc 
+4 2 Nc 
+6 1 Ssn 
+7 2 l_as_id 
+9 2 Options 
+Description 
+This message defines the network properties for a set of traffic. This can later 
+be used to bind to a Remote Application Server or Remote Signaling Gateway 
+to permit correct routing.  
+Parameters 
+spc 
+Signaling Point-code 
+nc 
+Network Context 
+ssn 
+Sub-system number 
+Section  4 Message Reference 
+38 
+l_as_id 
+Defines the Local Application Server to which this Routing Key is attached.  
+Note: The routing tables are per-Local Application Server. 
+options 
+A bit field specifying to allow one or more per-Routing Key options to be set. 
+Bit Mnemonic Description 
+0 SUA_CFG_RK_OPTIONS_LOADSHARE  Set to 1 to instruct SUA to load- 
+share traffic 
+4.2.10 Bind Routing Key Configuration 
+Synopsis 
+Binds a previously configured Routing Key to a Remote Application Server or 
+a Remote Signaling Gateway. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_CFG_BIND_RK (0x73a5) 
+id RK id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 6 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 r_sm_id 
+4 4 options 
+Description 
+This message binds a Remote Signaling Gateway (or, for IPSP operation, a 
+Remote Application Server) to a Routing key. This links the traffic defined by 
+the Routing Key to the remote entity which should be sent the traffic. 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+39 
+Parameters 
+r_sm_id 
+This should either be the value of r_as_id or r_sg_id. For IPSP, the Routing 
+Key should be bound to a R_AS; therefore, the r_as_id should be used. For 
+ASP-SG operation, the r_sg_id should be used to indicate the Remote 
+Signaling Gateway. 
+options 
+A bit field specifying to allow one or more options to be set. 
+Bit Mnemonic Description 
+0 SUA_CFG_BIND_RK_OPTIONS_RAS Set to 1 for binding to an R_AS. Set to 
+0 if binding to an R_SG 
+4.2.11 Trace Mask Configuration Request 
+Synopsis 
+Configures the Trace Masks, which allow specific events to be sent to the 
+Trace Module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_CFG_TRACE_MASK (0x73a6) 
+id 0 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 12 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 op_evt_mask 
+4 4 ip_evt_mask 
+8 4 mgmt_evt_mask 
+Section  4 Message Reference 
+40 
+Description 
+Message used to configure SUA to send a trace message to the trace module 
+whenever a specific message type is sent or received. The trace module is 
+identified in the SUA configuration request message. 
+Parameters 
+op_evt_mask 
+The output event mask. This is a 32bit value with bits set to 1 to cause a 
+trace message to be sent to the trace module whenever a message is issued 
+by SUA for the event indicated. 
+Bit Mnemonic Message(s) Traced 
+0 SUAOEM_SCP_RX_IND SCP_MSG_RX_IND 
+1 SUAOEM_SCTP_TX_REQ SCTP_MSG_TX_REQ 
+2 SUAOEM_SCP_SCMG_IND SCP_MSG_SCMG_IND 
+3 SUAOEM_SCTP_SHUTDOWN SCTP_MSG_SHUTDOWN 
+4 SUAOEM_STATUS_IND SUA_MSG_ASC_STATUS_IND 
+SUA_MSG_LASP_STATUS_IND 
+SUA_MSG_RASP_STATUS_IND 
+SUA_MSG_LAS_STATUS_IND 
+SUA_MSG_RAS_STATUS_IND 
+SUA_MSG_RK_STATUS_IND  
+SUA_MSG_STATUS_IND 
+5 SUAOEM_SCTP_ACTIVATE SCTP_MSG_ACTIVATE 
+6 SUAOEM_SCTP_ABORT SCTP_MSG_ABORT 
+7 SUAOEM_MGT_LIC_EVENT MGT_MSG_LIC_EVENT 
+8 SUAOEM_ERROR_IND SUA_MSG_ERROR_IND 
+9-31 Reserved Should be set to zero 
+ip_evt_mask 
+The input event mask. This is a 32bit value with bits set to 1 to cause a trace 
+message to be sent to the trace module whenever a message is received by 
+SUA for the event indicated. 
+Bit Mnemonic Message(s) Traced 
+0 SUAIEM_SCP_TX_REQ SCP_MSG_TX_REQ 
+1 SUAIEM_SCTP_RX_IND SCTP_MSG_RX_IND 
+2 SUAIEM_SCTP_STATUS_CHANGE SCTP_MSG_STATUS_CHANGE 
+3-5 Reserved Should be set to zero 
+6 SUAIEM_SCTP_CONG_STATUS SCTP_MSG_CONG_STATUS 
+5-31 Reserved Should be set to zero 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+41 
+mgmt_evt_mask 
+The management event mask. This is a 32bit value with bits set to 1 to cause 
+a trace message to be sent to the trace module whenever a management 
+message is sent or received by SUA for the event indicated. 
+Bit Mnemonic Message(s) Traced 
+0 SUAMEM_SUA_CFG SUA_MSG_CFG_LASP 
+SUA_MSG_CFG_ASC 
+SUA_MSG_CFG_LAS 
+SUA_MSG_CFG_BIND_LAS 
+SUA_MSG_CFG_RAS 
+SUA_MSG_CFG_BIND_RAS 
+SUA_MSG_CFG_RSG 
+SUA_MSG_CFG_RK 
+SUA_MSG_CFG_BIND_RK 
+1 SUAMEM_SUA_ASC SUA_MSG_ACT_ASC 
+SUA_MSG_DEACT_ASC 
+2 SUAMEM_SUA_ASP SUA_MSG_DEACT_ASP 
+SUA_MSG_ACT_ASP 
+3 SUAMEM_SCP_GTT SCP_MSG_GTT_ADD 
+SCP_MSG_GTT_REM 
+SCP_MSG_GTT_MOD 
+SCP_MSG_GTT_GET 
+SCP_MSG_R_GTT 
+SCP_MSG_R_GTT_MASK 
+SCP_MSG_GTT_TEST 
+SCP_MSG_GLST_ADD 
+SCP_MSG_GLST_MOD 
+SCP_MSG_GLST_REM 
+4 SUAMEM_R_STATUS SUA_MSG_R_ASC_STATUS 
+SUA_MSG_R_LASP_STATUS 
+SUA_MSG_R_RASP_STATUS 
+SUA_MSG_R_LAS_STATUS 
+SUA_MSG_R_RAS_STATUS 
+5 SUAMEM_R_STATS SUA_MSG_R_SERVER_STATS 
+SUA_MSG_R_RK_STATS 
+SUA_MSG_R_ASSOC_STATS 
+SUA_MSG_R_STATS 
+6-31 Reserved Should be set to zero 
+ 
+ 
+Section  4 Message Reference 
+42 
+4.3 Management Messages 
+This section contains information about the following messages: 
+• Activate Association. See below. 
+• Activate Local Application Server Process.  See page 43. 
+• Deactivate Association.  See page 44. 
+• Deactivate    Local ApplicationServerProcess.  See page 45. 
+4.3.1 Activate Association 
+Synopsis 
+Activates a previously configured Association. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_ACT_ASC (0xc3ae) 
+id Association id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 4 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 options 
+Description 
+Activates the association which must already have been configured. Typically, 
+the Local Application Server Process must also be activated. 
+Parameters 
+options 
+A bit field specifying to allow one or more options to be set. 
+Bit Mnemonic Description 
+0 SUA_ACT_ASC_OPTIONS_stay_up Set to 1 to cause the association to be brought 
+back into service where possible without further 
+management intervention. 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+43 
+4.3.2 Activate Local Application Server Process 
+Synopsis 
+Activates a previously configured Application Server Process for a particular 
+Local AS. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_ACT_ASP (0xc3af) 
+id L_AS id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 4 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 Options 
+Description 
+Requests activation of the Local ASP for the specified Local AS. 
+Parameters 
+options 
+A bit field specifying to allow one or more options to be set. 
+Bit Mnemonic Description 
+0 SUA_ACT_ASP_OPTIONS_stay_up Set to 1 to instruct SUA to attempt to 
+bring the ASP back into service without 
+further intervention. 
+Section  4 Message Reference 
+44 
+4.3.3 Deactivate Association 
+Synopsis 
+Deactivate an Association. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_DEACT_ASC (0xc3b0) 
+id Association id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+Description 
+Message sent to deactivate an association. 
+Parameters 
+No parameters defined. 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+45 
+4.3.4 Deactivate Local Application Server Process 
+Synopsis 
+Deactivate the Local Application Server Process for a particular Local AS. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_DEACT_ASP (0xc3b1) 
+id L_AS id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+Description 
+Message sent to deactivate a Local Application Server Process for the 
+specified Local AS. 
+Parameters 
+No parameters defined. 
+Section  4 Message Reference 
+46 
+4.4 Maintenance Messages 
+This section contains information about the following messages: 
+• Maintenance Event Indication.  See below. 
+4.4.1 Maintenance Event Indication 
+Synopsis 
+Sent by SUA to the Maintenance Module to indicate an event 
+Message Format 
+Message Header 
+Field Name Meaning 
+Type SUA_MSG_MAINT_IND (0x03b8) 
+id 0 
+src SUA_TASK_ID 
+dst Maintenance module  
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status Maintenance event code (on page 47) 
+err_info 0 
+len variable (0 to 8) 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 spc 
+4 1 ssn 
+5 2 nc 
+7 1 cong 
+Description 
+This message is sent to indicate when a routing failure or other error has 
+occurred preventing the message being routed to its destination. 
+Parameters 
+spc 
+Signaling Point-code 
+nc 
+Network Context 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+47 
+ssn 
+Sub-system number 
+cong 
+congestion status 
+Maintenance event code 
+The table below lists all of the maintenance indications together with the list 
+of parameters present in that indication. 
+Table 1. Maintenance Event Codes 
+Maintenance event code Parameters 
+RETC_NO_TRANS_ADDR_TYPE 0     
+RETC_NO_TRANS_ADDR_VAL 1     
+RETC_SS_CONGESTION 2 pc ssn nc cong 
+RETC_SS_FAILURE 3 pc ssn nc  
+RETC_UNEQUIPPED_USER 4 pc ssn nc  
+RETC_NETWORK_FAILURE 5 pc ssn nc  
+RETC_NETWORK_CONGESTION 6 pc ssn nc cong 
+RETC_UNQUALIFIED 7 pc ssn nc  
+RETC_MSG_TRANSPORT_ERR 8 pc ssn nc  
+Section  4 Message Reference 
+48 
+4.5 Status Messages 
+This section contains information about the following messages: 
+• Read Association Status Request.  See below. 
+• Read Local Application Server Process Status Request.  See page 49. 
+• Read Remote Application Server Process Status Request.  See page 50. 
+• Read Local Application Server Status Request.  See page 51. 
+• Read Remote Application Server Status Request.  See page . 52 
+• Error Message Indication.  See page 53. 
+• Notify Indication.  See page 55. 
+• Association Status Indication.  See page 56. 
+• Local Application Server Process Status Indication.  See page 57. 
+• Remote Application Server Process Status Indication.  See page 58. 
+• Local Application Server Status Indication.  See page 59. 
+• Remote Application Server Status Indication.  See page 60. 
+• Routing Key Status Indication.  See page 61. 
+4.5.1 Read Association Status Request 
+Synopsis 
+Sent to the module to request an updated response to be returned giving 
+Association status. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_R_ASC_STATUS (0x6395) 
+id Association id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status Association status 
+err_info 0 
+len 0 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+49 
+Description 
+The message can be sent to the module and will be returned updated with 
+the status of the association. 
+Association status 
+Value Meaning 
+1 IDLE 
+2 ESTABLISHED 
+3 CLOSED 
+9 CONGESTION ABATE 
+10 CONGESTION ONSET 
+11 CONGESTION DISCARD 
+Parameters 
+No parameters defined. 
+4.5.2 Read Local Application Server Process Status Request  
+Synopsis 
+Sent to the module to request an updated response to be returned giving 
+Local Application Server Process status. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_R_LASP_STATUS (0x6396) 
+id L_ASP id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 2 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 status 
+Section  4 Message Reference 
+50 
+Description 
+The message will be returned with the data updated in the parameter area of 
+the message. 
+Parameters 
+status 
+Value Meaning 
+1 IDLE 
+5 DOWN 
+6 ACTIVE 
+7 INACTIVE  
+4.5.3 Read Remote Application Server Process Status Request 
+Synopsis 
+Sent to the module to request an updated response to be returned giving 
+Remote Application Server Process status. 
+Message Format 
+Message Header 
+Field Name Meaning 
+Type SUA_MSG_R_RASP_STATUS (0x6397) 
+Id 0 
+Src Originating module ID 
+Dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+Hclass 0 
+status 0 
+err_info 0 
+len 2 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 status 
+Description 
+The message will be returned with the data updated in the parameter area of 
+the message. 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+51 
+Parameters 
+status 
+Value Meaning 
+1 IDLE 
+5 DOWN 
+4 UP 
+4.5.4 Read Local Application Server Status Request  
+Synopsis 
+Sent to the module to request an updated response to be returned giving 
+Local Application Server status. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_R_LAS_STATUS (0x6398) 
+id L_AS id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 2 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 status 
+Description 
+The message will be returned with the data updated in the parameter area of 
+the message. 
+Section  4 Message Reference 
+52 
+Parameters 
+status 
+Value Meaning 
+1 IDLE 
+5 DOWN 
+6 ACTIVE 
+7 INACTIVE 
+4.5.5 Read Remote Application Server Status Request 
+Synopsis 
+Sent to the module to request an updated response to be returned giving 
+Local Application Server status. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_R_RAS_STATUS (0x6399) 
+id 0 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 2 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 status 
+Description 
+The message will be returned with the data updated in the parameter area of 
+the message. 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+53 
+Parameters 
+status 
+Value Meaning 
+1 IDLE 
+5 DOWN 
+6 ACTIVE 
+7 INACTIVE 
+8 PENDING 
+4.5.6 Error Message Indication 
+Synopsis 
+M-ERROR indication due to ERR message received or an error occurring. 
+Message Format 
+Message Header 
+Field Name Meaning 
+Type SUA_MSG_ERROR_IND (0x03b3) 
+Id SCTP Association ID 
+Src SUA_TASK_ID 
+Dst Management module ID 
+Rsp_req Sending layer’s bit must be set 
+hclass 0 
+status Error type (see Table 3: Error Codes on page 54) 
+Err_info 0 
+Len 8 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 Param1 
+4 4 Param2 
+Section  4 Message Reference 
+54 
+Description 
+This indication is sent on receiving an SUA Management ERROR message 
+from an SUA peer or a locally occurring error 
+Parameters 
+Param1 
+Parameter 1 – see Table 2: Parameter Values below for values 
+Param2 
+Parameter 1 – see Table 2: Parameter Values below for values 
+Table 2. Parameter Values 
+Error type  Param 1 Param2 
+ERR_SCTP_MSG_LENGTH (1) 0 0 
+ERR_SCTP_INVALID_VERSION (3)      RX’d Message version 0 
+ERR_SCTP_INVALID_MSG_TYPE (4)     RX’d Message type 0 
+ERR_INFO (7)                     RX’d Error code  (see Table 3: 
+Error Codes below) RC 
+SUA_MGMT_ERR_LONG_MSG_GETM_FAILED 
+(9) (Generated on first occurrence only)  Length of message for failed request  0 
+Table 3. Error Codes 
+Error Code Description 
+0x01 Invalid Version 
+0x03 Unsupported Message Class 
+0x04 Unsupported Message Type 
+0x05 Unsupported Traffic Handling Mode 
+0x06 Unexpected Message 
+0x07 Protocol Error 
+0x09 Invalid Stream Identifier 
+0x0d Refused - Management Blocking 
+0x0e ASP Identifier Required 
+0x0f Invalid ASP Identifier 
+0x11 Invalid Parameter Value 
+0x12 Parameter Field Error 
+0x13 Unexpected Parameter 
+0x14 Destination Status Unknown 
+0x15 Invalid Network Appearance 
+0x16 Missing Parameter 
+0x19 Invalid Routing Context 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+55 
+Error Code Description 
+0x1a No Configured AS for ASP 
+0x1c Invalid load-sharing label 
+4.5.7 Notify Indication 
+Synopsis 
+N-NOTIFY indication due to NTFY message received  
+Message Format 
+Message Header 
+Field Name Meaning 
+Type SUA_MSG_STATUS_IND (0x03b4) 
+id SCTP Association ID 
+src SUA_TASK_ID 
+dst Management module ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 8 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 Param1 
+4 4 Param2 
+Description 
+This indication is sent on receiving an SUA Management NOTIFY message 
+from an SUA peer. 
+Parameters 
+Param1 
+Status type of message (see Table 4 Status Type on page 56) 
+Param2 
+Routing context (where present) 
+Section  4 Message Reference 
+56 
+Table 4. Status Type 
+Status type Description 
+0x00010002 AS Inactive 
+0x00010003 AS Active 
+0x00010004 AS Pending 
+0x00020001 Insufficient ASP resources active in AS 
+0x00020002 Alternate ASP Active 
+0x00020003 ASP failure 
+4.5.8 Association Status Indication 
+Synopsis 
+Indicates an Association changed state. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_ASC_STATUS_IND (0x0390) 
+id Association id 
+src SUA_TASK_ID 
+dst Management Module 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 2 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 status 
+Description 
+Message sent to the management module to indicate a state change in a 
+previously configured association. 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+57 
+Parameters 
+status 
+Value Meaning 
+1 IDLE 
+2 ESTABLISHED 
+3 CLOSED 
+9 CONGESTION ABATE 
+10 CONGESTION ONSET 
+11 CONGESTION DISCARD 
+4.5.9 Local Application Server Process Status Indication 
+Synopsis 
+Indicates a Local ASP changed state. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_LASP_STATUS_IND (0x0391) 
+id L_ASP id 
+src SUA_TASK_ID 
+dst Management Module 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 2 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 status 
+Section  4 Message Reference 
+58 
+Description 
+Message sent to the management module to indicate a state change in a 
+previously configured Local ASP. 
+Parameters 
+status 
+Value Meaning 
+1 IDLE 
+5 DOWN 
+6 ACTIVE 
+7 INACTIVE 
+4.5.10 Remote Application Server Process Status Indication 
+Synopsis 
+Indicates a Remote ASP changed state. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_RASP_STATUS_IND (0x0392) 
+id R_ASP id 
+src SUA_TASK_ID 
+dst Management Module 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 2 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 status 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+59 
+Description 
+Message sent to the management module to indicate a state change in a 
+previously configured Remote ASP. 
+Parameters 
+status 
+Value Meaning 
+1 IDLE 
+5 DOWN 
+4 UP 
+4.5.11 Local Application Server Status Indication 
+Synopsis 
+Sent by the module to indicate a Local AS has changed state. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_LAS_STATUS_IND (0x0393) 
+id L_AS id 
+src SUA_TASK_ID 
+dst Management Module 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 2 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 status 
+Section  4 Message Reference 
+60 
+Description 
+Message sent to the management module to indicate a state change in a 
+previously configured Local AS. 
+Parameters 
+status 
+Value Meaning 
+1 IDLE 
+5 DOWN 
+6 ACTIVE 
+7 INACTIVE 
+4.5.12 Remote Application Server Status Indication 
+Synopsis 
+Sent by the module to indicate Remote AS has changed state. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_RAS_STATUS_IND (0x0394) 
+id R_AS id 
+src SUA_TASK_ID 
+dst Management Module 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 2 
+ 
+Parameter Area 
+Offset Size Name 
+0 2 status 
+ 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+61 
+Description 
+Message sent to the management module to indicate a state change in a 
+previously configured Remote AS. 
+Parameters 
+status 
+Value Meaning 
+1 IDLE 
+5 DOWN 
+6 ACTIVE  
+7 INACTIVE  
+8 PENDING 
+4.5.13 Routing Key Status Indication 
+Synopsis 
+Sent by the module to indicate a Routing key has changed state. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_RK_STATUS_IND (0x0395) 
+id Routing Key id 
+src SUA_TASK_ID 
+dst Management Module 
+rsp_req 0 
+hclass 0 
+status RK status 
+err_info 0 
+len 8 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 spc 
+4 1 ssn 
+5 2 nc 
+7 1 cong 
+Section  4 Message Reference 
+62 
+Description 
+Message sent to the management module to indicate a state change in a 
+previously configured Routing Key. The status field will be set to one of the 
+following values: 
+Value Meaning 
+0 IDLE 
+1 AVAILABLE 
+2 UNAVAILABLE 
+Parameters 
+spc 
+Signaling Point Code 
+ssn 
+Sub-system number 
+nc 
+Network Context 
+cong 
+Congestion status 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+63 
+4.6 Statistics Messages 
+This section contains information about the following messages: 
+• Read Server Statistics.  See below. 
+• Read Routing Key Statistics.  See page 64. 
+• Read Association Statistics.  See page 65. 
+4.6.1 Read Server Statistics 
+Synopsis 
+Sent to the module to request an updated response to be returned giving 
+Server statistics. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_R_SERVER_STATS (0x639a) 
+id R_sg_Id or R_as_id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 8 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 data_tx 
+4 4 data_rx 
+Description 
+The returned message will be updated with the following information: 
+Parameters 
+data_tx 
+Transmitted data since last statistics reset. 
+data_rx 
+Received data since last statistics reset. 
+Section  4 Message Reference 
+64 
+4.6.2 Read Routing Key Statistics 
+Synopsis 
+Sent to the module to request an updated response to be returned giving 
+Routing Key statistics. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SUA_MSG_R_RK_STATS (0x639b) 
+id Routing key id 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 or 1 
+err_info 0 
+len 8 
+ 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 data_tx 
+4 4 Discarded 
+Description 
+The returned message will be updated with the following information for the 
+Routing Key. Set the status field to 1 to reset the statistics. 
+Parameters 
+data_tx 
+Count of transmitted data since last statistics reset. 
+discarded 
+Count of transmitted data discarded since last statistics reset. 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+65 
+4.6.3 Read Association Statistics 
+Synopsis 
+Sent to the module to request an updated response to be returned giving 
+association statistics. 
+Message Format 
+Message Header 
+Field Name Meaning 
+Type SUA_MSG_R_ASSOC_STATS  (0x63b5) 
+Id Association ID 
+Src Originating module ID 
+Dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 152 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 data_tx 
+4 4 asp_up_tx  
+8 4 asp_up_ack_tx  
+12 4 asp_dn_tx  
+16 4 asp_dn_ack_tx  
+20 4 asp_ac_tx 
+24 4 asp_ac_ack_tx  
+28 4 asp_ia_tx  
+32 4 asp_ia_ack_tx  
+36 4 error_tx  
+40 4 notify_tx  
+44 4 duna_tx  
+48 4 dava_tx  
+52 4 daud_tx  
+56 4 scon_tx 
+60 4 dupu_tx  
+64 4 drst_tx  
+Section  4 Message Reference 
+66 
+Parameter Area 
+Offset Size Name 
+68 4 beat_tx  
+72 4 beat_act_tx  
+76 4 data_rx  
+80 4 asp_up_rx  
+84 4 asp_up_ack_rx  
+88 4 asp_dn_rx  
+92 4 asp_dn_ack_rx  
+96 4 asp_ac_rx  
+100 4 asp_ac_ack_rx  
+104 4 asp_ia_rx 
+108 4 asp_ia_ack_rx  
+112 4 error_rx  
+116 4 notify_rx  
+120 4 duna_rx  
+124 4 dava_rx 
+128 4 daud_rx  
+132 4 scon_rx  
+136 4 dupu_rx  
+140 4 drst_rx  
+144 4 beat_rx  
+148 4 beat_act_rx 
+Description 
+Allows the user to retrieve statistics on the traffic carried on a per association 
+basis. 
+Parameters 
+data_tx  
+Number of data packets TX’d via this association 
+asp_up_tx  
+Number of ASP UP messages TX’d via this association 
+asp_up_ack_tx  
+Number of ASP UP ACK messages TX’d via this association 
+asp_dn_tx  
+Number of ASP DOWN messages TX’d via this association 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+67 
+asp_dn_ack_tx  
+Number of ASP DOWN ACK messages TX’d via this association 
+asp_ac_tx  
+Number of ASP ACTIVE messages TX’d via this association 
+asp_ac_ack_tx  
+Number of ASP ACTIVE ACK messages TX’d via this association 
+asp_ia_tx  
+Number of ASP INACTIVE messages TX’d via this association 
+asp_ia_ack_tx  
+Number of ASP INACTIVE ACK messages TX’d via this association 
+error_tx  
+Number of ERROR messages TX’d via this association 
+notify_tx  
+Number of NOTIFY messages TX’d via this association. 
+duna_tx  
+Number of DUNA messages TX’d via this association 
+dava_tx  
+Number of DAVA messages TX’d via this association 
+daud_tx  
+Number of DAUD messages TX’d via this association 
+scon_tx  
+Number of SCON messages TX’d via this association 
+dupu_tx  
+Number of DUPU messages TX’d via this association 
+drst_tx  
+Number of DRST messages TX’d via this association 
+beat_tx  
+Number of BEAT messages TX’d via this association 
+beat_act_tx  
+Number of BEAT ACK messages TX’d via this association 
+Section  4 Message Reference 
+68 
+data_rx  
+Number of data packets RX’d via this association 
+asp_up_rx  
+Number of ASP UP messages RX’d via this association 
+asp_up_ack_rx  
+Number of ASP UP ACK messages RX’d via this association 
+asp_dn_rx  
+Number of ASP DOWN messages RX’d via this association 
+asp_dn_ack_rx  
+Number of ASP DOWN ACK messages RX’d via this association 
+asp_ac_rx  
+Number of ASP ACTIVE messages RX’d via this association 
+asp_ac_ack_rx  
+Number of ASP ACTIVE ACK messages RX’d via this association 
+asp_ia_rx  
+Number of ASP INACTIVE messages RX’d via this association 
+asp_ia_ack_rx  
+Number of ASP INACTIVE ACK messages RX’d via this association 
+error_rx  
+Number of ERROR messages RX’d via this association 
+notify_rx  
+Number of NOTIFY messages RX’d via this association 
+duna_rx  
+Number of DUNA messages RX’d via this association 
+dava_rx  
+Number of DAVA messages RX’d via this association 
+daud_rx  
+Number of DAUD messages RX’d via this association 
+scon_rx  
+Number of SCON messages RX’d via this association 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+69 
+dupu_rx  
+Number of DUPU messages RX’d via this association 
+drst_rx  
+Number of DRST messages RX’d via this association 
+beat_rx  
+Number of BEAT messages RX’d via this association 
+beat_act_rx  
+Number of BEAT ACK messages RX’d via this association 
+Section  4 Message Reference 
+70 
+4.7 Other Messages 
+This section contains information about the following messages: 
+• Read Revision Request.  See below. 
+• License Event Indication.  See page 71. 
+• Request Licensing State.  See page 72. 
+4.7.1 Read Revision Request 
+Synopsis 
+Message used by SUA to indicate an implementation-specific, software- 
+related event to the local management module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type GEN_MSG_MOD_IDENT (0x6111) 
+id 0 
+src Originating module ID 
+dst SUA_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 28 
+ 
+Parameter Area 
+Offset Size Name Description 
+0 2 type Currently undefined 
+2 1 maj_rev Major version number 
+3 1 min_rev Minor version number 
+4 24 text Null terminated string giving textual module identity 
+Description 
+This message is provided to request a reply indicating the software version 
+for module under test. The parameter areas are filled in by the SUA module 
+and do not need to be included by the user. On receipt of this request, the 
+module returns the message with status "SUCCESS" to the sender including 
+the information requested. 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+71 
+4.7.2 License Event Indication 
+Synopsis 
+Sent to Layer Management to indicate a license-related event.  
+Message Format 
+Message Header 
+Field Name Meaning 
+type MGT_MSG_LIC_EVENT (0x0f23) 
+id 0 
+src SUA_TASK_ID  
+dst Layer Management 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 8 
+ 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 Protocol Type 
+4 2 Event Type 
+6 2 Event Indication 
+Description 
+This message is sent by SUA to layer management to indicate that a license- 
+related event has occurred. In the case of throughput, it indicates throughput 
+congestion onset, abatement, or the beginning of enforcement.  
+Parameters 
+Protocol Type 
+This will be set to 4 to indicate SUA. 
+Event Type 
+Event Type Description  
+0 Undefined 
+1 Throughput 
+2 Link/Associations 
+3 Session/Dialog 
+Section  4 Message Reference 
+72 
+Event Indication 
+Throughput Event indication Description 
+0 ABATE 
+1 CONGESTION 
+2 ENFORCEMENT 
+Link Associations 
+None currently defined. 
+Session/Dialog 
+None currently defined. 
+4.7.3 Request Licensing State 
+Synopsis 
+Sent by Layer Management to request the current license state. 
+Message Format 
+Message Header 
+Field Name Meaning 
+Type MGT_MSG_R_LIC_STATUS (0x6f22) 
+Id 0 
+Src Layer Management 
+Dst SUA_TASK_ID 
+rsp_req Set appropriate response required bit 
+Hclass 0 
+Status Set to 1 if module not enforcing licensing 
+err_info 0 
+Len 56 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 Version 
+4 4 Licensed Protocol 
+8 4 Licensed Throughput Rate 
+12 4 Licensed Links 
+16 4 Licensed Sessions 
+20 4 Licensed Options 
+24 4 Configured Throughput Rate 
+28 4 Configured Maximum Links 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+73 
+Parameter Area 
+32 4 Configured Maximum Sessions 
+36 4 Configured Options 
+40 4 Current Throughput Credit 
+44 4 Current Active Links 
+48 4 Current Active Sessions 
+52 4 Cong State 
+Description 
+Can be sent to the SUA module to request the message to be returned with 
+the parameter area updated with a number of license related data values. 
+Parameters 
+The version parameters and licensed protocol parameters should be set by 
+the user. The rest of the parameters are set by the module in the reply. 
+Version 
+Set to 0. 
+Licensed Protocol 
+Identifies the protocol being licensed. For SUA, this is set to 4. 
+Licensed Throughput 
+The throughput permitted by the installed license(s) (Units Kbytes/s). 
+Licensed Links 
+Number of links or associations permitted by the installed license(s). 
+Licensed Sessions 
+Number of simultaneous sessions or dialogs permitted by the installed 
+license(s).(Note: This is not used by SUA). 
+Licensed Options 
+Not used by SUA. 
+Configured Throughput 
+Maximum throughput requested in the SUA Configuration message. 
+Configured Maximum Links 
+Maximum number of associations which have been configured. 
+Configured Maximum Sessions 
+Not used by SUA. 
+Section  4 Message Reference 
+74 
+Configured Options 
+Not used by SUA 
+Current Throughput Credit 
+Number of bytes that can be received from the network or that can be sent to 
+a User by SUA before enforcement mechanisms are triggered (Units of 
+Bytes). 
+Current Active Links 
+Current number of associations configured. 
+Current Active Sessions 
+Not used by SUA. 
+Throughput Congestion State 
+Value State Description 
+0 UNCONG  
+1 CONG  
+ 
+ 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+75 
+5 External Message Definitions: SCTP 
+Interface 
+The Dialogic® SUA module interfaces to the Dialogic® SCTP module. The 
+following primitives defined in the Dialogic® SCTP Programmer’s Manual are 
+used: 
+5.1 Primitives from SUA to SCTP 
+SCTP_MSG_ACTIVATE Servers wait for incoming assoc / Client attempt association 
+SCTP_MSG_SHUTDOWN Gracefully close down association 
+SCTP_MSG_TX_REQ Transmit a data packet 
+SCTP_MSG_ABORT Abort an association 
+5.2 Primitives from SCTP to SUA 
+SCTP_MSG_STATUS_CHANGE Association status change 
+SCTP_MSG_RX_IND SCTP received data transfer indication 
+SCTP_MSG_CONG_STATUS Change in the congestion status of the association 
+ 
+Section  5 External Message Definitions: SCTP Interface 
+76 
+ 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+77 
+6 External Message Definitions: SCCP 
+Interface 
+This section contains information about SCCP: 
+• Management Messages.  See below. 
+• Protocol Messages.  See page 82.  
+• Global Title Translation Messages.  See page 82.  
+6.1 Management Messages  
+This section contains information about the following messages: 
+• Read Global Q.752 (previously Q.791) Statistics.  See below. 
+• Management Indication.  See page 80. 
+6.1.1 Read Global Q.752 (previously Q.791) Statistics 
+Synopsis 
+This message is used to retrieve (and optionally reset) statistics from SUA in 
+an SCCP compatible format 
+Message Format 
+Message Header 
+Field Name Meaning 
+Type SUA_MSG_R_STATS (0x63b6) 
+Id 0 
+Src Originating module ID 
+Dst SUA_TASK_ID 
+Rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 1 to reset all statistics, otherwise 0 
+Err_info 0 
+Len 100 
+ 
+Section  6 External Message Definitions: SCCP Interface 
+78 
+Parameter Area 
+Offset Size Name 
+0 1 version 
+1 3 padding 
+4 4 rtf_ttype 
+8 4 rtf_val 
+12 4 rtf_net_fail 
+16 4 rtf_net_cong 
+20 4 rtf_ss_fail 
+24 4 rtf_ss_cong 
+28 4 rtf_ss_fail 
+32 4 rtf_sif_error 
+36 4 rtf_too_long 
+40 4 rtf_unknown 
+44 4 stx_err 
+48 4 sor_grant 
+52 4 sor_deny 
+56 4 udts_tx 
+60 4 udts_rx 
+64 4 num_msg 
+68 4 lss_msg 
+72 4 num_gtt 
+76 4 txm_cl0 
+80 4 txm_cl1 
+84 4 rxm_cl0 
+88 4 rxm_cl1 
+92 4 long_msg 
+96 4 long_msg_err 
+Description 
+The returned message will be updated with the following information. Set the 
+status field to 1 to reset the statistics. 
+Parameters 
+Version 
+message version (currently zero) 
+rtf_ttype 
+Routing Failure – No translation for address of such nature 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+79 
+rtf_tval  
+Routing Failure – No translation for this specific address 
+rtf_net_fail  
+Routing Failure – Network Failure (Point Code not available) 
+rtf_net_cong  
+Routing Failure – Network Congestion 
+rtf_ss_fail  
+Routing Failure – Subsystem Failure (unavailable) 
+rtf_ss_cong  
+Routing Failure – Subsystem Congestion 
+rtf_uu  
+Routing Failure – Unequipped user (Subsystem) 
+sif_err  
+length exceeds max sif 
+too_long 
+max length exceeded 
+rtf_unknown 
+Routing Failure – Reason unknown 
+stx_err  
+Syntax error detected 
+sor_grant 
+Subsystem out-of-service request granted 
+sor_deny 
+Subsystem out-of-service request denied 
+udts_tx  
+UDTS messages sent 
+udts_rx  
+UDTS messages received 
+num_msg  
+Total messages handled (from local or remote subsystems) 
+Section  6 External Message Definitions: SCCP Interface 
+80 
+lss_msg  
+Total messages intended for local subsystems 
+num_gtt  
+Total messages requiring global title translation 
+txm_cl0 
+Total messages originating (for connectionless class 0 only)  
+txm_cl1  
+Total messages originating (for connectionless class 1 only)  
+rxm_cl0  
+Total messages received (for connectionless class 0 only)  
+rxm_cl1  
+Total messages received (for connectionless class 1 only)  
+long_msg  
+Total long messages successfully allocated 
+long_msg_err  
+Total long messages failed to allocate  
+6.1.2 Management Indication 
+Synopsis 
+Sent by SUA to local Sub-System in an SCCP compatible format. 
+Message Format 
+Message Header 
+Field Name Meaning 
+Type SCP_MSG_SCMG_IND (0x8745) 
+id Local Sub-system number 
+src SUA_TASK_ID 
+dst User module ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 10 
+ 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+81 
+Parameter Area 
+Offset Size Name 
+0 1 primitive type 
+1 1 format id 
+2 1 ssn 
+3 4 spc  
+7 1 cong 
+8 2 nc 
+Description 
+This message is used by SUA to notify the local sub-system of a change in 
+the status of remote sub-systems and signaling points. 
+Parameters 
+Primitive type 
+Type of message (see Table 5: Primitive Types and Format Identifiers below) 
+Format id 
+Format identifier (see Table 5: Primitive Types and Format Identifiers below) 
+ssn 
+Sub-system number (when present). 
+spc 
+Signaling Point-code - least significant byte first as per Q.713 
+cong 
+congestion status (when present) 
+nc 
+Network context 
+Table 5. Primitive Types and Format Identifiers 
+Primitive type Format ID Parameters 
+SSA (1) ssn spc 0 nc 
+SSP (2) ssn spc 0 nc 
+N-STATE indication (2) 
+SSC (7) ssn spc cong nc 
+SPA (128) 0 spc 0 nc 
+SPP (129) 0 spc 0 nc 
+N-PCSTATE indication (5) 
+SPC (130) 0 spc cong nc 
+Section  6 External Message Definitions: SCCP Interface 
+82 
+6.2 Protocol Messages 
+SCP_MSG_TX_REQ (SCCP_N_UNITDATA_REQ) 
+SCP_MSG_RX_IND  (SCCP_N_UNITDATA_IND, SCCP_N_NOTICE_IND) 
+6.3 Global Title Translation Messages 
+SCP_MSG_GTT_ADD     
+SCP_MSG_GTT_REM     
+SCP_MSG_GTT_MOD     
+SCP_MSG_GTT_GET     
+SCP_MSG_R_GTT       
+SCP_MSG_R_GTT_MASK  
+SCP_MSG_GTT_TEST    
+SCP_MSG_GLST_ADD    
+SCP_MSG_GLST_MOD    
+SCP_MSG_GLST_REM 
+Messages are used in a compatible way to the messages defined 
+in the Dialogic® SCCP Programmer’s Manual. 
+ 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+7 Example Configurations 
+This section contains information about: 
+• IPSP Peer-to-Peer.  See below. 
+• ASP to Signaling Gateway.  See page 86. 
+7.1 IPSP Peer-to-Peer 
+This section describes a simple configuration to support IPSP Operation (Peer- 
+to-Peer). The figure below shows all of the entities that require configuration. 
+In addition, there are messages required to bind certain entities together. 
+Each of these entities and the binds requires a separate configuration 
+message, examples of which are given below. 
+Figure 7. IPSP Configuration 
+ 
+83 
+Section  7 Example Configurations 
+84 
+The example configuration messages below cover a single Local ASP and 
+Local AS connected via a single SCTP association to a Remote AS routed to by 
+the specified Routing Key. 
+*SUA_MSG_CONFIG              
+M-t739c-fcf-dc3-r8000-p d1 ef ef 0010 0000 0010 00000010 00 
+000000 0000 
+ 
+*SUA_MSG_CFG_LASP            
+M-t739d-fcf-dc3-r8000-i0000-p 00000000 
+ 
+*SUA_MSG_CFG_LAS             
+M-t739f-fcf-dc3-r8000-i0000-p 00000000 00 14 0000 00 00 0000 
+00000001 00 
+ 
+*SUA_MSG_CFG_RAS             
+M-t73a1-fcf-dc3-r8000-i0000-p 
+ 
+*SUA_MSG_CFG_ASC             
+M-t739e-fcf-dc3-r8000-i0000-p 0000 0000 0000 0000 0000 00000005 
+ 
+*SUA_MSG_CFG_RK              
+M-t73a4-fcf-dc3-r8000-i0000-p 00000002 0000 08 0000 00000000 
+ 
+*SUA_MSG_CFG_BIND_RAS        
+M-t73a2-fcf-dc3-r8000-i0000-p 0000 0000 00000000 07 00000000 
+ 
+*SUA_MSG_CFG_BIND_RK         
+M-t73a5-fcf-dc3-r8000-i0000-p 0000 00000001 
+ 
+*SUA_MSG_ACT_ASC             
+M-tc3ae-fcf-dc3-r8000-i0000-p 00000001 
+ 
+SUA_MSG_CONFIG 
+Configures a simple system with 16 associations, servers and routes. No GTTs 
+are used. 
+Parameter Value Meaning 
+Id 0 (In header)  
+sctp_mod_id 0xd1  
+mgt_mod_id    0xef  
+trace_mod_id   0xef  
+max_assocs   16  
+reserved 0  
+max_routes   16  
+max_gtt 16  
+maint_mod_id 0 Use mgt_mod_id for maintenance messages 
+reserved 0 None 
+max_throughput 0 Support maximum for license 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+85 
+SUA_MSG_CFG_LASP 
+Configure a Local ASP with an id of 0. 
+SUA_MSG_CFG_LAS 
+Configures a Local AS with id 0. 
+SUA_MSG_CFG_RAS 
+Configure a Remote AS with an id of 0 
+SUA_MSG_CFG_ASC 
+Configure an association with Local ASP id of 0 to connect to a remote node 
+in an IPSP-to-IPSP configuration. 
+SUA_MSG_CFG_RK 
+Configure the routing key for destination point code of 2 and sub-system 
+number of 8. 
+SUA_MSG_CFG_BIND_RAS 
+Bind the Remote AS to the association. 
+SUA_MSG_CFG_BIND_RK 
+Bind the Routing Key defined above to the Remote AS id 0. 
+SUA_MSG_ACT_ASC 
+Activate the association (id 0). 
+Section  7 Example Configurations 
+7.2 ASP to Signaling Gateway 
+This section describes a simple configuration to support ASP Operation. 
+ 
+86 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+87 
+*SUA_MSG_CONFIG              
+M-t739c-fcf-dc3-r8000-p d1 ef ef 0010 0000 0010 00000000 00 
+000000 0000 
+ 
+*SUA_MSG_CFG_LASP            
+M-t739d-fcf-dc3-r8000-i0000-p 00000000 
+ 
+*SUA_MSG_CFG_LAS             
+M-t739f-fcf-dc3-r8000-i0000-p 00000000 00 14 0000 00 00 0000 
+00000001 00 
+ 
+*SUA_MSG_CFG_RSG             
+M-t73a3-fcf-dc3-r8000-i0000-p 
+ 
+*SUA_MSG_CFG_ASC             
+M-t739e-fcf-dc3-r8000-i0000-p 0000 0000 0000 0000 0000 00000004 
+ 
+*SUA_MSG_CFG_RK              
+M-t73a4-fcf-dc3-r8000-i0000-p 00000002 0000 08 0000 00000000 
+ 
+*SUA_MSG_CFG_BIND_RK         
+M-t73a5-fcf-dc3-r8000-i0000-p 0000 00000000 
+ 
+*SUA_MSG_ACT_ASC             
+M-tc3ae-fcf-dc3-r8000-i0000-p 00000001 
+ 
+SUA_MSG_CONFIG 
+Configures a simple system with 16 associations, servers and routes. No GTTs 
+are used. 
+Parameter Value Meaning 
+Id 0 (In header)  
+sctp_mod_id  0xd1  
+mgt_mod_id    0xef  
+trace_mod_id   0xef  
+max_assocs   16  
+reserved   0  
+max_routes   16  
+max_gtt 0 Support maximum available 
+maint_mod_id 0 Use mgt_mod_id for maintenance messages 
+reserved 0 None 
+max_throughput 0 Support maximum for license 
+SUA_MSG_CFG_LASP 
+Configure a Local ASP with an id of 0. 
+SUA_MSG_CFG_LAS 
+Configures a Local AS with id 0. 
+Section  7 Example Configurations 
+88 
+SUA_MSG_CFG_RSG 
+Configure a Remote Signaling Gateway with an id of 0 
+SUA_MSG_CFG_ASC 
+Configure an association with Local ASP id of 0 to connect to a remote node 
+in an ASP-to-SG configuration. 
+SUA_MSG_CFG_RK 
+Configure the routing key for destination point code of 2 and sub-system 
+number of 8. 
+SUA_MSG_CFG_BIND_RK 
+Bind the Routing Key defined above to the Remote SG id 0. 
+SUA_MSG_ACT_ASC 
+Activate the association (id 0). 
+ 
+ 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+89 
+Appendix A: Message Types 
+A.1 Message Type Table 
+The following table lists, by message type, the messages described in this 
+manual. 
+Message Type Mnemonic Description 
+0x0390 SUA_MSG_ASC_STATUS_IND Indicates an Association changed 
+state  
+0x0391 SUA_MSG_LASP_STATUS_IND Indicates a Local ASP changed state  
+0x0392 SUA_MSG_RASP_STATUS_IND Indicates a Remote ASP changed 
+state  
+0x0393 SUA_MSG_LAS_STATUS_IND Indicates a Local AS changed state  
+0x0394 SUA_MSG_RAS_STATUS_IND Indicates a Remote AS changed state 
+0x0395 SUA_MSG_RK_STATUS_IND Indicates a touting key changed state  
+0x03b3 SUA_MSG_ERROR_IND Indicates an SUA Management 
+ERROR message has been received 
+from an SUA peer or that a locally 
+occurring error has been received.. 
+0x03b4 SUA_MSG_STATUS_IND Indicates an SUA Management 
+NOTIFY message has been received 
+from an SUA peer. 
+0x03b8 SUA_MSG_MAINT_IND Indicates a routing failure or other 
+error that is preventing the message 
+being routed to its destination. 
+0x6395 SUA_MSG_R_ASC_STATUS Requests the status of an Association 
+0x6396 SUA_MSG_R_LASP_STATUS Requests the status of a Local ASP  
+0x6397 SUA_MSG_R_RASP_STATUS Requests the status of a Remote 
+ASP  
+0x6398 SUA_MSG_R_LAS_STATUS Requests the status of a Local AS  
+0x6399 SUA_MSG_R_RAS_STATUS Requests the status of a Remote AS  
+0x639a SUA_MSG_R_SERVER_STATS Requests the statistics kept for a 
+Server  
+0x639b SUA_MSG_R_RK_STATS Requests the statistics for a particular 
+Routing Key  
+0x63b5 SUA_MSG_R_ASSOC_STATS Requests updated response returned 
+giving association statistics. 
+0x63b6 SUA_MSG_R_STATS Retrieves statistics from SUA in an 
+SCCP compatible format 
+0x739c SUA_MSG_CONFIG System Configuration Message 
+identifying default module Ids and 
+resource allocation.  
+0x739d SUA_MSG_CFG_LASP Local ASP Configuration  
+0x739e SUA_MSG_CFG_ASC Association Configuration  
+0x739f SUA_MSG_CFG_LAS Declares a Local Application Server  
+Section  Appendix A: Message Types 
+90 
+Message Type Mnemonic Description 
+0x73a0 SUA_MSG_CFG_BIND_LAS Binds a Local AS to an Association  
+0x73a1 SUA_MSG_CFG_RAS Declares a Remote Application 
+Server to communicate with  
+0x73a2 SUA_MSG_CFG_BIND_RAS Binds a Remote AS to an Association  
+0x73a3 SUA_MSG_CFG_RSG Declares a Remote SG  
+0x73a4 SUA_MSG_CFG_RK Defines a routing key for a local AS  
+0x73a5 SUA_MSG_CFG_BIND_RK Binds a Routing Key to a RAS or 
+RSG  
+0x8745 SCP_MSG_SCMG_IND Notifies of a change in the status of 
+remote sub-systems and signaling 
+points. 
+0xc3ae SUA_MSG_ACT_ASC Activates an SCTP Association  
+0xc3af SUA_MSG_ACT_ASP Activates a Local AS  
+0xc3b0 SUA_MSG_DEACT_ASC Deactivates an SCTP Association  
+0xc3b1 SUA_MSG_DEACT_ASP Deactivates a Local AS  
+ 
+Dialogic® SS7 Protocols SUA Programmer's Manual Issue 3 
+91 
+Appendix B: Additional Services 
+This appendix contains information about: 
+• Timer Services.  See below. 
+B.1 Timer Services 
+The notion of time in the Dialogic® SUA module is based on a periodic timer 
+tick received from the timer module every 100ms. This ‘tick’ is used to run all 
+SUA protocol timers. This appendix details the messages formats which are 
+used by the SUA module to control timer services. 
+B.1.1 Keep Time 
+Synopsis 
+Message sent to request the timer module to issue a periodic timer tick 
+(TM_EXP) message to the SUA module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type KEEP_TIME (0x7006) 
+id 0 
+src Sending module’s ID 
+dst Timer module ID 
+rsp_req 0 
+class 0 
+status 0 
+err_info 0 
+len 6 
+ 
+Parameter Area 
+Offset Size Name 
+0 4 Reserved; should be set to zero if issued 
+by the user. 
+4 2 resolution 
+Parameter Description 
+resolution 
+The number of operating system ticks between timer expiry messages being 
+issued to the SUA module. This parameter is set from the timer_res 
+parameter in the SUA module configuration message. 
+Section  Appendix B: Additional Services 
+92 
+B.1.2 Timer Expiry 
+Synopsis 
+Periodic timer tick message issued by the timer module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type TM_EXP (0xc002) 
+id index of timer in table 
+src Timer module ID 
+dst Destination module ID 
+rsp_req 0 
+class 0 
+status 0 
+err_info 0 
+len 4 
+Parameter Area 
+Offset Size Name 
+0 4 reserved – must be set to zero 
+ 
+ 
+ 
+ 
+ 
+ 

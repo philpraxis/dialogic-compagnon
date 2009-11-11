@@ -1,0 +1,2379 @@
+ www.dialogic.com 
+Dialogic® SS7 Protocols 
+MTP3 Programmer’s Manual
+2 
+Copyright© 2005-2007 Dialogic Corporation. All Rights Reserved. You may not reproduce this document in 
+whole or in part without permission in writing from Dialogic Corporation. 
+All contents of this document are furnished for informational use only and are subject to change without notice and do not represent a commitment on the part 
+of Dialogic Corporation or its subsidiaries (“Dialogic”). Reasonable effort is made to ensure the accuracy of the information contained in the document. 
+However, Dialogic does not warrant the accuracy of this information and cannot accept responsibility for errors, inaccuracies or omissions that may be 
+contained in this document. 
+INFORMATION IN THIS DOCUMENT IS PROVIDED IN CONNECTION WITH DIALOGIC® PRODUCTS. NO LICENSE, EXPRESS OR IMPLIED, 
+BY ESTOPPEL OR OTHERWISE, TO ANY INTELLECTUAL PROPERTY RIGHTS IS GRANTED BY THIS DOCUMENT. EXCEPT AS PROVIDED 
+IN A SIGNED AGREEMENT BETWEEN YOU AND DIALOGIC, DIALOGIC ASSUMES NO LIABILITY WHATSOEVER, AND DIALOGIC 
+DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTY, RELATING TO SALE AND/OR USE OF DIALOGIC PRODUCTS INCLUDING LIABILITY 
+OR WARRANTIES RELATING TO FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR INFRINGEMENT OF ANY 
+INTELLECTUAL PROPERTY RIGHT OF A THIRD PARTY. 
+Dialogic products are not intended for use in medical, life saving, life sustaining, critical control or safety systems, or in nuclear facility applications. 
+It is possible that the use or implementation of any one of the concepts, applications, or ideas described in this document, in marketing collateral produced by 
+or on web pages maintained by Dialogic may infringe one or more patents or other intellectual property rights owned by third parties. Dialogic does not 
+provide any intellectual property licenses with the sale of Dialogic products other than a license to use such product in accordance with intellectual property 
+owned or validly licensed by Dialogic and no such licenses are provided except pursuant to a signed agreement with Dialogic. More detailed information 
+about such intellectual property is available from Dialogic’s legal department at 9800 Cavendish Blvd., 5th Floor, Montreal, Quebec, Canada H4M 2V9. 
+Dialogic encourages all users of its products to procure all necessary intellectual property licenses required to implement any concepts or 
+applications and does not condone or encourage any intellectual property infringement and disclaims any responsibility related thereto. These 
+intellectual property licenses may differ from country to country and it is the responsibility of those who develop the concepts or applications to be 
+aware of and comply with different national license requirements. 
+Dialogic is a registered trademark of Dialogic Corporation. Dialogic's trademarks may be used publicly only with permission from Dialogic. Such permission 
+may only be granted by Dialogic’s legal department at 9800 Cavendish Blvd., 5th Floor, Montreal, Quebec, Canada H4M 2V9. Any authorized use of 
+Dialogic's trademarks will be subject to full respect of the trademark guidelines published by Dialogic from time to time and any use of Dialogic’s trademarks 
+requires proper acknowledgement. 
+The names of actual companies and products mentioned herein are the trademarks of their respective owners. 
+Publication Date: August 2007 
+Document Number: 05-2471-002, Issue 7
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3 
+Contents 
+1 Introduction.............................................................................................................5 
+1.1 Applicability.......................................................................................................5 
+1.2 Related Information............................................................................................5 
+2 Functional Overview.................................................................................................6 
+2.1 MTP3 Module Overview........................................................................................6 
+2.2 Module Configuration..........................................................................................6 
+2.3 Feature Overview................................................................................................7 
+2.4 General Description.............................................................................................7 
+3 Message Reference...................................................................................................9 
+3.1 Protocol Requests from User Part to MTP3..............................................................9 
+3.1.1 API_MSG_TX_REQ  – MTP Transfer Request................................................10 
+3.2 Protocol Indications from MTP3 to User Part..........................................................11 
+3.2.1 API_MSG_RX_IND – MTP Transfer Indication..............................................12 
+3.2.2 MTP_MSG_PAUSE – MTP Pause Indication..................................................13 
+3.2.3 MTP_MSG_RESUME – MTP Resume Indication.............................................14 
+3.2.4 MTP_MSG_STATUS – MTP Status Indication................................................15 
+3.3 Layer Management Requests Sent to MTP3...........................................................16 
+3.3.1 MTP_MSG_ACT_LS – Activate Link Set Request...........................................17 
+3.3.2 MTP_MSG_DEACT_LS – Deactivate Link Set Request...................................18 
+3.3.3 MTP_MSG_ACT_SL – Activate Signaling Link Request...................................19 
+3.3.4 MTP_MSG_DEACT_SL – Deactivate Signaling Link Request...........................20 
+3.3.5 MTP_MSG_INHIB_SL – Inhibit Signaling Link Request..................................21 
+3.3.6 MTP_MSG_UNINHIB_SL – Uninhibit Signaling Link Request..........................22 
+3.3.7 MTP_MSG_SLTC_START – Signaling Link Test Request.................................23 
+3.3.8 MTP_MSG_SRT_START – Start SRT Request (Japan)....................................24 
+3.4 Management Indications Issued by MTP3 to Layer Management...............................25 
+3.4.1 MTP_MSG_LINK_INHIB – Signaling Link Inhibited Indication.........................26 
+3.4.2 MTP_MSG_LINK_UNINHIB – Signaling Link Uninhibited Indication.................27 
+3.4.3 MTP_MSG_INHIB_DENIED – Signaling Link Inhibit Denied Indication.............28 
+3.4.4 MTP_MSG_UNINHIB_FAIL – Signaling Link Uninhibit Failure Indication...........29 
+3.4.5 MTP_MSG_SRT_RESULT – SRT Result Indication (Japan)..............................30 
+3.5 Management Requests Sent to MTP3....................................................................31 
+3.5.1 MTP_MSG_RESET – MTP3 Module Reset Request.........................................33 
+3.5.2 MTP_MSG_CONFIG – MTP3 Module Configuration Request............................34 
+3.5.3 MTP_MSG_CNF_LINKSET – Link Set Configuration Request...........................38 
+3.5.4 MTP_MSG_CNF_LINK – Signaling Link Configuration Request........................40 
+3.5.5 MTP_MSG_CNF_ROUTE – Route Configuration Request................................42 
+3.5.6 MTP_MSG_CNF_TIMERS – MTP3 Timer Configuration Request.......................44 
+3.5.7 MTP_MSG_TRACE_MASK – MTP3 Trace Mask Configuration Request...............45 
+3.5.8 MTP_MSG_END_LINKSET – Link Set End Request........................................48 
+3.5.9 MTP_MSG_END_LINK – Signaling Link End Request.....................................48 
+3.5.10 MTP_MSG_END_ROUTE – Route End Request.............................................49 
+3.5.11 MTP_MSG_GARBAGE – Clear Garbage Request...........................................50 
+3.5.12 MTP_MSG_UPDATE_L4 – Update Level 4 Request........................................51 
+3.5.13 MTP_MSG_R_LK_STATUS – Read Link Status Request..................................52 
+3.5.14 MTP_MSG_R_RT_STATUS – Read Route Status Request...............................54 
+3.5.15 MTP_MSG_R_SP_STATS – Read Signaling Point Statistics Request.................56 
+3.5.16 MTP_MSG_R_RT_STATS – Read Route Statistics Request..............................57 
+3.5.17 MTP_MSG_R_LS_STATS – Read Link Set Statistics Request..........................58 
+3.5.18 MTP_MSG_R_LK_STATS – Read Link Statistics Request................................59 
+3.5.19 GEN_MSG_MOD_IDENT – Read Module Version Request..............................60 
+3.6 Management Indications Issued by MTP3..............................................................61 
+3.6.1 MGT_MSG_MTP_EVENT – MTP3 Q.752 Event Indication...............................62 
+3.6.2 MGT_MSG_EVENT_IND – Error Indication..................................................63 
+3.6.3 MGT_MSG_TRACE_EV – Trace Event Indication...........................................65 
+3.7 Message Summary Table....................................................................................66 
+4 Internal Interfaces..................................................................................................68 
+4.1 Primitives Issued by MTP3 to MTP2......................................................................68
+4 
+Contents 
+4.2 Primitives Received by MTP3 from MTP2................................................................68 
+4.3 Messages Exchanged Between MTP3 and Timer Services.........................................69 
+4.4 Messages Exchanged Between MTP2 and MTP3 On-board........................................69 
+Glossary...................................................................................................................70 
+Figures 
+1 MTP3 Context Diagram...............................................................................................8 
+Tables 
+1 Message Summary Table...........................................................................................66 
+Revision History 
+Note: The latest released issue of this guide can be found at: 
+http://www.dialogic.com/support/helpweb/signaling 
+Issue No. Part No. Date Description of Changes 
+7 05-2471-002 19-Apr-07 
+Changed to Dialogic format. 
+Changes to Message Format in Section 3.2.4, “MTP_MSG_STATUS” on 
+page15. 
+Changes to tx_pool_size in Section 3.5.2, “MTP_MSG_CONFIG” on 
+page34. 
+6 05-2471-001-01 07-Jul-05 
+Support for additional link and route status queries added using messages: 
+MTP_MSG_R_RT_STATUS, MTP_MSG_R_LK_STATUS and 
+MTP_MSG_UPDATE_L4. 
+Support for Japan specific Signaling Route Test (SRT) added using 
+messages: MTP_MSG_SRT_START and MTP_MSG_SRT_RESULT. 
+Support for dynamic configuration changes added using the messages: 
+MTP_MSG_END_LINKSET, MTP_MSG_END_LINK and 
+MTP_MSG_END_ROUTE. 
+5 Not Applicable 26-Nov-97 
+Module enhanced to support Alternative Routing. Format of link set and 
+route configuration messages modified (while maintaining backward 
+compatibility). 
+Link set configuration enhanced so that each link set can (if required) have 
+a different local point code and use a different sub-service field setting. 
+Management Inhibiting now supported. 
+Minor typographical corrections including mnemonics for many message 
+types. 
+4 Not Applicable 08-Jun-95 
+Name changed from Level 3 Programmer’s Manual to MTP3 Programmer’s 
+Manual. 
+ANSI and 24-bit point code options added. module_id no longer required in 
+configuration message. Level 2 instance number added. 
+5 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+Chapter 1:  Introduction 
+Signaling System Number 7 (SS7), as defined by the ITU-T and other national standards bodies, defines a 
+Message Transfer Part (MTP) for the reliable transfer of messages between different nodes within a telephony 
+network. MTP is conceptually sub-divided into three layers: MTP1, MTP2 and MTP3. 
+The Signaling Network Functions of the MTP are known as MTP Level 3 (MTP3), as specified in ITU-T 
+Recommendation Q.704, ANSI T1.111.4, and are used by many other national and international standards 
+bodies. The Signaling Network Functions ensure a reliable transfer of the signaling messages even in the 
+event of failures of signaling links or nodes within the signaling network. 
+MTP3 uses the services offered by the underlying protocol module (for example, MTP2 or M2PA) to achieve 
+point-to-point communication with peer MTP3 implementations. 
+This manual gives an overview of the operation of the MTP3 module and defines the structure of all 
+messages that can be sent to the module or issued by the module. 
+1.1 Applicability 
+This manual relates to the MTP3 software implementation used on Dialogic® SS7 products. It is applicable to 
+MTP3 host-based software and to board-based MTP3 software running on the following Dialogic® boards: 
+•SS7HD 
+•SPCI4 
+•SPCI2S 
+The manual is intended for use by developers who are using SS7 board-level products and wish to use some 
+or all of the features of the message-based interface to the MTP3 module. Users of the s7_mgt configuration 
+utility should note that the s7_mgt utility generates the configuration messages detailed in this document 
+based on the content of a configuration file therefore, there is no need for the user to generate configuration 
+messages. 
+This manual is not intended for use with the following Dialogic® SS7 products: 
+•SS7G21 
+•SS7G22 
+Users of these Dialogic® products should refer to the appropriate product documentation. 
+This document describes the interface to the MTP3 module including full details of all run-time configuration 
+options. It applies to revisions of the MTP3 module commencing with a major revision number of 5 (for 
+example, Version 5.00). The module version can be read using the GEN_MSG_MOD_IDENT message 
+described later in this manual. 
+1.2 Related Information 
+Refer to the following documents for related information: 
+•Software Environment Programmer’s Manual – U10SSS 
+•MTP2 Programmer’s Manual – 05-2331 
+•M2PA Programmer’s Manual – 05-2407 
+•ITU-T Recommendations Q.704, Q.707 – Message Transfer Part 
+•ITU-T Recommendation Q.752 – Monitoring and Measurements 
+•ANSI T1.111.4 – Message Transfer Part 
+For more information on Dialogic® SS7 products and solutions, visit 
+http://www.dialogic.com/support/helpweb/signaling/.
+6 
+Chapter 2 Functional Overview 
+Chapter 2:  Functional Overview 
+2.1 MTP3 Module Overview 
+The MTP3 module is an implementation of the ITU-T Signaling System Number 7 (SS7), Message Transfer 
+Part (MTP) level 3. It implements the Signaling Message Handling and Signaling Network Functions from 
+Q.704, the Signaling Link Test Control from Q.707 and Monitoring and Measurement Reporting from Q.752. 
+The MTP3 module can also be configured at run-time to operate in accordance with ANSI T1.111. 
+The MTP3 module provides the user with sufficient level 3 functionality to implement a Signaling Point (SP) 
+equipped with multiple link sets, each containing up to 16 signaling links and connecting to multiple 
+destinations either directly or via Signaling Transfer Points (STPs). It supports load sharing within a link set 
+and the full changeover and changeback procedures to ensure that, in the event of a link failure, traffic is 
+transferred to an alternative link in the link set. The module also supports the use of Alternative Link Sets 
+allowing each destination to be reached by two Alternative Routes. These link sets can be configured as 
+“preferred” and “secondary” link sets or as equal priority, in which case, load sharing across the link sets is 
+supported. In the event of a link set failure or recovery, the Forced Rerouting and Controlled Rerouting 
+procedures are invoked. 
+Messages can be sent to adjacent signaling points using the associated mode of signaling or via signaling 
+transfer points to any remote signaling point using the quasi-associated mode. Received messages destined 
+for the signaling point are presented to the appropriate User Part module, which is provided by the user. The 
+user can activate and deactivate each signaling link set or individual links, inhibit and uninhibit individual 
+links and enable the Signaling Link Test (SLT) procedure in accordance with ITU-T Recommendation Q.707. 
+The module also supports comprehensive event reporting and measurements in accordance with ITU-T 
+Q.752. 
+In addition to protocol-related functions, the MTP3 module contains a number of features to assist the user 
+when developing an application. These features include the ability to trace any primitive message received 
+by or issued from the MTP3 module to a management module where it can be recorded or presented to the 
+user. In this way, the user can debug the application without ever needing to gain detailed knowledge of the 
+internal operation of the MTP3 module. 
+2.2 Module Configuration 
+Each link set is uniquely identified by a link set identifier (linkset_id) with a value in range of 0to one less 
+than the number of link sets supported. Each link within the module is uniquely identified by a link identifier 
+(link_id) with a value in the range of 0 up to one less than the number of links supported. In all message 
+exchanges with the management module, each link is considered to belong to a link set and references to 
+the link are made using the link set identifier (linkset_id) and the link reference (link_ref), which has a 
+value in the range of 0 to one less than the maximum configured number of links in a link set. 
+The MTP3 module is configured for operation in conjunction with up to 16 user part modules that lie above 
+the MTP3 module in the protocol stack, and one or more level 2 modules that lie below the MTP3 module in 
+the protocol stack. 
+Management functions should be provided by a management module that is responsible for correctly 
+configuring the MTP3 module, activating and deactivating the links and recording or presenting the trace 
+messages and event indications to the user. 
+7 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+2.3 Feature Overview 
+Features of the MTP3 module include: 
+•Software implementation of ITU recommendation Q.704 
+•Software implementation of ANSI T1.111.4. 
+•Support for 24-bit point codes (China) 
+•Support for Japan specific extensions 
+•Run-time selection between ITU, ANSI, China and Japan operation 
+•Run-time selection of point code size 14-bit, 16-bit or 24-bit 
+•Support for dual-operation, where two instances of MTP3 cooperate to form a single local point code 
+•Support for Alternative Routing and Combined Link Sets 
+•Support for Signaling Link Test 
+•Support for Monitoring and Measurements in accordance with ITU-T Q.752 
+•Message-based interface 
+•Comprehensive trace options for selectively reporting to system management each primitive issued to, 
+or received by, the MTP3 module 
+2.4 General Description 
+The interface to the MTP3 module is entirely message-based, using the structured messages documented in 
+the Software Environment Programmer’s Manual. The MTP3 module is capable of working in conjunction with 
+board-based MTP2 implementations running on multiple boards and host-based M2PA implementations. 
+Figure1 provides an overview of the MTP3 module showing the various interfaces. 
+8 
+Chapter 2 Functional Overview 
+Figure 1. MTP3 Context Diagram 
+API_MSG_TX_REQ 
+MTP_MSG_RESET 
+MTP_MSG_CONFIG 
+MTP_MSG_CNF_LINKSET 
+MTP_MSG_CNF_LINK 
+MTP_MSG_CNF_ROUTE 
+MTP_MSG_CNF_TIMERS 
+MTP_MSG_TRACE_MASK 
+MTP_MSG_END_LINKSET 
+MTP_MSG_END_LINK 
+MTP_MSG_END_ROUTE 
+MTP_MSG_GARBAGE 
+MTP_MSG_UPDATE_L4 
+MTP_MSG_R_LK_STATUS 
+MTP_MSG_R_RT_STATUS 
+MTP_MSG_R_SP_STATS 
+MTP_MSG_R_RT_STATS 
+MTP_MSG_R_LS_STATS 
+MTP_MSG_R_LK_STATS 
+GEN_MSG_MOD_IDENT 
+MGT_MSG_EVENT_IND 
+MGT_MSG_TRACE_EV 
+MGT_MSG_MTP_EVENT 
+API_MSG_RX_IND 
+MTP_MSG_PAUSE 
+MTP_MSG_RESUME 
+MTP_MSG_STATUS 
+MTP3 
+Module 
+API_MSG_TX_REQ 
+SS7_MSG_START 
+SS7_MSG_STOP 
+SS7_MSG_EMGCY 
+SS7_MSG_EMGCY_CLRD 
+SS7_MSG_RTV_BSNT 
+SS7_MSG_RTVL_REQ 
+SS7_MSG_FLUSH 
+SS7_MSG_CONTINUE 
+API_MSG_RX_IND 
+SS7_MSG_IN_SVC 
+SS7_MSG_OUT_SVC 
+SS7_MSG_REM_PR_OUT 
+SS7_MSG_REM_PR_OK 
+SS7_MSG_RXD_BSNT 
+API_MSG_RTVD_MSG 
+SS7_MSG_RTVL_COMPL 
+MTP_MSG_RTVL_NOT_POS 
+MTP_MSG_LINK_CONG 
+MTP_MSG_LINK_UNCONG 
+MTP_MSG_FLUSH_ACK 
+TIM_MSG_KEEP_TIME 
+SS7_MSG_TM_EXP 
+User Part 
+Interface 
+Management 
+Interface 
+System 
+Services 
+MTP2 
+Interface 
+MTP_MSG_ACT_LS 
+MTP_MSG_DEACT_LS 
+MTP_MSG_ACT_SL 
+MTP_MSG_DEACT_SL 
+MTP_MSG_INHIB_SL 
+MTP_MSG_UNINHIB_SL 
+MTP_MSG_SLTC_START 
+MTP_MSG_SRT_START 
+MTP_MSG_LINK_INHIB 
+MTP_MSG_LINK_UNINHIB 
+MTP_MSG_INHIB_DENIED 
+MTP_MSG_UNINHIB_FAIL 
+MTP_MSG_FOR_USP 
+MTP_MSG_SRT_RESULT 
+Layer Management 
+Interface
+9 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+Chapter 3:  Message Reference 
+This section describes the individual messages and associated parameters that may be sent to MTP3 or 
+generated by MTP3. The interface is message-based, using messages of type MSG as defined in the 
+Software Environment Programmer’s Manual. 
+These messages are used for the primitive protocol interface with layer 4 User Part module, the primitive 
+protocol interface with the MTP3 layer management module and for the non-primitive interface to 
+management for the purposes of configuring and managing the MTP3 module. 
+The messages are grouped into the following categories: 
+•Protocol Requests from User Part to MTP3 
+•Protocol Indications from MTP3 to User Part 
+•Layer Management Requests Sent to MTP3 
+•Management Indications Issued by MTP3 to Layer Management 
+•Management Requests Sent to MTP3 
+•Management Indications Issued by MTP3 
+3.1 Protocol Requests from User Part to MTP3 
+Primitive protocol requests are sent from the User Part (for example, ISUP, SCCP etc.) to MTP3 in accordance 
+with the published protocol specifications. 
+This section of the manual is applicable only to users intending to write their own User Part implementation. 
+When using a User Part from the Dialogic® SS7 product range, the messages for this interface are 
+implemented within the User Part module and the user should consult the User Part documentation, which 
+details the format of the messages that should be sent from the application to the User Part module. 
+Currently, only the following protocol request is sent from the User Part to MTP3: 
+•API_MSG_TX_REQ  – MTP Transfer Request 
+When sending a protocol request to MTP3, the user should ensure that the message is sent to the correct 
+module_id and the correct instance of the MTP3 module (if multiple instances are in use, for example, on 
+different boards). 
+The default module_id for MTP3 is MTP_TASK_ID (0x22). However, host-based MTP3 is capable of running 
+at different module IDs and this can be useful for example where multiple MTP3 modules are running on a 
+single host. The user should ensure that the correct MTP3 module ID is written to the hdr->dst field of the 
+message. 
+Typically, it is appropriate to set the instance value to 0 using the GCT_set_instance() library function. 
+However, if separate MTP3 instances are running on multiple boards, it is necessary to set the instance to the 
+board ID on which the target MTP3 is running. 
+10 
+Chapter 3 Message Reference 
+3.1.1 API_MSG_TX_REQ  – MTP Transfer Request 
+Synopsis 
+Message issued by the User Part (for example, ISUP, SCCP etc.) to MTP3 to invoke the Message Transfer 
+Request service for transmission to the network. 
+Message Format  
+Message Header 
+Field Name Meaning 
+type API_MSG_TX_REQ (0xcf00) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len Number of octets in Message Signal Unit (MSU) 
+Parameter Area 
+OFFSET SIZE NAME 
+0 len 
+MSU data in binary format commencing with the Service Indicator 
+Octet (SIO). The following information is contained in this field: 
+• Originating Point Code 
+• Destination Point Code 
+• Signaling Link Selection 
+• Service Information Octet 
+• User Data 
+The data should be formatted since it is sent to the network 
+commencing with the SIO. The format depends on the point code size 
+currently in use. 
+11 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.2 Protocol Indications from MTP3 to User Part 
+Protocol primitive indications are issued by MTP3 to the appropriate User Part module(s) as configured on a 
+per Service Indicator (SI) basis in the module configuration message (user_id field). These indications are 
+in accordance with the published protocol specifications. 
+Note: This section of the manual is applicable only to users intending to write their own User Part 
+implementation. When using a User Part from the Dialogic® SS7 product range, the messages for 
+this interface are received and processed by the User Part module and the user should consult 
+the User Part documentation, which details the format of the messages that are sent from the 
+User Part to the application. 
+The User Part module is responsible for releasing all messages sent to it by MTP3. 
+The following protocol indications are issued by MTP3 to the User Part: 
+•API_MSG_RX_IND – MTP Transfer Indication 
+•MTP_MSG_PAUSE – MTP Pause Indication 
+•MTP_MSG_RESUME – MTP Resume Indication 
+•MTP_MSG_STATUS – MTP Status Indication 
+12 
+Chapter 3 Message Reference 
+3.2.1 API_MSG_RX_IND – MTP Transfer Indication 
+Synopsis 
+Message issued to the User Part by MTP3 to indicate reception of a Message Signal Unit (MSU) from the 
+network. 
+Message Format  
+Message Header 
+Field Name Meaning 
+type API_MSG_RX_IND (0x8f01) 
+id 
+The use of this field is controlled by the setting of bit 0 in the 
+ext_options field of the module configuration message. 
+• If bit 0 of ext_options is set to 0, this field contains the User Part 
+Reference (or Service Indicator). This is primarily useful for 
+backward compatibility. 
+• If bit 0 of ext_options is set to 1 (recommended for all new 
+designs), this field provides an indication of the MTP Label Format 
+used in the parameter area as follows: 
+0 – MTP label contains 14-bit point codes 
+1 – MTP label contains 24-bit point codes 
+2 – MTP label contains 16-bit point codes 
+src MTP3 module ID 
+dst User part module ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len Number of octets in MSU 
+Parameter Area 
+Offset Size Name 
+0 len 
+MSU data in binary format commencing with the Service Indicator 
+Octet (SIO). The following information is contained in this field: 
+• Originating Point Code 
+• Destination Point Code 
+• Signaling Link Selection 
+• Service Information Octet 
+• User Data 
+The data is formatted since it was received from the network 
+commencing with the SIO. The format depends on the point code size 
+currently in use. 
+13 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.2.2 MTP_MSG_PAUSE – MTP Pause Indication 
+Synopsis 
+This primitive is issued by MTP3 to indicate to the user part the total inability of providing MTP service to the 
+specified destination. 
+Message Format  
+Message Header 
+Field Name Meaning 
+type MTP_MSG_PAUSE (0x8403) 
+id User Part Reference 
+src MTP3 module ID 
+dst User Part module ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 4 
+Parameter Area 
+Offset Size Name 
+0 4 Affected destination point code 
+14 
+Chapter 3 Message Reference 
+3.2.3 MTP_MSG_RESUME – MTP Resume Indication 
+Synopsis 
+This primitive is issued by MTP3 to indicate to the user the total ability of providing MTP service to the 
+specified destination. 
+Message Format  
+Message Header 
+Field Name Meaning 
+type MTP_MSG_RESUME (0x8404) 
+id User Part Reference 
+src MTP3 module ID 
+dst User Part module ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 4 
+Parameter Area 
+Offset Size Name 
+0 4 Affected destination point code 
+15 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.2.4 MTP_MSG_STATUS – MTP Status Indication 
+Synopsis 
+This primitive is issued by MTP3 to indicate to the user part the partial inability of providing the MTP service 
+to the specified destination. This may be due to signaling network congestion or due to unavailability of the 
+remote user part. 
+Message Format  
+Message Header 
+Field Name Meaning 
+type MTP_MSG_STATUS (0x8405) 
+id User Part Reference 
+src MTP3 module ID 
+dst User Part module ID 
+rsp_req 0 
+hclass 0 
+status 
+One of the following: 
+• 1 = Remote User Unavailable 
+• 2 = Signaling Network Congestion 
+err_info 0 
+len 6 or 8 
+Parameter Area 
+Offset Size Name 
+0 4 Affected destination point code 
+4 2 
+Congestion status (if status = 0x02). 
+This field is set to the current congestion level in the range 0 to 3, 
+where 0 means no congestion and 3 means maximum congestion. 
+Many networks use only a single level of congestion (that is, 1). 
+6 2 
+Unavailabilty cause (if status = Remote User Unavailable(1)) 
+The unavailabilty cause may be one of the following: 
+0 = Unknown 
+1 = Unequipped User 
+2 = Inaccessible User
+16 
+Chapter 3 Message Reference 
+3.3 Layer Management Requests Sent to MTP3 
+Protocol management primitives are sent from Layer Management to MTP3 in accordance with published 
+MTP3 recommendations. The primitive names are closely aligned with the terminology used in ITU-T 
+Recommendation Q.704. 
+The layer management primitives allow the user to activate and deactivate signaling links, inhibit and 
+uninhibit signaling links and request manual signaling link tests to be performed. 
+The full list of layer management requests sent to MTP3 includes: 
+•MTP_MSG_ACT_SL – Activate Link Set Request 
+•MTP_MSG_DEACT_SL – Deactivate Link Set Request 
+•MTP_MSG_INHIB_SL – Inhibit Signaling Link Request 
+•MTP_MSG_UNINHIB_SL – Uninhibit Signaling Link Request 
+•MTP_MSG_SLTC_START – Signaling Link Test Request 
+•MTP_MSG_SRT_START – Start SRT Request (Japan) 
+When sending layer management requests to MTP3, the user should ensure that the message is sent to the 
+correct module_id, the correct instance of the MTP3 module (if multiple instances are in use – for example 
+on different boards) and to the correct id. 
+The default module_id for MTP3 is MTP_TASK_ID (0x22). However, host-based MTP3 is capable of running 
+at different module IDs and this can be useful, for example, where multiple MTP3 modules are running on a 
+single host. The user should ensure that the correct MTP3 module ID is written to the hdr->dst field of the 
+message. 
+Typically, it is appropriate to set the instance value to 0 using the GCT_set_instance() library function; 
+however, if separate MTP3 instances are running on multiple boards, it is necessary to set the instance to 
+the board_id on which the target MTP3 is running. 
+Since links are identified in terms of linkset_id and link_ref, the hdr->id field for all layer management 
+requests should be set to (linkset_id * 256) + link_ref. 
+The hdr->rsp_req field may be used optionally to request a confirmation. If requested, the MTP3 module 
+confirms acceptance of the primitive by sending the message back to its originator with bit14 cleared in the 
+type field of the message. This mechanism is described in detail in the Software Environment Programmer’s 
+Manual. 
+17 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.3.1 MTP_MSG_ACT_LS – Activate Link Set Request 
+Synopsis 
+This primitive is used by management to request the MTP3 module to activate all the links in a linkset. 
+Note: The preferred mechanism of link activation is to use instead the MTP_MSG_ACT_SL message to 
+activate individual signaling links. 
+Message Format 
+Description 
+On receipt of this message, MTP3 attempts to activate all links in the link set. Receipt of a confirmation 
+message does not imply that the link set is available for use, merely that MTP3 is attempting to bring the link 
+into service. The user part should determine availability of a signaling relation using the MTP PAUSE and MTP 
+RESUME indications. 
+The user can determine the current state of individual signaling links on demand using the 
+MTP_MSG_R_LK_STATUS message. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_ACT_LS (0xc30e) 
+id linkset_id * 256 
+src Originating module ID 
+dst MTP3 module ID 
+rsp_req Sending layer’s bit set if response required 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+18 
+Chapter 3 Message Reference 
+3.3.2 MTP_MSG_DEACT_LS – Deactivate Link Set Request 
+Synopsis 
+This primitive is used by management to request the MTP3 module to deactivate all the links in a link set. 
+Note: The preferred mechanism of link deactivation is to use instead the MTP_MSG_DEACT_SL 
+message to deactivate individual signaling links. 
+Message Format 
+Description 
+On receipt of this message, MTP3 attempts to deactivate all links in the link set. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_DEACT_LS (0xc30f) 
+id linkset_id * 256 
+src Originating module ID 
+dst MTP3 module ID 
+rsp_req Sending layer’s bit set if response required 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+19 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.3.3 MTP_MSG_ACT_SL – Activate Signaling Link Request 
+Synopsis 
+This primitive is used by management to request the MTP3 module to activate the specified single link within 
+a link set. 
+Message Format 
+Description 
+On receipt of this message, MTP3 attempts to activate the specified link in the link set. Receipt of a 
+confirmation message does not imply that the link is available for use, merely that MTP3 is attempting to 
+bring the link into service. The user part should determine availability of a signaling relation using the MTP 
+PAUSE and MTP RESUME indications. 
+The user can determine the current state of a signaling link on demand using the MTP_MSG_R_LK_STATUS 
+message. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_ACT_SL (0xc30a) 
+id (linkset_id * 256) + link_ref 
+src Originating module ID 
+dst MTP3 module ID 
+rsp_req Sending layer’s bit set if response required 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+20 
+Chapter 3 Message Reference 
+3.3.4 MTP_MSG_DEACT_SL – Deactivate Signaling Link Request 
+Synopsis 
+This primitive is used by management to request the MTP3 module to deactivate the specified link within a 
+link set. 
+Message Format 
+Description 
+On receipt of this message, MTP3 attempts to deactivate the specified link in the link set. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_DEACT_SL (0xc30b) 
+id (linkset_id * 256) + link_ref 
+src Originating module ID 
+dst MTP3 module ID 
+rsp_req Sending layer’s bit set if response required 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+21 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.3.5 MTP_MSG_INHIB_SL – Inhibit Signaling Link Request 
+Synopsis 
+This primitive is used to request the MTP3 module to invoke management inhibiting on the specified link 
+within a link set. 
+Message Format 
+Description 
+On receipt of this message, MTP3 attempts to execute the Management Inhibiting function. For Management 
+Inhibiting to succeed, there must be alternative available links to reach all destinations that can be accessed 
+over the link. 
+If the procedure is successful, MTP3 stops sending traffic over the link. 
+If the procedure is not successful, the MTP3 module issues a message to management 
+(MTP_MSG_INHIB_DENIED) indicating that the requested operation has failed. 
+The user can determine the current state of a signaling link (including whether it is currently inhibited) on 
+demand using the MTP_MSG_R_LK_STATUS message. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_INHIB_SL (0xc310) 
+id (linkset_id * 256) + link_ref 
+src Originating module ID 
+dst MTP3 module ID 
+rsp_req Sending layer’s bit set if response required 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+22 
+Chapter 3 Message Reference 
+3.3.6 MTP_MSG_UNINHIB_SL – Uninhibit Signaling Link Request 
+Synopsis 
+This primitive is used to request MTP3 to remove the management inhibit condition for the specified link 
+within a link set. 
+Message Format 
+Description 
+On receipt of this message, MTP3 attempts to execute the Management UnInhibiting function. If the 
+procedure is not successful, the MTP3 module issues a message (MTP_MSG_UNINHIB_FAIL) to management 
+indicating that the requested operation has failed. 
+The user can determine the current state of a signaling link (including whether it is currently inhibited) on 
+demand using the MTP_MSG_R_LK_STATUS message. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_UNINHIB_SL (0xc311) 
+id (linkset_id * 256) + link_ref 
+src Originating module ID 
+dst MTP3 module ID 
+rsp_req Sending layer’s bit set if response required 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+23 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.3.7 MTP_MSG_SLTC_START – Signaling Link Test Request 
+Synopsis 
+This primitive is used by management to manually request that a signaling link test be carried out in 
+accordance with Q.707 on the specified link. 
+Message Format 
+Description 
+Receipt of this message causes a Signaling Link Test to be carried out on the specified link. This test is in 
+addition to the periodic test that is carried out automatically by the module (when configured accordingly). 
+Typically, this message is not used when the periodic Signaling Link Test is enabled. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_SLTC_START (0xc30c) 
+id (linkset_id * 256) + link_ref 
+src Originating module ID 
+dst MTP3 module ID 
+rsp_req Sending layer’s bit set if response required 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+24 
+Chapter 3 Message Reference 
+3.3.8 MTP_MSG_SRT_START – Start SRT Request (Japan) 
+Synopsis 
+Primitive issued by user (or management) to MTP3 requesting that a Japan-specific Signaling Route Test 
+(SRT) be started on the specified signaling link. 
+Message Format  
+Description 
+This primitive is issued by the user to request that a Signaling Route Test be started on the specified link 
+towards the specified DPC. 
+The MTP3 module generates the message and sends it to the network. It also starts an internal timer 
+(Designated in JT-Q.707/NTT-Q.707 as Timer T10) while waiting for a response. If a successful response is 
+not received, MTP3 generates a second SRT message, restarts the timer, and waits for the response. 
+On receipt of the response, or failure of the SRT, MTP3 sends an MTP_MSG_SRT_RESULT message to the 
+user indicating the result of the test. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_SRT_START (0xc317) 
+id (linkset_id * 256) + link_ref 
+src Originating module ID 
+dst MTP3 module ID 
+rsp_req Sending layer’s bit set if response required 
+hclass 0 
+status 0 
+err_info 0 
+len 4 
+Parameter Area 
+Offset Size Name 
+0 4 DPC – Destination Point Code for SRT message 
+25 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.4 Management Indications Issued by MTP3 to Layer Management 
+Protocol management primitives are sent by MTP3 to Layer Management in accordance with published MTP3 
+recommendations. The primitive names are closely aligned with the terminology used in ITU-T 
+Recommendation Q.704. 
+The full list of management indications that can be issued by MTP3 includes: 
+•MTP_MSG_LINK_INHIB – Signaling Link Inhibited Indication 
+•MTP_MSG_LINK_UNINHIB – Signaling Link Uninhibited Indication 
+•MTP_MSG_INHIB_DENIED – Signaling Link Inhibit Denied Indication 
+•MTP_MSG_UNINHIB_FAIL – Signaling Link Uninhibit Failure Indication 
+•MTP_MSG_SRT_RESULT – SRT Result Indication (Japan) 
+Messages are sent to the module_id configured as the Management module ID (mgmt_id) in the MTP3 
+module configuration message (MTP_MSG_CONFIG), except in the case of the MTP_MSG_SRT_RESULT 
+message where the result is sent to the module that originally requested the SRT. 
+26 
+Chapter 3 Message Reference 
+3.4.1 MTP_MSG_LINK_INHIB – Signaling Link Inhibited Indication 
+Synopsis 
+This primitive is used to indicate to management that a link has been inhibited. 
+Message Format 
+Description 
+This message is issued to management whenever a signaling link becomes inhibited. This may be due to 
+local inhibiting or remote inhibiting. 
+The user can determine the current state of a signaling link (including whether it is currently inhibited) on 
+demand using the MTP_MSG_R_LK_STATUS message. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_LINK_INHIB (0x8380) 
+id (linkset_id * 256) + link_ref 
+src MTP3 module ID 
+dst Management module ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+27 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.4.2 MTP_MSG_LINK_UNINHIB – Signaling Link Uninhibited Indication 
+Synopsis 
+This primitive is used to indicate to management that a link has been uninhibited. 
+Message Format 
+Description 
+This message is issued to management whenever a signaling link that has been inhibited becomes 
+uninhibited. 
+The user can determine the current state of a signaling link (including whether it is currently inhibited) on 
+demand using the MTP_MSG_R_LK_STATUS message. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_LINK_UNINHIB (0x8381) 
+id (linkset_id * 256) + link_ref 
+src MTP3 module ID 
+dst Management module ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+28 
+Chapter 3 Message Reference 
+3.4.3 MTP_MSG_INHIB_DENIED – Signaling Link Inhibit Denied Indication 
+Synopsis 
+This primitive is used to indicate to management that an inhibit request has been denied. 
+Message Format 
+Description 
+This message is issued to management whenever an attempt at inhibiting a signaling link fails. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_INHIB_DENIED (0x8382) 
+id (linkset_id * 256) + link_ref 
+src MTP3 module ID 
+dst Management module ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+29 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.4.4 MTP_MSG_UNINHIB_FAIL – Signaling Link Uninhibit Failure Indication 
+Synopsis 
+This primitive is used to indicate to management a failure to uninhibit a link. 
+Message Format 
+Description 
+This message is issued to management whenever an attempt at uninhibiting a signaling link fails. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_UNINHIB_FAIL (0x8383) 
+id (linkset_id * 256) + link_ref 
+src MTP3 module ID 
+dst Management module ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+30 
+Chapter 3 Message Reference 
+3.4.5 MTP_MSG_SRT_RESULT – SRT Result Indication (Japan) 
+Synopsis 
+Primitive issued by MTP3 to notify the result of a (Japan-specific) Signaling Route test to the user. 
+Message Format 
+Description 
+This primitive is issued by MTP3 to the user to convey the result of a Signaling Route Test (SRT) on the 
+specified link. 
+Note: The message is sent to the module_id that requested the original SRT (unlike other 
+management indications that are sent to the management module established at configuration 
+time). 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_SRT_RESULT (0x8321) 
+id (linkset_id * 256) + link_ref 
+src MTP3 module ID 
+dst User module ID (Taken from original SRT request) 
+rsp_req 0 
+hclass 0 
+status 
+Result of the SRT: 
+• 0 = Success 
+• 1 = Failure (T10 Expiry) 
+• 2 = Failure (Incorrect Test Pattern) 
+• 3 = Failure (SRA received on wrong link) 
+• 5 = Failure (SRT aborted internally) 
+Other values reserved for additional failure reasons. 
+err_info 0 
+len 0 
+31 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.5 Management Requests Sent to MTP3 
+In addition to the protocol primitives defined for the MTP3 to User Part interface and the MTP3 to Layer 
+Management Interface, the MTP3 module supports a non-primitive interface for configuration and 
+management. 
+The non-primitive interface is used to support requests by the user for initialization, configuration and 
+diagnostic purposes and to allow MTP3 to report protocol-based and software error events to the local 
+system management module. 
+This section describes the formats of all the messages used in the non-primitive interface. 
+The full list of management requests available to send to MTP3 includes: 
+•MTP_MSG_RESET – MTP3 Module Reset Request 
+•MTP_MSG_CONFIG – MTP3 Module Configuration Request 
+•MTP_MSG_CNF_LINKSET – Link Set Configuration Request 
+•MTP_MSG_CNF_LINK – Signaling Link Configuration Request 
+•MTP_MSG_CNF_ROUTE – Route Configuration Request 
+•MTP_MSG_CNF_TIMERS – MTP3 Timer Configuration Request 
+•MTP_MSG_TRACE_MASK – MTP3 Trace Mask Configuration Request 
+•MTP_MSG_END_LINKSET – Link Set End Request 
+•MTP_MSG_END_LINK – Signaling Link End Request 
+•MTP_MSG_END_ROUTE – Route End Request 
+•MTP_MSG_GARBAGE – Clear Garbage Request 
+•MTP_MSG_UPDATE_L4 – Update Level 4 Request 
+•MTP_MSG_R_LK_STATUS – Read Link Status Request 
+•MTP_MSG_R_RT_STATUS – Read Route Status Request 
+•MTP_MSG_R_SP_STATS – Read Signaling Point Statistics Request 
+•MTP_MSG_R_RT_STATS – Read Route Statistics Request 
+•MTP_MSG_R_LS_STATS – Read Link Set Statistics Request 
+•MTP_MSG_R_LK_STATS – Read Link Statistics Request 
+•GEN_MSG_MOD_IDENT – Read Module Version Request 
+When sending layer management requests to MTP3, the user should ensure that the message is sent to the 
+correct module_id, the correct instance of the MTP3 module (if multiple instances are in use, for example, 
+on different boards) and to the correct id. 
+The default module_id for MTP3 is MTP_TASK_ID (0x22). However, host-based MTP3 is capable of running 
+at different module IDs and this can be useful for example where multiple MTP3 modules are running on a 
+single host. The user should ensure that the correct MTP3 module ID is written to the hdr->dst field of the 
+message. 
+Typically, it is appropriate to set the instance value to 0 using the GCT_set_instance() library function. 
+However, if separate MTP3 instances are running on multiple boards, it is necessary to set the instance to 
+the board_id on which the target MTP3 is running. 
+Care should be taken to correctly populate the hdr->id field as different messages require different 
+parameters. In particular, messages relating to links and link sets should be expressed as: (linkset_id * 
+256) + link_ref. 
+The hdr->rsp_req field may optionally be used to request a confirmation. If requested, the MTP3 module 
+confirms acceptance of the primitive by sending the message back to its originator with bit14 cleared in the 
+type field of the message. This mechanism is described in detail in the Software Environment Programmer’s 
+Manual. Messages intended to read back information from MTP3 must use this mechanism, otherwise MTP3 
+will not respond to the request. 
+32 
+Chapter 3 Message Reference 
+The MTP3 module returns a confirmation message containing a status value taken from the following table: 
+Mnemonic Value Description 
+SUCCESS 0 Success 
+MTP_BAD_PRIM 0x51 Invalid or unexpected message 
+MTP_BAD_ID 0x58 Invalid ID in header 
+MTP_GARBAGE 0x65 Failed to clear garbage queue, (in which case, it is necessary to 
+send another MTP_MSG_GARBAGE message at a later time)
+33 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.5.1 MTP_MSG_RESET – MTP3 Module Reset Request 
+Synopsis 
+Message used to initialize or to re-initialize the MTP3 module. 
+Message Format 
+Description 
+This message is used to initialize the MTP3 module. All messages received by the module before the first 
+MTP_MSG_RESET message are discarded. Subsequent MTP_MSG_RESET requests cause all system 
+resources requested by the MTP3 module to be released and the module to be reset to its idle state. 
+Whenever the module is reset, it must subsequently be configured (using the MTP_MSG_CONFIG, 
+MTP_MSG_CNF_LINKSET, MTP_MSG_CNF_LINK and MTP_MSG_CNF_ROUTE requests) before attempting to 
+activate signaling links. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_RESET (0x7300) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+34 
+Chapter 3 Message Reference 
+3.5.2 MTP_MSG_CONFIG – MTP3 Module Configuration Request 
+Synopsis 
+This message is used to configure the MTP3 module. It must be issued after an MTP_MSG_RESET request 
+and before any MTP_MSG_CNF_LINKSET requests are issued. 
+Message Format  
+Parameters 
+•options 
+This field is a 16-bit field used to convey various run-time options to the module, as shown in the 
+following table (refer also to the ext_options field that conveys additional run-time options): 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_CONFIG (0x7303) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 40 
+Parameter Area 
+Offset Size Name 
+0 2 options - Run-time options 
+2 1 module_id – Reserved, should be set to 0 
+3 1 mngt_id- Module ID of management module 
+4 2 tx_pool_size - Transmit pool size 
+6 2 timer_res – Reserved, must be set to 1 
+8 4 point_code – Default Local Point code for MTP3 
+12 2 num_links - Total number of links 
+14 2 num_linksets Total number of link sets 
+16 1 ssf – Default Sub-Service field value 
+17 5 Reserved for future use, must be set to zero 
+22 2 ext_options – Extended run-time options 
+24 16 user_id - Module ID for each of the 16 user parts 
+Bit Meaning 
+0 
+This bit is set to disable the discrimination function. Typically, only MSUs with a destination 
+point code equal to the point code of the signaling point are distributed to the user parts. 
+However, if this bit is set, ALL received MSUs are passed to the user parts. 
+• 0 – Normal setting, message discrimination enabled as per protocol specification 
+• 1 – Disable discrimination 
+1 
+This bit is set to disable the Sub-Service Field (SSF) discrimination function. Typically, only 
+MSUs with a SSF matching the SSF supplied in the configuration message are accepted for 
+distribution to the user parts. However, if this bit is set, the SSF is not examined by the 
+discrimination function. 
+• 0 – Normal setting, SSF discrimination enabled as per protocol specification 
+• 1 – Disable SSF discrimination 
+2 
+This bit is used to control the buffer format used by MTP3 for MTP Transfer Requests and 
+Indications. This field should be set as follows, depending on the MTP3 implementation in 
+use: 
+• For Host-based MTP3, set this bit to 1 
+• For SS7HD-based MTP3 (ss7.dc4), set this bit to 1 
+• For SSPCI4 / SPCI2S based MTP3 (ss7.dc3), set this bit to 0 
+35 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+•mngt_id 
+The module identifier of the management module to which trace messages and event notifications are 
+sent. 
+•tx_pool_size 
+This parameter is used to set the size of an internal pool of buffers used for generation of MTP3 
+messages for transmission to the network. This parameter should be set to the following fixed values 
+depending on the specific MTP3 implementation in use: 
+•timer_res 
+This parameter is reserved for future use and should always be set to 1. 
+•point_code 
+The default local point code of the signaling point (SP) which should lie in the range of 0 to 16383 (for 
+14-bit point codes) and in the range of 0 and 16777215 (for 24-bit point codes). 
+The user can specify the local point code on a per-link set basis if required, allowing MTP3 to connect to 
+more than one network where each network uses a different point code numbering scheme. This is 
+achieved using the local_pc parameter in the link set configuration message which overrides the 
+point_code parameter. 
+3 
+This bit is used to determine the behavior when an MSU is received from the network for a 
+User Part that is not currently configured. The module can either discard the message with 
+no further action or issue a User Part Unavailable message back to the network. 
+• 0 – Discard the message 
+• 1 – Issue a User Part Unavailable message 
+5 
+This bit is set to disable operation of Management Inhibiting functionality. When set, any 
+attempt to inhibit a signaling link (either locally or remotely is denied). When clear, 
+Management Inhibiting Functionality operates normally. 
+• 0 – Normal setting, enable Management Inhibiting support 
+• 1 – Disable Management Inhibiting support 
+6 
+This bit is used to disable the Signaling Route Set Test mechanism. Typically, when a remote 
+signaling point becomes unavailable, a periodic Signaling Route Set Test message is issued in 
+order to ensure that subsequent availability of the signaling point is detected. Setting this bit 
+allows the sending of this message to be disabled. 
+• 0 – Normal setting, enable Signaling Route Set Test 
+• 1 - Disable Signaling Route Set Test 
+8 
+This bit is used to select between ITU and ANSI operation. 
+• 0 - ITU (CCITT) operation 
+• 1 - ANSI operation 
+NOTE: For correct ANSI operation, the user should always set bits 9, 10 and 11, as well as 
+bit8. 
+9 
+This bit is used to select between 14/16-bit point codes and 24-bit point codes. It must 
+always be set to 1 when the ANSI option is selected. 
+• 0 – Use 14-bit or 16-bit point codes (depending on the setting of ext_options bit 4) 
+• 1 – Use 24-bit point codes 
+10 
+This bit is used to enable Multiple Congestion States operation. It should always be set when 
+ANSI option is selected. 
+• 0 - Disable Multiple Congestion States 
+• 1 - Enable Multiple Congestion States 
+11 
+This bit is used to enable Multiple Message Priority operation. It should always be set when 
+ANSI option is selected. 
+• 0 - Disable Multiple Message Priority operation 
+• 1 - Enable Multiple Message Priority operation 
+Others All other bits are reserved for future use and must be set to zero. 
+MTP3 Implementation tx_pool_size 
+Host-Based MTP3 0 
+SS7HD (ss7.dc4) 0 
+SPCI4 / SPCI2S (ss7.dc3) 20 
+Bit Meaning
+36 
+Chapter 3 Message Reference 
+•num_links 
+The total number of signaling links to be supported by the signaling point. This is a run-time setting and 
+should be in the range of 1 and the maximum number of links supported by the implementation. If it is 
+known at configuration time that the system requires less than the maximum number of links, 
+num_links should be set accordingly to achieve slight performance benefits. 
+•num_linksets 
+The number of link sets to be supported by the signaling point. This is a run-time setting and should be 
+in the range of 1 and the compile-time maximum number of link sets. If it is known at configuration time 
+that the system requires less than the maximum number of link sets, num_linksets should be set 
+accordingly to achieve slight performance benefits. 
+•ssf 
+The default value to be used in the Sub-Service Field (SSF) of all Message Signal Units (MSUs) 
+originating from within the MTP3 module. The valid range is 0 to 15. This parameter is also used in the 
+discrimination function. The user can override this parameter by specifying a per-link set SSF value if 
+required. 
+Note: When using ANSI operation, the two least significant bits of the ssf parameter must always be 
+set to 1 for correct operation. 
+•user_id 
+An array of module identifiers for each of the 16 possible User Parts. These are the modules to which the 
+MTP3 module distributes received messages for this signaling point. The value for any User Parts not 
+implemented should be set to zero. The values for the user parts handled by MTP3 (0, 1 and 2) is 
+typically set to zero to allow these messages to be handled internally by MTP3.  
+•ext_options 
+This field is used in addition to the options field to convey “extended” run-time options to the module as 
+shown in the following table: 
+user_id Suggested Setting 
+user_id[0] This parameter is typically set to zero so that Signaling Network Management 
+messages are processed by MTP3. 
+user_id[1] This parameter is typically set to zero so that Signaling Network Test & 
+Maintenance messages are processed by MTP3. 
+user_id[2] This parameter is typically set to zero so that ANSI format Signaling Network 
+Test & Maintenance messages are processed by MTP3. 
+user_id[3] If SCCP is in use, this parameter should be set to the module ID of the SCCP 
+module. Otherwise, it should be set to zero. 
+user_id[4] If TUP is in use, this parameter should be set to the module ID of the TUP module. 
+Otherwise, it should be set to zero. 
+user_id[5] If ISUP is in use, this parameter should be set to the module ID of the ISUP 
+module. Otherwise, it should be set to zero. 
+user_id[x] If Service Indicator x is in use, this parameter should be set to the module ID of the 
+appropriate User Part module. Otherwise, it should be set to zero. 
+Bit Meaning 
+0 
+This bit is used to control the usage of the hdr->id field of MTP Transfer Indication 
+messages. 
+• 0 – The id field contains the User Part Reference (or Service Indicator), this is 
+primarily useful for backward compatibility. 
+• 1 - The id field provides an indication of the MTP Label Format used in the parameter 
+area. This is the recommended setting for all new designs. 
+1 
+This bit controls how received Transfer Controlled and Signaling Route Set Congestion 
+Messages that are not destined for the local point code are processed. 
+• 0 – Normal operation; messages are discarded. 
+• 1 – Messages are sent to fixed module_id 0x0a. 
+2 
+This bit controls MTP3 operation on detection of Remote Processor Outage (RPO). 
+• 0 – On detection of RPO, the signaling link is taken out of service and restoration 
+commences. This setting is useful for backward compatibility. 
+• 1 – Normal setting; RPO is handled in accordance with the ITU-T 1992 (and later) 
+recommendations. 
+37 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3 
+This bit is used when MTP3 is operating in dual mode to control which bit of the Sub-Service 
+Field is used to flag messages that have been received by one MTP3 and are being conveyed 
+to the dual module over the inter-MTP3 link set. 
+• 0 – Normal setting; sub-Service Field bit 2 is modified. 
+• 1 – Alternative setting; sub-Service Field bit 0 is modified. 
+4 
+This bit is used to select between 14-bit point codes and 16-bit point codes. It is only 
+significant when 24-bit point codes are NOT selected (refer to the options parameter). 
+• 0 – Use 14-bit point codes 
+• 1 – Use 16-bit point codes 
+5 
+This bit is used to activate Japan-specific MTP3 operation. 
+• 0 – Normal setting; Japan-specific functionality is disabled 
+• 1 – Japan-specific functionality is enabled 
+NOTE: For correct Japan-specific operation, the user should also select 16-bit point codes 
+by setting bit 4 as well as bit 5. 
+6 
+This bit is used to control the handling of received Route Set Test Messages. It should only be 
+set if bit 1 is also set. 
+• 0 – Normal operation; Route Set Test messages processed by MTP3 
+• 1 – Route Set Test Messages not processed by MTP3, but passed directly to 
+module_id0x0a 
+Others All other bits are reserved for future use and must be set to zero. 
+Bit Meaning
+38 
+Chapter 3 Message Reference 
+3.5.3 MTP_MSG_CNF_LINKSET – Link Set Configuration Request 
+Synopsis 
+This message is used to configure each link set within the signaling point. It must be issued after a 
+MTP_MSG_CONFIG request and before any MTP_MSG_CNF_LINK requests are issued for links within the link 
+set. 
+This message may also be used to modify existing link sets. If the number of links in the link set needs to be 
+increased or decreased, then this message may be used with the MTPLSF_RECFG option (bit 2 of the flags 
+field). First, all links in the link set must be ended. Then, with the reconfigure option set and all other 
+parameters unchanged from when the link set was first configured, the new number of links in the link set 
+may be set. 
+Message Format  
+Parameters 
+•adj_pc 
+The adjacent point code, that is, the point code of the signaling point at the other end of all signaling 
+links within the link set. 
+•target_cnt 
+This field is reserved for future use and should always be set to zero. 
+•num_links 
+The number of signaling links that are allocated to the link set. 
+Note: Each of these links requires its own configuration message be issued to the module. 
+•sls_bits 
+The number of bits from the SLS field to use for load sharing. This should range from 0 to 4. The least 
+significant bits of the SLS are used for load sharing. Typically, this should be set to 4. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_CNF_LINKSET (0x7310) 
+id linkset_id * 256 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 16 
+Parameter Area 
+Offset Size Name 
+0 4 adj_pc - Point code of the adjacent signaling point 
+4 2 target_cnt- Reserved; set to zero 
+6 2 num_links- Number of links allocated to the link set 
+8 2 flags - Run-time options 
+10 1 sls_bits - Number of sls bits to use for load sharing within the link set 
+11 1 ssf – Per link set Sub-Service-Field 
+12 4 local_pc – Per-link set local point code 
+39 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+•ssf 
+The value to be used in the Sub-Service Field (SSF) of all Message Signal Units (MSUs) related to this 
+link set originating from within the MTP3 module. The valid range is 0 to 15. The parameter is also used 
+in the discrimination function. 
+This field allows the user to specify the SSF on a per-link set basis (instead of using the default SSF 
+specified in the global configuration message). If the user wishes to specify a per-link set SSF value, bit 
+1 of the flags field in this message must also be set. 
+Note: When using ANSI operation, the two least significant bits of the ssf parameter must always be 
+set to 1 for correct operation. 
+•local_pc 
+The local point code of the signaling point as seen by the network connected to this link set. This should 
+lie in the range of 0 to 16383 (for 14-bit point codes) and in the range of 0 and 16777215 (for 24-bit 
+point codes). 
+This field allows the user to specify the local point code on a per-link set basis (instead of using the 
+default point_code specified in the global configuration message). When a per-link set local point code 
+is specified, the user must also set bit 0 in the flags field of the link set configuration message. 
+•flags 
+This field is a 16-bit field containing run-time configuration options for the link set as follows: 
+Bit Meaning 
+0 
+This bit is used to determine whether or not the user has supplied a per-link set local 
+point code for this link set. If not, the point_code parameter from the global 
+configuration message is used instead. 
+• 0 - Use the per module (default) point_code as the local point code 
+• 1 - Use the local_pc parameter as the local point code for this link set 
+1 
+This bit is used to determine whether or not the user has supplied a per-link set sub- 
+service-field (SSF) for this link set. If not, the ssf parameter from the global 
+configuration message is used instead. 
+• 0 - Use the per-module (default) SSF for this link set 
+• 1 - Use the per-link set ssf parameter for this link set 
+2 
+This bit must be set to 1 when the message is being used to modify the existing link set 
+configuration. 
+• 0 – Normal setting; used when link set is first configured 
+• 1 – Reconfiguration; used when the link set is being modified 
+15 
+This bit is used to indicate that the link set is the inter-MTP3 link set connecting 
+together the two halves when operating in a dual MTP3 configuration. 
+• 0 – Normal setting 
+• 1 – This link set is the inter-MTP3 link set in a dual configuration 
+Other bits All other bits are reserved for future use and must be set to zero. 
+40 
+Chapter 3 Message Reference 
+3.5.4 MTP_MSG_CNF_LINK – Signaling Link Configuration Request 
+Synopsis 
+This message is used to configure each link within the signaling point. It must be issued after the 
+MTP_MSG_CNF_LINKSET request that configures the link set in which the link exists. 
+Message Format  
+Parameters 
+•link_id 
+The link identifier used to uniquely identify the link within the MTP3 module. The valid range is from 0 to 
+one less than the number of links supported. 
+•slc 
+The Signaling Link Code (SLC) that distinguishes this link from others in the link set. This is typically the 
+same as link_ref. 
+•lower 
+The module ID of the level 2 module for this link. Typically, this is set to the MTP2 moduleID. 
+•l2_llid 
+The logical link ID of the signaling link within the level 2 module. This is the value that is used in the id 
+field of messages issued by MTP3 to MTP2. 
+•l2_inst 
+The instance number of the MTP2 module. This is used to determine to which MTP2 module messages for 
+this link should be sent. This allows for multiple instances of the MTP2 module, each running on a 
+separate board. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_CNF_LINK (0x7311) 
+id (linkset_id * 256) + link_ref 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 16 
+Parameter Area 
+Offset Size Name 
+0 2 link_id - link_id of the link within the SP 
+2 1 slc- Signaling link code for the link (SLC) 
+3 1 lower- Module ID of lower layer (for example, MTP2) 
+4 2 l2_llid - Logical link ID of the level 2 link 
+6 2 flags - Link-specific flags (see below) 
+8 2 l2_inst - Level 2 module instance number 
+10 6 Reserved for future use; must be set to zero. 
+41 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+•flags 
+This field is a 16-bit field containing run-time configuration options that may be used to modify the 
+operation of the signaling link depending on local requirements. The following flags are defined: 
+Bit Meaning 
+0 
+This bit is set to override automatic internal selection of the proving period during link 
+alignment. 
+• 0 – Normal setting; proving period is in accordance with the SS7 protocol 
+• 1 – Proving period is controlled by bit 3 as detailed below 
+1 
+This bit is set to cause a Signaling Link Test to be successfully carried out on link 
+activation before marking the link as available. If it is not set, the link is marked as 
+available as soon as the link is IN SERVICE at level 2. 
+• 0 - Do not carry out SLT on activation 
+• 1 - Carry out SLT on activation 
+2 
+This bit is set to cause a periodic Signaling Link Test to be carried out while a link is in 
+service. In the event that the test fails, the link is marked as unavailable and 
+restoration commences. This option is only valid if bit 1 is also set. 
+• 0 - Do not conduct periodic SLT 
+• 1 - Conduct periodic SLT 
+3 
+This bit is only significant when bit 0 is set to cause fixed selection or for Normal or 
+Emergency proving periods during link alignment. 
+• 0 – Always use Emergency proving period during link alignment 
+• 1 – Always use Normal proving period during link alignment 
+Other bits All other bits are reserved for future use and must be set to zero. 
+42 
+Chapter 3 Message Reference 
+3.5.5 MTP_MSG_CNF_ROUTE – Route Configuration Request 
+Synopsis 
+This message is used to add a route to the MTP3 routing table. It should be issued once for each route. The 
+message specifies which link set or link sets are to be used to reach the destination point code and whether 
+or not to invoke load sharing across the link sets. 
+When modifying an existing Route, different link sets may be configured and the LSH option may be enabled 
+or disabled. 
+Message Format  
+Parameters 
+•dpc 
+The destination point code, that is, the point code of the remote signaling point for which this message is 
+configuring routing data. It may be either an adjacent point code or a point code accessible via an 
+adjacent Signaling Transfer Point (STP). 
+Note: A route configuration message must be issued for each adjacent signaling point, even if no user 
+part messages are sent to the adjacent signaling point. 
+•norm_ls 
+The linkset_id of the normal link set used to reach the specified destination. This may be any of the 
+following options: 
+—a) The only link set used to reach the destination. 
+—b) The preferred link set used to reach the destination. 
+—c) One of a pair of links sets forming a combined link set. 
+In the latter two cases, a second link set must also be specified. 
+•second_ls 
+The linkset_id of an optional second link set used to reach the specified destination. This may be either 
+of the following options: 
+—a) The secondary link set used to reach the destination only on failure of the preferred link set. 
+—b) One of a pair of link sets forming a combined link set over which load sharing takes place. 
+When a second link set is specified, the user must also set bit 0 in the flags field of this message. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_CNF_ROUTE (0x7312) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 32 
+Parameter Area 
+Offset Size Name 
+0 4 dpc - Destination Point Code 
+4 1 norm_ls - linkset_id of normal link set 
+5 1 second_ls - linkset_id of optional link set 
+6 2 Reserved for future use, must be set to zero. 
+8 2 flags - run time options (see below) 
+10 2 up_enable - User part enable mask 
+12 20 Reserved for future use, must be set to zero.
+43 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+•up_enable 
+A 16-bit field used to identify the user parts that are supported over this route. The bits are labelled 0 to 
+15 and for each user part supported, the bit corresponding to the Service Indicator for that user part 
+should be set. For example, to support just ISUP messages, the ISUP Service Indicator is 5; therefore, 
+bit 5 should be set. Consequently, a up_enable value of 0x0020 is appropriate in this case. 
+•flags 
+A 16-bit field containing run-time configuration options for the route as follows: 
+Bit Meaning 
+0 
+This bit is used to determine whether or not the user has supplied a second link set 
+parameter for this route. 
+• 0 - Only a single link set is specified 
+• 1 - Two link sets are specified for this route 
+1 
+This bit is used to determine whether or not to load share messages across the two link 
+sets. It is only used when two link sets are specified for the route. When set, the MTP3 
+module load shares messages for the destination equally across each of the two 
+specified link sets. Otherwise, the MTP3 module considers the normal link set to be the 
+preferred link set and only uses the second link set in the event of failure of the normal 
+link set. 
+• 0 – Disable load sharing, that is, use preferred and secondary link sets 
+• 1 – Enable load sharing across the two link sets 
+2 
+This bit can be used to mark the route as a “default” route that is used by MTP3 to 
+carry traffic to any destinations that are not explicitly configured using route 
+configuration messages. 
+• 0 – Normal operation 
+• 1 – This route is a default route permitted to carry traffic for any unknown DPC 
+3 
+This bit is used in conjunction with bit 2 to control the behavior of default routes. 
+• 0 – Normal operation. If the route is a default route, it is only used to carry traffic 
+when the configured dpc is determined accessible in accordance with normal 
+signaling route accessibility procedures. 
+• 1 – Pseudo DPC operation. The route is considered available to carry traffic as soon 
+as either link set is accessible. MTP3 does not generate Route Set Test messages or 
+expect Transfer Allowed messages for this “default” route. 
+4 
+This bit is used to control the behavior in the event that the destination becomes 
+inaccessible over all link sets within the route. 
+• 0 – Normal operation. The destination is declared inaccessible and any buffered 
+messages are discarded. 
+• 1 – An internal 10 second timer is run during which time messages continue to be 
+buffered (subject to capacity), allowing for potential recovery of the route. If the 
+route recovers during this time, buffered messages are transmitted. On expiry of 
+the timer, any buffered messages are discarded. 
+5 
+This bit allows the user to disable the Route Set Test (RST) procedure for this route. 
+0 – Normal operation; generate RST messages 
+1 – Disable RST; do not generate RST messages 
+15 
+This bit must be set to 1 when the message is being used to modify the existing route 
+configuration. 
+• 0 – Normal setting; used when the route is first configured 
+• 1 – Reconfiguration; used when the route is being modified 
+Other bits All other bits are reserved for future use and must be set to zero. 
+44 
+Chapter 3 Message Reference 
+3.5.6 MTP_MSG_CNF_TIMERS – MTP3 Timer Configuration Request 
+Synopsis 
+This message is used to configure the MTP timer values to values other than their default values. The 
+message can be issued at any time after the MTP_MSG_CONFIG message. The new timer values take effect 
+when the timer is next started. 
+Message Format  
+Message Header 
+Field Name Meaning 
+type MTP_MSG_CNF_TIMERS (0x7317) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 64 
+Parameter Area 
+Offset Size Name 
+0 2 version; must be set to zero 
+2 2 Timer T1 
+4 2 Timer T2 
+6 2 Timer T3 
+8 2 Timer T4 
+10 2 Timer T5 
+12 2 Timer T6 
+14 2 Timer T7 
+16 2 Timer T8 
+18 2 Timer T9 
+20 2 Timer T10 
+22 2 Timer T11 
+24 2 Timer T12 
+26 2 Timer T13 
+28 2 Timer T14 
+30 2 Timer T15 
+32 2 Timer T16 
+34 2 Timer T17 
+36 2 Timer T18 
+38 2 Timer T19 
+40 2 Timer T20 (ITU) 
+42 2 Timer T21 
+44 2 Timer T22 (ITU) or T20 (ANSI) 
+46 2 Timer T23 (ITU) or T21 (ANSI) 
+48 2 Timer T24 
+Offset Size Name 
+50 2 SLTC Timer T1 
+52 2 SLTC Timer T2 
+54 2 Timer T101 
+56 8 Reserved for future use, must be set to zero.
+45 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.5.7 MTP_MSG_TRACE_MASK – MTP3 Trace Mask Configuration Request 
+Synopsis 
+Set the MTP3 module’s event masks for tracing (input and output) messages to the management module on 
+a per-primitive basis and reporting Q.752 events on a per-event basis. The fields in the masks are defined 
+below. 
+Message Format  
+Parameters 
+•op_evt_mask 
+The output event trace mask. This is a 32-bit value with bits set to 1 to cause a trace message to be sent 
+to the system management module whenever a message is issued by MTP3 for the events indicated. 
+ 31     30     29     28     27     26     25     24 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |   0  | 
+|      |      |      |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+ 23     22     21     20     19     18     17     16 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |FLUSH | CONT |MSGFOR|UNINH_|INHIB_| 
+|      |      |      |      |      |USP   |FAIL  |DENIED| 
++------+------+------+------+------+------+------+------+ 
+ 15     14     13     12     11     10      9      8 
++------+------+------+------+------+------+------+------+ 
+|LINK_ |LINK_ |LPO_  |LPO   |RTVL_ |RTV_  |L2_   |L2_EM | 
+|UNINH |INHIB |RECOV |      |REQ   |BSNT  |NO_EM |      | 
++------+------+------+------+------+------+------+------+ 
+ 7      6      5      4      3      2      1      0 
++------+------+------+------+------+------+------+------+ 
+|L2_   |L2_   |TX_REQ|   0  |STATUS|RESUME|PAUSE |TFR_  | 
+|STOP  |START |      |      |      |      |      |IND   | 
++------+------+------+------+------+------+------+-----------+ 
+where: 
+—FLUSH = Flush Request 
+—CONT = Continue Request 
+—MSGFORUSP = Message for unknown destination point code indication 
+—UNINH_FAIL = MTP Uninhibit Failed Indication 
+—INHIB_DENIED = MTP Uninhibit Denied Indication 
+—LINK_UNINH = MTP Link Uninhibited Indication 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_TRACE_MASK (0x5316) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 24 
+Parameter Area 
+Offset Size Name 
+0 4 op_evt_mask - Output event trace mask 
+4 4 ip_evt_mask - Input event trace mask 
+8 4 q791_evt_mask - Q.752 (previously Q.791) event trace mask 
+12 12 Reserved for future use; must be set to zero. 
+46 
+Chapter 3 Message Reference 
+—LINK_INHIB = MTP Link Inhibited Indication 
+—LPO_RECOV = Local Processor Recovered Indication 
+—LPO = Local Processor Outage Indication 
+—RTVL_REQ = Retrieval Request 
+—RTV_BSNT = Retrieve BSNT Request 
+—L2_NO_EM = Emergency Ceases Indication 
+—L2_EM = Emergency Indication 
+—L2_STOP = Stop Request 
+—L2_START = Start Request 
+—TX_REQ = Message for Transmission Request 
+—STATUS = MTP Status Indication 
+—RESUME = MTP Resume Indication 
+—PAUSE = MTP Pause Indication 
+—TFR_IND = MTP Transfer Indication 
+•ip_evt_mask 
+The input event trace mask. This is a 32-bit value with bits set to 1 to cause a trace message to be sent 
+to the system management module on receipt of messages indicating the events shown. 
+ 31     30     29     28     27     26     25     24 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |   0  | 
+| |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+ 23     22     21     20     19     18     17     16 
++------+------+------+------+------+------+------+------+ 
+|   0  |FLUSH |RTVL_ |BSNT_ |LINK_ |LINK_ |UNINH_|INHIB_| 
+|      |ACK   |NOTPOS|NOTRTV|UNCONG|CONG  |LINK  |LINK  | 
++------+------+------+------+------+------+------+------+ 
+ 15     14     13     12     11     10      9      8 
++------+------+------+------+------+------+------+------+ 
+|DEACT_|ACT_  |   0  |START_|DEACT_|ACT_  |RTVL_ |RTVD_ | 
+|LKSET |LKSET |      |SLTC  |LINK  |LINK  |CMPL  |MSG   | 
++------+------+------+------+------+------+------+------+ 
+ 7      6      5      4      3      2      1      0 
++------+------+------+------+------+------+------+------+ 
+|BSNT_ |L2_RPO|L2_RPO|L2_OUT|L2_IN |TM_EXP|RX_IND|TFR_  | 
+|IND   |_CLRD |      |_SVC  |_SVC  |      |      |REQ   | 
++-------+------+------+------+------+------+------+-----------+ 
+where: 
+—FLUSH_ACK = Flush Ack Indication 
+—RTVL_NOTPOS = Retrieval Not Possible Indication 
+—BSNT_NOTRTV = BSNT Not Retrievable Indication 
+—LINK_UNCONG = Link Uncongested Indication 
+—LINK_CONG = Link Congested Indication 
+—UNINH_LINK = Uninhibit Link Request 
+—INHIB_LINK = Inhibit Link Request 
+—DEACT_LKSET = Deactivate Link Set Request 
+—ACT_LKSET = Activate Link Set Request 
+—START_SLTC = Start Signaling Link Test Request 
+—DEACT_LINK = Deactivate Link Request 
+—ACT_LINK = Activate Link Request 
+—RTVL_CMPL = Retrieval Complete Indication 
+—RTVD_MSG = Retrieved Message Indication 
+—BSNT_IND = BNST Indication 
+—L2_RPO_CLRD = Remote Processor Outage Cleared Indication 
+47 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+—L2_RPO = Remote Processor Outage Indication 
+—L2_OUT_SVC = Out Of Service Indication 
+—L2_IN_SVC = In Service Indication 
+—TM_EXP = Timer Expiry Indication 
+—RX_IND = Received Message Indication 
+—TFR_REQ = MTP Transfer Request 
+•q791_evt_mask 
+The event mask that determines which Monitoring and Measurement events are generated by MTP3. This 
+is a 32-bit value with bits set to 1 to cause protocol events to be reported to management in accordance 
+with ITU-T Q.752 (previously Q.791). When enabled, events are reported using the 
+MGT_MSG_MTP_EVENT message. 
+Note: Typically these events should be enabled for normal operation; take care not to inadvertently 
+clear these fields when sending this message to MTP3. 
+ 31     30     29     28     27     26     25     24 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |   0  | 
+|      |      |      |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+ 23     22     21     20     19     18     17     16 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |AJSP_ | 
+|      |      |      |      |      |      |      |OK    | 
++------+------+------+------+------+------+------+------+ 
+ 15     14     13     12     11     10      9      8 
++------+------+------+------+------+------+------+------+ 
+|AJSP_ |DEST_ |DEST_ |TFA_  |TFP_  |LS_   |LS_   |CONG_ | 
+|LOST  |OK    |LOST  |SENT  |SENT  |OK    |LOST  |DIS   | 
++------+------+------+------+------+------+------+------+ 
+ 7      6      5      4      3      2      1      0 
++------+------+------+------+------+------+------+------+ 
+|CONG_ |CONG  |RPO_  |RPO   |REST  |CB    |CO    |  0   | 
+|CLR   |      |CLR   |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+where: 
+—AJSP_OK = Adjacent SP accessible 
+—AJSP_LOST = Adjacent SP inaccessible 
+—DEST_OK = Destination available 
+—DEST_LOST = Destination unavailable 
+—TFA_SENT = Transfer Allowed broadcast 
+—TFP_SENT = Transfer Prohibited broadcast 
+—LS_OK = Link Set recovered 
+—LS_LOST = Link Set failure 
+—CONG_DIS = MSU(s) discarded due to congestion 
+—CONG_CLR = Congestion cleared 
+—CONG = Signaling link congested 
+—RPO_CLR = Remote processor outage cleared 
+—RPO = Remote processor outage 
+—REST = Link restoration commenced 
+—CB = Changeback 
+—CO = Changeover 
+48 
+Chapter 3 Message Reference 
+3.5.8 MTP_MSG_END_LINKSET – Link Set End Request 
+Synopsis 
+Message sent to MTP3 to remove a link set that has previously been configured. Prior to ending a link set, all 
+signaling links must also be removed and all routes using the link set must be ended or modified not to use 
+it. 
+Message Format 
+3.5.9 MTP_MSG_END_LINK – Signaling Link End Request 
+Synopsis 
+Message sent to MTP3 to remove a signaling link that has previously been configured. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_END_LINKSET (0x7323) 
+id linkset_id * 256 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_END_LINK (0x7324) 
+id (linkset_id * 256) + link_ref 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 0
+49 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.5.10 MTP_MSG_END_ROUTE – Route End Request 
+Synopsis 
+Message sent to MTP3 to remove a route from the routing table. 
+Message Format  
+Parameters 
+•dpc 
+The destination point code for which the route is being removed. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_END_ROUTE (0x7325) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+Parameter Area 
+Offset Size Name 
+0 4 dpc – Destination point code 
+50 
+Chapter 3 Message Reference 
+3.5.11 MTP_MSG_GARBAGE – Clear Garbage Request 
+Synopsis 
+This message is used to clear the MTP3 module’s garbage queue. When the module is reset, it may not be 
+possible to release all frames from the transmit pool as some may still require confirmation from the lower 
+layers. When this happens, the frame is appended to the modules, garbage queue and a message is sent to 
+management. The MTP_MSG_GARBAGE request can be used by management to attempt to clear the 
+garbage queue, freeing the memory for use by other modules. 
+Note: The garbage queue is only used on certain board-based MTP3 implementations (that is, SPCI4, 
+and SPCI2S). It is not used for host-based implementations or on the Dialogic® SS7HD board. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_GARBAGE (0x731d) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+51 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.5.12 MTP_MSG_UPDATE_L4 – Update Level 4 Request 
+Synopsis 
+Message sent to MTP3 to request the broadcast of current route status to all user parts for a specified 
+destination. 
+Message Format  
+Description 
+This message is sent to the MTP3 module to request that all user parts are notified of the current route 
+status for the given destination using the normal MTP PAUSE, MTP RESUME and MTPSTATUS primitives. 
+The message is intended for use after new routes have been configured or following additional user part 
+configuration on a live system (for example, the addition of a new ISUP circuit group). It allows the user to 
+ensure that the user part is updated with the current accessibility of the destination. 
+The confirmation message indicates success or failure in the status field of the header (success=0). 
+Parameters 
+•dpc 
+The destination point code for which a status broadcast is requested. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_UPDATE_L4 (0x731f) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+len 4 
+Parameter Area 
+Offset Size Name 
+0 4 dpc 
+52 
+Chapter 3 Message Reference 
+3.5.13 MTP_MSG_R_LK_STATUS – Read Link Status Request 
+Synopsis 
+The message is used by (any) external module to request on-demand from MTP3 the per-link availability 
+status of a signaling link. 
+Note: This is the preferred method of reading link status as it does not require the application to track 
+status indications to know the current status. 
+Message Format  
+Parameters 
+•link_id 
+The MTP3 global link ID written into the response for convenience. 
+•availability 
+Coded as follows: 
+•state_flags 
+Contains a number of individual flags that allow the user to determine the reason for link unavailability. It 
+is coded as follows:  
+Message Header 
+Field Name Meaning 
+type MTP_MSG_R_LK_STATUS (0x6322) 
+id (linkset_id * 256) + link_ref 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Must be used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 8 
+Parameter Area 
+Offset Size Name 
+0 2 link_id 
+2 1 availability 
+3 1 Reserved for future use; currently set to zero 
+4 2 state_flags 
+6 2 transient_flags 
+Value Mnemonic Description 
+0 MTPLKAV_UNAVAILABLE Unavailable; the link is not available to carry signaling traffic 
+1 MTPLKAV_AVAILABLE Available; the link is available to carry signaling traffic 
+Bit Mnemonic Description 
+0 MTPLKSF_FAILED The link is out of service at MTP2 (either due to failure, deactivation or 
+SLT failure). 
+1 MTPLKSF_INHR The link is Remotely Inhibited. 
+2 MTPLKSF_INHL The link is Locally Inhibited. 
+3 MTPLKSF_BLKR The link is (Remotely) Blocked (that is, a Remote Processor Outage 
+condition currently exists). 
+53 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+•transient_flags 
+Contains a number of individual flags that provide additional information on the current internal 
+operating state of the link. These conditions are all transient conditions that only last for a few seconds. 
+The field is coded as follows: 
+Bit Mnemonic Description 
+0 MTPLKTF_CO_IN_PROG Changeover in progress. 
+1 MTPLKTF_CB_IN_PROG Changeback in progress. 
+2 MTPLKTF_LIN_IN_PROG Local link inhibit in progress. 
+3 MTPLKTF_UNH_IN_PROG Link uninhibit in progress. 
+54 
+Chapter 3 Message Reference 
+3.5.14 MTP_MSG_R_RT_STATUS – Read Route Status Request 
+Synopsis 
+Message issued to MTP3 to request current route status for a given destination. 
+Message Format  
+Description 
+This message is sent to the MTP3 module to request the current accessibility of a destination (route). The 
+sending module must fill in the dpc parameter and set the remainder of the parameter area to zero before 
+sending the message to MTP3. The sending module must also set its response required bit in the rsp_req 
+field of the message header. The response includes: 
+•Current route accessibility (Unavailable or Available) 
+•Current route congestion status (0, 1, 2 or 3) 
+•Individual link set accessibility (Unconfigured, Unavailable or Available) of the DPC over each link set 
+The confirmation message indicates success or failure in the status field of the header (success=0) and fills 
+in the remaining fields of the parameter area. 
+The message may be sent by any module, but is intended for use by the system management module in 
+response to a request from the user for route status information. 
+Parameters 
+•dpc 
+The destination point code for which status is requested. 
+•route_status 
+The current overall accessibility of the specified destination. Values taken from the table shown below. 
+•route_cong 
+The current congestion status of the route in the range 0 to 3, when multiple congestion levels are used 
+or 0 to 1 when a single congestion level is used. 0 indicates no congestion. 
+Message Header 
+Field Name Meaning 
+type MTP_MSG_R_RT_STATUS (0x631e) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Must be used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 20 
+Parameter Area 
+Offset Size Name 
+0 4 dpc 
+4 4 Reserved; must be set to zero 
+8 1 route_status 
+9 1 route_cong 
+10 2 Reserved; must be set to zero 
+12 1 ls0_status 
+13 3 Reserved; must be set to zero 
+16 1 ls1_status 
+17 3 Reserved; must be set to zero 
+55 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+•ls0_status 
+Current accessibility of the destination over the first link set of the route. Values taken from the table 
+shown below. 
+•ls1_status 
+Current accessibility of the destination over the second link set of the route. Values taken from the table 
+shown below. 
+Mnemonic Value Meaning 
+MTPACCESS_UNAVAIL_0 0 Unavailable – Not configured 
+MTPACCESS_UNAVAIL_1 1 Unavailable – Normal, unspecific 
+2 to 7 Unavailable – Reserved for future specific meanings 
+MTPACCESS_AVAIL_8 8 Available – Normal, unspecific 
+9 to 15 Available – Reserved for future specific meanings 
+56 
+Chapter 3 Message Reference 
+3.5.15 MTP_MSG_R_SP_STATS – Read Signaling Point Statistics Request 
+Synopsis 
+This message is used by management to request that the module produces a report in accordance with ITU- 
+T Q.752 of the statistics relating to the signaling point as a whole. The statistics are written into the 
+parameter area and the message is returned to the sender. The internal statistics can be reset by setting 
+status = 1 or left unchanged if status = 0. 
+Message Format  
+Message Header 
+Field Name Meaning 
+type MTP_MSG_R_SP_STATS (0x6318) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Must be used to request a confirmation 
+hclass 0 
+status 0 - Read statistics without modification. 
+1 - Read and reset statistics. 
+err_info 0 
+len 8 
+Parameter Area (Written by MTP3 in Response) 
+Offset Size Name 
+0 4 version - set to zero 
+4 4 Number of MSUs for which no outgoing route was available 
+57 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.5.16 MTP_MSG_R_RT_STATS – Read Route Statistics Request 
+Synopsis 
+The message is used by management to request that the module produces a report in accordance with ITU- 
+T Q.752 of the statistics relating a particular route. The statistics are written into the parameter area and the 
+message is returned to the sender. The internal statistics can be reset by setting status = 1 or left unchanged 
+if status = 0. The dpc field in the parameter area must be initialized by the sending module. 
+Message Format  
+Message Header 
+Field Name Meaning 
+type MTP_MSG_R_RT_STATS (0x6319) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Must be used to request a confirmation 
+hclass 0 
+status 0 - Read statistics without modification. 
+1 - Read and reset statistics. 
+err_info 0 
+len 16 
+Parameter Area 
+Offset Size Name 
+0 4 dpc - (initialized by sender) 
+4 4 version - set to zero 
+8 4 Number of times the route has been unavailable 
+12 4 Duration of route unavailable 
+58 
+Chapter 3 Message Reference 
+3.5.17 MTP_MSG_R_LS_STATS – Read Link Set Statistics Request 
+Synopsis 
+The message is used by management to request that the module produces a report in accordance with ITU- 
+T Q.752 of the statistics relating to a particular link set. The statistics are written into the parameter area 
+and the message is returned to the sender. The internal statistics can be reset by setting status = 1 or left 
+unchanged if status = 0. 
+Message Format  
+Message Header 
+Field Name Meaning 
+type MTP_MSG_R_LS_STATS (0x631a) 
+id linkset_id * 256 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Must be used to request a confirmation 
+hclass 0 
+status 0 - Read statistics without modification 
+1 - Read and reset statistics 
+err_info 0 
+len 16 
+Parameter Area 
+Offset Size Name 
+0 4 version - set to zero 
+4 4 Duration of link set unavailable 
+8 4 Number of times the adjacent SP has been inaccessible 
+12 4 Duration of adjacent SP inaccessible 
+59 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.5.18 MTP_MSG_R_LK_STATS – Read Link Statistics Request 
+Synopsis 
+The message is used by management to request that the module produces a report in accordance with ITU- 
+T Q.752 of the statistics relating to a particular link. The statistics are written into the parameter area and 
+the message is returned to the sender. 
+Message Format  
+Message Header 
+Field Name Meaning 
+type MTP_MSG_R_LK_STATS (0x631b) 
+id (linkset_id * 256) + link_ref 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Must be used to request a confirmation 
+hclass 0 
+status 0 - Read statistics without modification 
+1 - Read and reset statistics 
+err_info 0 
+len 68 
+Parameter Area 
+Offset Size Name 
+0 4 version - set to zero 
+4 4 Number of changeover attempts for the link 
+8 4 Duration of link unavailability (for any reason) 
+12 4 Duration of link inhibition due to local action 
+16 4 Duration of link inhibition due to remote action 
+20 4 Duration of unavailability due to link failure 
+24 4 Duration of link unavailability due to RPO 
+28 4 Number of local management inhibit 
+32 4 Number of local management uninhibit 
+36 4 Number of SIO/SIF octets transmitted 
+40 4 Number of MSUs transmitted 
+44 4 Number of SIF/SIO octets received 
+48 4 Number of MSUs received 
+52 4 Congestion indications 
+56 4 Duration of link congestion 
+60 4 MSUs discarded due to congestion 
+64 4 Number of congestion events resulting in loss of MSUs 
+60 
+Chapter 3 Message Reference 
+3.5.19 GEN_MSG_MOD_IDENT – Read Module Version Request 
+Synopsis 
+Request the module type and software issue number. 
+Message Format  
+Message Header 
+Field Name Meaning 
+type GEN_MSG_MOD_IDENT (0x6111) 
+id 0 
+src Sending module ID 
+dst MTP3 module ID 
+rsp_req Must be used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 28 
+Parameter Area (Written by MTP3 Module in Response) 
+Offset Size Name 
+0 2 type – Reserved for future use 
+2 1 maj_rev - Major revision number 
+3 1 min_rev - Minor revision number 
+4 24 text – Null terminated string giving textual module identity. “SS7 
+MTP3” 
+61 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.6 Management Indications Issued by MTP3 
+Management indications are sent to the user nominated management module to advise of events occurring 
+within the MTP3 module such as protocol events, diagnostic traces or error indications. 
+The full list of management indications available to be sent from MTP3 includes: 
+•MGT_MSG_MTP_EVENT – MTP3 Q.752 Event Indication 
+•MGT_MSG_EVENT_IND – Error Indication 
+•MGT_MSG_TRACE_EV – Trace Event Indication 
+Management indications are sent to the management module as configured in the mgmt_id field of the 
+MTP_MSG_CONFIG message. 
+The user can select, using trace masks, which events to report and disable the remainder. 
+The use of the hdr->id field is detailed on a per-message basis in this section. 
+The receiving module is responsible for releasing the message using the relm() library function.
+62 
+Chapter 3 Message Reference 
+3.6.1 MGT_MSG_MTP_EVENT – MTP3 Q.752 Event Indication 
+Synopsis 
+This message is used by level 3 to notify management of various protocol events in accordance with ITU-T 
+Q.752. Notification of individual events can be enabled or disabled using the MTP_MSG_TRACE_MASK 
+message. 
+Message Format  
+The EVENT_CODE coding and the meaning of the event specific parameters are given in the following table: 
+Message Header 
+Field Name Meaning 
+type MGT_MSG_MTP_EVENT (0x0301) 
+id 0 
+src MTP3 module ID 
+dst Management module ID 
+rsp_req 0 
+hclass 0 
+status EVENT CODE (see below) 
+err_info Timestamp 
+len Either 0, 1, 2 or 4 
+Parameter Area 
+Offset Size Name 
+0 len Event specific parameters 
+Value Mnemonic Parameter Description 
+1 MTPEV_CO link Changeover 
+2 MTPEV_CB link Changeback 
+3 MTPEV_REST link Restoration commenced 
+4 MTPEV_RPO link Remote processor outage 
+5 MTPEV_RPO_CLR link Remote processor outage cleared 
+6 MTPEV_CONG link Signaling link congestion 
+7 MTPEV_CONG_CLR link Congestion cleared 
+9 MTPEV_LS_LOST link set Link set failure 
+10 MTPEV_LS_OK link set Link set recovered 
+13 MTPEV_DEST_LOST point code Destination unavailable 
+14 MTPEV_DEST_OK point code Destination available 
+15 MTPEV_AJSP_LOST link set Adjacent SP inaccessible 
+16 MTPEV_AJSP_OK link set Adjacent SP accessible 
+link is indicated as (linkset_id * 256) + link_ref, (size = 2). 
+link set is indicated as linkset_id, (size = 1). 
+point code is a 4 byte value, (size = 4).
+63 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.6.2 MGT_MSG_EVENT_IND – Error Indication 
+Synopsis 
+This message is used by level 3 to advise management of errors or events occurring within the MTP3 
+module. 
+Message Format 
+The error_code in the status field is coded as shown in the following table: 
+Message Header 
+Field Name Meaning 
+type MGT_MSG_EVENT_IND (0x0008) 
+id 0 (unless shown below) 
+src MTP3 module ID 
+dst Management module ID 
+rsp_req 0 
+hclass 0 
+status error_code (see below) 
+err_info Timestamp 
+len 0 
+Value Mnemonic ID Description 
+0x52 MTP_POOL_EMPTY 0 
+Indicates that MTP3 has attempted to allocate a message 
+buffer from its internal pool, but the pool is empty. When 
+this happens, MTP3 continues to activate a normal 
+(external) message buffer so there is no impact on 
+operation and no messages are lost. 
+0x53 MTP_TX_FAIL 0 MTP3 failed to send an MSU to lower layer. This indicates that an internal call to the GCT_send() function has 
+failed. 
+0x54 MTP_LEN_ERR 0 MSU too long for buffer. This can only happen if the user tries to send an MSU that is physically too long to fit into 
+an internal buffer. 
+0x55 MTP_SLT_FAIL link_id 
+Signaling link test failure. This event is logged on the 
+second expiry of the Signaling Link Test Control timer as a 
+result of not receiving a valid Signaling Link Test 
+Acknowledgement (SLTA) message. This may be due to 
+configuration error (opc, dpc, ssf, slc) or may be as a 
+result of incorrect physical connections (for example, loop 
+back in place or wrong timeslot in use). 
+0x56 MTP_BAD_DPC 0 
+Message received for unknown destination. This event can 
+only occur when operating in dual MTP3 mode. It occurs if 
+a message is received from the other MTP3 for passing on 
+to the network, but the DPC has not been configured. 
+0x57 MTP_TALLOC_ERR 0 Failed to allocate a buffer to send a message to the lower layer. The message is discarded. Under normal usage, this 
+event should not occur. 
+0x59 MTP_MALLOC_ERR 0 
+Failed to allocate an internal buffer during Changeback 
+process. In the unlikely event that this event occurs, the 
+changeback operation is completed using the time- 
+controlled diversion. However, this event indicates that the 
+system has run out of messages, so unpredictable 
+operation may result. 
+0x5a MTP_BSNT_FAIL link_id 
+MTP3 failed to receive a BSNT from MTP2 during a 
+changeover cycle. This may be as a result of a failure of 
+the MTP2 board. MTP3 uses the Emergency Changeover 
+procedure. 
+0x5b MTP_RTV_FAIL link_id 
+MTP3 failed to retrieve some or all messages from the 
+MTP2 transmission buffer during Changeover. This may be 
+as a result of a failure of the MTP2 board. MTP3 discards 
+any retrieved messages. 
+64 
+Chapter 3 Message Reference 
+0x5c MTP_BAD_FSN link_id 
+Erroneous FSN in COA. This indicates that MTP2 was 
+unable to complete message retrieval using the received 
+FSN and potentially some messages are discarded during 
+changeover. Recovery should be automatic. 
+0x5d MTP_BAD_COO link_id A Changeover message was received after changeover had completed. This can happen under different network 
+failure scenarios and is of no real consequence. 
+0x5e MTP_SNMM_ERR 0 Internal software error. Please report through normal 
+support channel. 
+0x5f MTP_SLTM_ERR 0 Internal software error. Please report through normal 
+support channel. 
+0x60 MTP_NO_COA link_id 
+Failed to receive COA. MTP3 Timer T2 expired while 
+awaiting a Changeover Ack from the remote end. This is 
+an informational message, Changeover continues 
+following timer expiry. Persistent receipt of this message 
+may be an indication of a configuration mismatch with the 
+remote end. 
+0x61 MTP_NO_CBA link_id 
+Failed to receive CBA. MTP3 Timer T5 expired prior to 
+receipt of all Changeback Ack messages. This is an 
+informational message, Changeback continues using the 
+time-controlled method and no resulting impact on 
+operation occurs. 
+0x66 MTP_TIM_ERR tim_ref 
+Attempt to re-use active timer resource (message ID is set 
+to the timer reference). This indicates an internal software 
+error and should be reported through the normal support 
+channel. 
+0x67 MTP_RRT_OVRFLW 0 
+Messages discarded due to overflow of Re-Routing buffer. 
+MTP3 has discarded messages during forced or controlled 
+rerouting as a result of an excessive number of messages 
+queued internally. Operation resumes normally, although 
+some messages are lost. 
+0x68 MTP_FLUSH_FAIL link_id Failed to receive Flush Ack from MTP2. This condition could 
+occur if the board on which MTP2 is running has failed. 
+0x69 MTP_FLUSH_L2 link_id 
+MTP2 transmission buffer flushes (due to RPO). 
+Unacknowledged messages in the MTP2 transmission 
+buffer have been flushed out due to the excessive duration 
+of the RPO condition. 
+0x70 MTP_SRT_FAIL link_id Signaling Route Test (SRT) Failure (Japan specific). The user is notified of the failure reason in the 
+MTP_MSG_SRT_RESULT message. 
+0x71 MTP_SRT_RETRY link_id Signaling Route Test (SRT) Retry (Japan specific). MTP3 is 
+repeating an SRT as the first attempt was not successful. 
+Value Mnemonic ID Description
+65 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+3.6.3 MGT_MSG_TRACE_EV – Trace Event Indication 
+Synopsis 
+The MTP3 module may be configured to report to management each primitive issued or received. This is 
+useful for trace and diagnostic purposes. The MTP3 event masks are used to enable and disable tracing on a 
+per-primitive basis for each link. The traced primitives are reported as event indications as shown below. 
+Message Format  
+Message Header 
+Field Name Meaning 
+type MGT_MSG_TRACE_EV (0x0003) 
+id 0 
+src MTP3 module ID 
+dst Management module ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 18 + length of traced data 
+Parameter Area 
+Offset Size Name 
+0 1 source module id 
+1 1 destination module id 
+2 2 id 
+4 2 type 
+6 2 status 
+8 4 timestamp 
+12 4 pointer to the message being traced 
+16 2 data length 
+18 0 to 280 data - Data taken from the payload of a traced transmit or receive 
+frame or the contents of the MSG parameter area 
+66 
+Chapter 3 Message Reference 
+3.7 Message Summary Table 
+Table1 lists, by message type, all the messages defined in this manual. 
+Table 1. Message Summary Table 
+Message 
+Type Mnemonic Description 
+0x0003 MGT_MSG_TRACE_EV Trace Event Indication 
+0x0008 MGT_MSG_EVENT_IND Error Indication 
+0x0301 MGT_MSG_MTP_EVENT MTP3 Q.752 Event Indication 
+0x1316 Confirmation of MTP_MSG_TRACE_MASK 
+0x2111 Confirmation of GEN_MSG_MOD_IDENT 
+0x2318 Confirmation of MTP_MSG_R_SP_STATS 
+0x2319 Confirmation of MTP_MSG_R_RT_STATS 
+0x231a Confirmation of MTP_MSG_R_LS_STATS 
+0x231b Confirmation of MTP_MSG_R_LK_STATS 
+0x231e Confirmation of MTP_MSG_R_RT_STATUS 
+0x2322 Confirmation of MTP_MSG_R_LK_STATUS 
+0x3300 Confirmation of MTP_MSG_RESET 
+0x3303 Confirmation of MTP_MSG_CONFIG 
+0x3310 Confirmation of MTP_MSG_CNF_LINKSET 
+0x3311 Confirmation of MTP_MSG_CNF_LINK 
+0x3312 Confirmation of MTP_MSG_CNF_ROUTE 
+0x3316 Confirmation of MTP_MSG_GARBAGE 
+0x3317 Confirmation of MTP_MSG_CNF_TIMERS 
+0x331f Confirmation of MTP_MSG_UPDATE_L4 
+0x3323 Confirmation of MTP_MSG_END_LINKSET 
+0x3324 Confirmation of MTP_MSG_END_LINK 
+0x3325 Confirmation of MTP_MSG_END_ROUTE 
+0x5316 MTP_MSG_TRACE_MASK MTP3 Trace Mask Configuration Request 
+0x6111 GEN_MSG_MOD_IDENT Read Module Version request 
+0x6318 MTP_MSG_R_SP_STATS Read Signaling Point Statistics Request 
+0x6319 MTP_MSG_R_RT_STATS Read Route Statistics Request 
+0x631a MTP_MSG_R_LS_STATS Read Link Set Statistics Request 
+0x631b MTP_MSG_R_LK_STATS Read Link Statistics Request 
+0x631e MTP_MSG_R_RT_STATUS Read Route Status Request 
+0x6322 MTP_MSG_R_LK_STATUS Read Link Status Request 
+0x7300 MTP_MSG_RESET MTP3 Module Reset Request 
+0x7303 MTP_MSG_CONFIG MTP3 Module Configuration Request 
+0x7310 MTP_MSG_CNF_LINKSET Link Set Configuration Request 
+0x7311 MTP_MSG_CNF_LINK Signaling Link Configuration Request 
+0x7312 MTP_MSG_CNF_ROUTE Route Configuration Request 
+0x7316 MTP_MSG_GARBAGE Clear Garbage Request 
+0x7317 MTP_MSG_CNF_TIMERS MTP3 Timer Configuration Request 
+0x731f MTP_MSG_UPDATE_L4 Update Level 4 Request 
+0x7323 MTP_MSG_END_LINKSET Link Set End request 
+0x7324 MTP_MSG_END_LINK Signaling Link End Request 
+0x7325 MTP_MSG_END_ROUTE Route End Request 
+0x830a Confirmation of MTP_MSG_ACT_SL 
+67 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+0x830b Confirmation of MTP_MSG_DEACT_SL 
+0x830c Confirmation of MTP_MSG_SLTC_START 
+0x830e Confirmation of MTP_MSG_ACT_LS 
+0x830f Confirmation of MTP_MSG_DEACT_LS 
+0x8310 Confirmation of MTP_MSG_INHIB_SL 
+0x8311 Confirmation of MTP_MSG_UNINHIB_SL 
+0x8317 Confirmation of MTP_MSG_SRT_START 
+0x8321 MTP_MSG_SRT_RESULT SRT Result Indication 
+0x8380 MTP_MSG_LINK_INHIB Signaling Link Inhibited Indication 
+0x8381 MTP_MSG_LINK_UNINHIB Signaling Link Uninhibited Indication 
+0x8382 MTP_MSG_INHIB_DENIED Signaling Link Inhibit Denied 
+0x8383 MTP_MSG_UNINHIB_FAIL Signaling Link Uninhibit Failure Indication 
+0x8403 MTP_MSG_PAUSE MTP Pause Indication 
+0x8404 MTP_MSG_RESUME MTP Resume Indication 
+0x8405 MTP_MSG_STATUS MTP Status Indication 
+0x8f00 Confirmation of API_MSG_TX_REQ 
+0x8f01 API_MSG_RX_IND MTP Transfer Indication 
+0xc30a MTP_MSG_ACT_SL Activate Signaling Link Request 
+0xc30b MTP_MSG_DEACT_SL Deactivate Signaling Link Request 
+0xc30c MTP_MSG_SLTC_START Signaling Link Test Request 
+0xc30e MTP_MSG_ACT_LS Activate Link Set Request 
+0xc30f MTP_MSG_DEACT_LS Deactivate Link Set Request 
+0xc310 MTP_MSG_INHIB_SL Inhibit Signaling Link Request 
+0xc311 MTP_MSG_UNINHIB_SL Uninhibit Signaling Link Request 
+0xc317 MTP_MSG_SRT_START Start SRT Request (Japan) 
+0xcf00 API_MSG_TX_REQ MTP Transfer Request 
+Table 1. Message Summary Table (Continued) 
+Message 
+Type Mnemonic Description
+68 
+Chapter 4 Internal Interfaces 
+Chapter 4:  Internal Interfaces 
+The MTP3 module interfaces with the lower layer protocol layer (for example, MTP2) and system services for 
+timer tick information. Detailed knowledge of these interfaces is not required in order to use the MTP3 
+module, however, for completeness the messages and message types used on these interfaces are detailed 
+in this chapter. 
+4.1 Primitives Issued by MTP3 to MTP2 
+4.2 Primitives Received by MTP3 from MTP2 
+Message 
+Mnemonic Message Type Brief Description of Internal Use 
+API_MSG_TX_REQ 0xcf00 Send a Message Signal Unit (MSU) to MTP2 for 
+transmission 
+SS7_MSG_START 0xc204 Starts the MTP2 Initial Alignment procedure 
+SS7_MSG_STOP 0xc205 Takes a link out of service 
+SS7_MSG_EMGCY 0xc207 Notifies MTP2 of an Emergency condition 
+SS7_MSG_EMGCY_CLRD 0xc208 Cancels a previous Emergency request 
+SS7_MSG_RTV_BSNT 0xc209 Requests BSNT from MTP2 
+SS7_MSG_RTVL_REQ 0xc20a Requests retrieval of unacknowledged messages 
+SS7_MSG_FLUSH 0xc212 Flushes messages from the transmission and 
+retransmission buffers during periods of processor outage 
+SS7_MSG_CONTINUE 0xc211 Resumes normal operation following processor outage 
+Message 
+Mnemonic MessageType Brief Description of Internal Use 
+API_MSG_RX_IND 0x8f01 Message Signal Unit (MSU) received from the network 
+SS7_MSG_IN_SVC 0x8303 In Service indication 
+SS7_MSG_OUT_SVC 0x8304 Out of Service indication 
+SS7_MSG_REM_PR_OUT 0x8305 Remote Processor Outage indication 
+SS7_MSG_REM_PR_OK 0x8306 Remote Processor Outage cleared indication 
+SS7_MSG_RXD_BSNT 0x8307 BSNT indication form MTP2 
+API_MSG_RTVD_MSG 0x8f08 Retrieved message 
+SS7_MSG_RTVL_COMPL 0x8309 Retrieval complete indication 
+MTP_MSG_RTVL_NOT_POS 0x8315 Retrieval not possible indication 
+MTP_MSG_LINK_CONG 0x8312 Link congestion indication 
+MTP_MSG_LINK_UNCONG 0x8313 Link congestion cleared indication 
+MTP_MSG_FLUSH_ACK 0x8316 Flush acknowledgement indication 
+69 
+Dialogic® SS7 Protocols MTP3 Programmer’s Manual Issue 7 
+4.3 Messages Exchanged Between MTP3 and Timer Services 
+4.4 Messages Exchanged Between MTP2 and MTP3 On-board 
+In addition, three internal messages are used as part of the on-board interface between MTP2 and MTP3 to 
+convey message for transmission to MTP2, to convey received indications to MTP3 and to transfer retrieved 
+messages from MTP2 to MTP3. These messages are not passed off board so the user does not need to use 
+these messages. For completeness they are also listed below: 
+Message 
+Mnemonic Message Type Brief Description of Internal Use 
+SS7_MSG_TM_EXP 0xc002 Periodic 100ms timer expiry indication sent to MTP3 
+TIM_MSG_KEEP_TIME 0x7006 Message sent by MTP3 to initialize timer services 
+Message 
+Mnemonic MessageType Brief Description of Internal Use 
+SS7_MSG_TX_REQ 0xc000 Sends a Message Signal Unit (MSU) to MTP2 for 
+transmission 
+SS7_MSG_RX_IND 0x8001 Indication of a received MSU from MTP2 to MTP3 
+SS7_MSG_RTVD_MSG 0x8301 Message sent by MTP2 to return retrieved messages to 
+MTP3 
+70 
+Glossary 
+Glossary 
+DPC Destination Point Code 
+M2PA MTP2 Peer to Peer Adaptation Layer. A SIGTRAN protocol used to replicate the services 
+offered by MTP2 while using IP as a transport protocol. 
+MTP Message Transfer Part. Layers 1 to 3 of the SS7 protocol stack broadly equivalent to the 
+Physical, Data Link and Network layers in the OSI protocol stack. See also MTP1, MTP2, 
+and MTP3. 
+MTP1 Message Transfer Part Level 1. An SS7 stack layer that defines the physical and electrical 
+characteristics of the signaling links of the SS7 network. Signaling links use DS0 
+channels and carry raw signaling data at a rate of 48, 56 or 64 kbps. 
+MTP2 Message Transfer Part Level 2. An SS7 stack layer that provides link-layer functionality. 
+Ensures that two end points of a signaling link can reliably exchange signaling messages. 
+It provides error checking, flow control and sequence checking. 
+MTP3 Message Transfer Part Level 3. An SS7 stack layer that provides network-layer 
+functionality. Ensures that messages can be delivered between signaling points across 
+the SS7 network regardless of whether the signaling points are directly connected. It 
+provides node addressing, routing, alternate routing and congestion control. 
+MSU Message Signal Unit. A data unit that carries signaling information for call control, 
+transaction processing, network management and maintenance. Typically, the MSU is 
+carried in the Signaling Information Field (SIF) of SS7 messages. 
+SLT Signaling Link Test 
+SRT Signaling Route Test 
+SS7 Signaling System Number 7 
+SSF Sub-Service Field 
+STP Signaling Transfer Points

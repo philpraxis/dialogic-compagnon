@@ -1,0 +1,1685 @@
+ 
+www.dialogic.com 
+Dialogic® SS7 Protocols 
+SCTP Programmer's Manual 
+ 
+ 
+ 
+2 
+Copyright© 2002-2008 Dialogic Corporation. All Rights Reserved. You may not reproduce this document in whole or in part without 
+permission in writing from Dialogic Corporation at the address provided below. 
+All contents of this document are furnished for informational use only and are subject to change without notice and do not represent a 
+commitment on the part of Dialogic Corporation or its subsidiaries (“Dialogic”). Reasonable effort is made to ensure the accuracy of the 
+information contained in the document. However, Dialogic does not warrant the accuracy of this information and cannot accept 
+responsibility for errors, inaccuracies or omissions that may be contained in this document. 
+INFORMATION IN THIS DOCUMENT IS PROVIDED IN CONNECTION WITH DIALOGIC® PRODUCTS. NO LICENSE, EXPRESS OR IMPLIED, 
+BY ESTOPPEL OR OTHERWISE, TO ANY INTELLECTUAL PROPERTY RIGHTS IS GRANTED BY THIS DOCUMENT. EXCEPT AS PROVIDED IN 
+A SIGNED AGREEMENT BETWEEN YOU AND DIALOGIC, DIALOGIC ASSUMES NO LIABILITY WHATSOEVER, AND DIALOGIC DISCLAIMS 
+ANY EXPRESS OR IMPLIED WARRANTY, RELATING TO SALE AND/OR USE OF DIALOGIC PRODUCTS INCLUDING LIABILITY OR 
+WARRANTIES RELATING TO FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR INFRINGEMENT OF ANY INTELLECTUAL 
+PROPERTY RIGHT OF A THIRD PARTY.  
+Dialogic products are not intended for use in medical, life saving, life sustaining, critical control or safety systems, or in nuclear facility 
+applications. 
+It is possible that the use or implementation of any one of the concepts, applications, or ideas described in this document, in marketing 
+collateral produced by or on web pages maintained by Dialogic may infringe one or more patents or other intellectual property rights 
+owned by third parties. Dialogic does not provide any intellectual property licenses with the sale of Dialogic products other than a 
+license to use such product in accordance with intellectual property owned or validly licensed by Dialogic and no such licenses are 
+provided except pursuant to a signed agreement with Dialogic. More detailed information about such intellectual property is available 
+from Dialogic’s legal department at 9800 Cavendish Blvd., 5th Floor, Montreal, Quebec, Canada H4M 2V9. 
+Dialogic encourages all users of its products to procure all necessary intellectual property licenses required to implement 
+any concepts or applications and does not condone or encourage any intellectual property infringement and disclaims any 
+responsibility related thereto. These intellectual property licenses may differ from country to country and it is the 
+responsibility of those who develop the concepts or applications to be aware of and comply with different national license 
+requirements.  
+Dialogic, Dialogic Pro, Brooktrout, Cantata, SnowShore, Eicon, Eicon Networks, Eiconcard, Diva, SIPcontrol, Diva ISDN, TruFax, 
+Realblocs, Realcomm 100, NetAccess, Instant ISDN, TRXStream, Exnet, Exnet Connect, EXS, ExchangePlus VSE, Switchkit, N20, 
+Powering The Service-Ready Network, Vantage, Connecting People to Information, Connecting to Growth and Shiva, among others as 
+well as related logos, are either registered trademarks or trademarks of Dialogic. Dialogic's trademarks may be used publicly only with 
+permission from Dialogic. Such permission may only be granted by Dialogic’s legal department at 9800 Cavendish Blvd., 5th Floor, 
+Montreal, Quebec, Canada H4M 2V9. Any authorized use of Dialogic's trademarks will be subject to full respect of the trademark 
+guidelines published by Dialogic from time to time and any use of Dialogic’s trademarks requires proper acknowledgement. 
+The names of actual companies and products mentioned herein are the trademarks of their respective owners. 
+Publication Date: February 2008 
+Document Number: U01STN, Issue 4 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+3 
+Contents 
+Revision History...........................................................................................................5 
+1 Introduction........................................................................................................7 
+1.1 SCTP and SCTPD Modules........................................................................................................7 
+1.2 SCTPN Module........................................................................................................................7 
+1.3 Compatibility..........................................................................................................................8 
+1.4 Abbreviations.........................................................................................................................8 
+1.5 Related Documentation............................................................................................................8 
+1.6 Feature Overview....................................................................................................................8 
+2 General Description.............................................................................................9 
+2.1 Module Overview....................................................................................................................9 
+2.2 Module Configuration.............................................................................................................10 
+2.3 Association State Transitions..................................................................................................11 
+3 Internal Data Structures...................................................................................13 
+3.1 Global Data Structure............................................................................................................13 
+3.2 Association Data Structure.....................................................................................................13 
+3.3 Per Peer Address Data Structure.............................................................................................13 
+4 Interface to System Services.............................................................................15 
+4.1 System Functions.................................................................................................................15 
+4.2 Timer Operation...................................................................................................................15 
+5 SCTP Management Interface.............................................................................17 
+5.1 Module Configuration Request................................................................................................17 
+5.2 Add Host Network Address Request.........................................................................................19 
+5.3 Remove Host Network Address Request...................................................................................20 
+5.4 Configure Association Request................................................................................................21 
+5.5 Add Peer Network Address Request.........................................................................................25 
+5.6 Remove Peer Network Address Request...................................................................................26 
+5.7 Set Primary Address Request.................................................................................................27 
+5.8 Global Statistics Request........................................................................................................28 
+5.9 Read Association Configuration Request...................................................................................30 
+5.10 Read Association Statistics Request.........................................................................................31 
+5.11 Read Association Peer Address Statistics..................................................................................34 
+6 User Layer Interface to SCTP............................................................................37 
+6.1 SCTP Status Codes................................................................................................................37 
+6.2 Association Activate Request..................................................................................................37 
+6.3 Association Shutdown Request...............................................................................................38 
+6.4 Association Abort Request......................................................................................................39 
+6.5 Association Data Transfer Request..........................................................................................40 
+7 SCTP Interface to User Layer............................................................................43 
+7.1 Association Data Transfer Indication........................................................................................43 
+7.2 Association Status Change.....................................................................................................44 
+7.3 Association Network Status....................................................................................................45 
+7.4 Association Congestion Status................................................................................................46 
+8 SCTP Trace Messages........................................................................................49 
+Contents 
+4 
+8.1 Trace Mask Configuration Request..........................................................................................49 
+8.2 Trace Event Indication...........................................................................................................50 
+9 SCTP to SCTPD Interface...................................................................................53 
+9.1 SCTPD Configuration Request.................................................................................................53 
+9.2 IP Data Transmission Request................................................................................................54 
+9.3 IP Data Reception Indication..................................................................................................55 
+10 Network Address Representation......................................................................57 
+10.1 Network Address Structure for an invalid address.....................................................................57 
+10.2 Network Address Structure for Internet Protocol Version 4.........................................................57 
+11 Module Command Line Interface.......................................................................59 
+11.1 SCTP...................................................................................................................................59 
+11.2 SCTPD.................................................................................................................................59 
+11.3 SCTPN.................................................................................................................................59 
+12 Example SCTP Message Flows...........................................................................61 
+Appendix A ...............................................................................................................65 
+A.1 Message Type Table..............................................................................................................65 
+Figures 
+Figure 1. Module Configuration...............................................................................................10 
+Figure 2. Associated State Transitions.....................................................................................11 
+Figure 3. Example SCTP Message Flows: Configure as Client and Connect to Peer Server...............61 
+Figure 4. Example SCTP Message Flows: Configure as Server and Connect from Peer Client...........62 
+Figure 5. Example SCTP Message Flows: Association Shutdown by User Application......................62 
+Figure 6. Example SCTP Message Flows: Association Shutdown by Peer Application.......................63 
+ 
+ 
+ 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+5 
+ 
+Revision History 
+Issue Date Description 
+4 February 2008 Document rebranded and reformatted. 
+3 October 2006 Support for native SCTP interface layer. 
+2 September 2003 Additional configuration module options added (CRC32). 
+1 June 2002 Raised to issue 1. 
+Note: The latest release issue of this guide can be found at:  
+http://www.dialogic.com/support/helpweb/signaling
+Revision History 
+6 
+ 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+7 
+1 Introduction 
+The suite of SCTP modules (SCTP, SCTPD and SCTPN) provides access to a 
+software implementation of the Stream Control Transmission Protocol (SCTP). 
+In addition to the protocol-related functions, the modules contain a number 
+of features to assist you in the development of your application. These 
+features include the ability to trace any primitive message received by, or 
+issued from, the SCTP modules to a management module where it can be 
+recorded or presented to you. In this way, you can debug your application 
+without needing to gain detailed knowledge of the internal working of the 
+SCTP module. 
+This manual is intended for use by systems integrators and application 
+programmers who will need to use the SCTP modules, but do not need to 
+know the detail of the internal operation of the modules. 
+There are two separate implementations that provide Stream Control 
+Transmission Protocol (SCTP) services. Both implementations provide the 
+same message interface to other modules through the message passing 
+environment. Both implementations cannot be run concurrently on the same 
+host. 
+This manual gives an overview of the operation of the SCTP modules and 
+details the structure of all messages which can be sent to, or issued by, the 
+modules and also describes the configuration parameters. 
+1.1 SCTP and SCTPD Modules 
+The SCTP module is a software implementation of the Stream Control 
+Transmission Protocol (SCTP) as specified in RFC2960 and includes the 
+checksum change required in RFC3309. 
+The current SCTP implementation provides you with functionality to 
+implement up to 32 separate associations, each with up to 128 input and 
+output streams. Each association can be configured with up to 4 network 
+addresses to provide multi-homing capabilities. 
+The SCTP module requires services provided by the SCTPD module, which 
+must also be running.  It is suitable for use under Windows, Linux, Solaris 8 
+and Solaris 9.  For Solaris 10, the SCTPN module should be used instead. 
+1.2 SCTPN Module 
+The SCTPN module is an interface layer to the SCTP stack that is built into 
+Solaris 10. The SCTPN module provides a GCT message interface compatible 
+with the SCTP module. 
+The module itself imposes no hard limits on the number of associations and 
+streams which can be used, and these limits are therefore bounded by the 
+available resources and limitations of the operating system’s SCTP stack. 
+Note: The SCTPN module does not require the SCTPD module and the SCTPD module 
+must not be running. 
+Section  1 Introduction 
+8 
+1.3 Compatibility 
+The following table shows the compatibility of each implementation with 
+various operating systems. This table is not intended to be exhaustive. 
+ SCTP / SCTPD SCTPN 
+Windows   
+Linux   
+32-bit Solaris 8   
+32-bit Solaris 9   
+32-bit Solaris 10   
+64-bit Solaris 8   
+64-bit Solaris 9   
+64-bit Solaris 10   
+1.4 Abbreviations 
+IETF Internet Engineering Task Force. 
+RFC Request for Comments. 
+SCTP Stream Control Transmission Protocol. 
+1.5 Related Documentation 
+[1] RFC 2960 - Stream Control Transmission Protocol 
+[2] Software Environment Programmer's Manual 
+[3] RFC 3309 - Stream Control Transmission Protocol Checksum Change 
+1.6 Feature Overview 
+Key features of the SCTP module include: 
+• Implementation of RFC 2960. 
+• Configuration options on a per association basis. 
+• Message-oriented interface. 
+• Selectable (RFC2960 / RFC3309) module checksum algorithm. 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+9 
+2 General Description 
+2.1 Module Overview 
+The SCTP module is an implementation of the Stream Control Transmission 
+Protocol as defined in RFC 2960, and the additional checksum change 
+specified in RFC 3309. 
+Each association is uniquely identified by an association identifier assoc_id. 
+Assoc_ids range from 0 to one less than the number of associations 
+supported. 
+Section  2 General Description 
+2.2 Module Configuration 
+The module is configured for operation in conjunction with a number of user 
+part modules, which lie above the SCTP module in the protocol stack, and a 
+network interface module that lies below the SCTP module in the protocol 
+stack.  
+Management functionality should be provided by a management module, 
+which configures the SCTP module and handles the recording or presenting of 
+trace messages and event indications to you. 
+Figure 1. Module Configuration 
+Management 
+ULP 
+SCTP / SCTPN 
+SCTPD 
+(Not applicable 
+when using 
+SCTPN) 
+SCTP_MSG_ACTIVATE 
+SCTP_MSG_SHUTDOWN 
+SCTP_MSG_ABORT 
+SCTP_MSG_TX_REQ 
+SCTP_MSG_RX_IND 
+SCTP_MSG_STATUS_CHANGE 
+SCTP_MSG_NETWORK_STATUS 
+SCTP_MSG_CONG_STATUS 
+SCTP_MSG_CONFIG 
+SCTP_MSG_HOST_IP_ADDR_ADD 
+SCTP_MSG_HOST_IP_ADDR_REM 
+SCTP_MSG_AS_HOST_IP_ADDR_ADD 
+SCTP_MSG_AS_HOST_IP_ADDR_REM 
+SCTP_MSG_AS_CONFIG 
+SCTP_MSG_END 
+SCTP_MSG_ADDR_ADD 
+SCTP_MSG_ADDR_REM 
+SCTP_MSG_PRIMARY 
+SCTP_MSG_R_GLOBAL_STATS 
+SCTP_MSG_R_CONFIG 
+SCTP_MSG_R_STATS 
+SCTP_MSG_R_PEER_ADDR_STATS 
+SCTP_MSG_TRACE_MASK 
+MGT_MSG_TRACE_EV 
+SCTP_MSG_IP_DATA_MID_REQ 
+SCTP_MSG_IP_DATA_END_REQSCTP_MSG_IP_DATA_MID_INDSCTP_MSG_IP_DATA_END_IND 
+USER 
+LEVEL 
+PROTOCOL 
+SCTP_MSG_IP_CONFIG 
+ 
+10 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+2.3 Association State Transitions 
+A simplified state transition diagram for the SCTP module is detailed below. 
+Figure 2. Associated State Transitions 
+CONFIGURING 
+CLOSED 
+CONNECTINGCONNECTED 
+CLOSING 
+S 
+C 
+T 
+P 
+_ 
+M 
+S 
+G 
+_ 
+A 
+C 
+TI 
+V 
+A 
+T 
+E 
+C 
+o 
+n 
+f 
+i 
+g 
+u 
+r 
+e 
+d 
+ 
+a 
+s 
+ 
+c 
+l 
+i 
+e 
+n 
+t 
+Assoc up 
+Asso 
+c up 
+SC 
+TP 
+_M 
+SG 
+_S 
+HU 
+TD 
+OW 
+N 
+Asso 
+c dow 
+n 
+ 
+11 
+Section  2 General Description 
+12 
+ 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+13 
+3 Internal Data Structures 
+This chapter describes the internal data structures used by the SCTP module. 
+This description is intended to assist you in understanding the operation of 
+the module. It is not necessary to acquire detailed knowledge of these 
+structures in order to use the module. 
+3.1 Global Data Structure 
+The entire data storage used by the module is contained in a single 
+contiguous data structure. This structure contains global configuration 
+settings, per association storage and statistics storage all relating to 
+operation of the SCTP protocol. It also contains internal event queues, timer 
+control structures and internal buffers for message processing. 
+3.2 Association Data Structure 
+Each circuit group has a data structure within the global data structure, which 
+contains the user supplied configuration parameters for the association (e.g. 
+host and peer ports and addresses). 
+3.3 Per Peer Address Data Structure 
+Each association stores data and statistics with respect to each address 
+supplied by its peer during association initialization. 
+Section  3 Internal Data Structures 
+14 
+ 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+15 
+4 Interface to System Services 
+4.1 System Functions 
+In addition to the primitive interface and the management interface to the 
+SCTP module (which are described in later sections) the module requires a 
+few basic system services to be supplied by the underlying operating system. 
+This functionality is usually supplied by the appropriate Development package 
+and is detailed in the Software Environment Programmer's Manual. 
+4.2 Timer Operation 
+In order to provide internal implementation of the SCTP protocol timers the 
+SCTP module needs to receive a periodic timer tick message. This is usually 
+achieved using the Timer module supplied in the Development Package. 
+The format of these messages is described in the Software Environment 
+Programmer's Manual. 
+Note: The SCTPN module does not require timer ticks. 
+Section  4 Interface to System Services 
+16 
+ 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+17 
+5 SCTP Management Interface 
+The management layer communicates with the SCTP module using the 
+following primitives. 
+Primitive Description 
+SCTP_MSG_CONFIG Configure global options within the SCTP 
+module. 
+SCTP_MSG_HOST_IP_ADDR_ADD Add an IP address to the list of valid IP 
+addresses available for the host. 
+SCTP_MSG_HOST_IP_ADDR_REM Remove a IP address from the list of valid IP 
+addresses available for the host. 
+SCTP_MSG_AS_CONFIG  Configure association. 
+SCTP_MSG_AS_ADDR_ADD Add a peer network address to an association. 
+SCTP_MSG_AS_ADDR_REM Remove a peer address from an association. 
+SCTP_MSG_AS_PRIMARY Designate a peer address as the primary 
+address. 
+SCTP_MSG_TRACE_MASK Define which events generate trace messages 
+to the trace module. 
+SCTP_MSG_R_GLOBAL_STATS Read the global statistics for the SCTP module. 
+SCTP_MSG_R_STATS Read the statistics for a particular association. 
+SCTP_MSG_R_AS_PEER_ADDR_STATS Read the statistics for a particular peer network 
+address for a particular association. 
+5.1 Module Configuration Request 
+Synopsis 
+Configure system parameters for the SCTP module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_CONFIG (0x7282) 
+id 0 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 20 
+Section  5 SCTP Management Interface 
+18 
+Parameter Area 
+Offset Size Name 
+0 1 mngt_id 
+1 1 trace_id 
+2 1 ip_id 
+3 2 max_assocs 
+5 2 max_i_streams 
+7 2 max_o_streams 
+9 2 ms_per_tick 
+11 2 options 
+13 7 reserved 
+Parameters 
+mngt_id 
+Module ID of the management module. 
+trace_id 
+Module ID of the message trace module. 
+ip_id 
+Module ID of the IP daemon.  
+Note: This parameter is ignored when using the SCTPN module. 
+max_assocs 
+Maximum number of associations the module will be required to handle. 
+max_i_streams 
+Maximum number of input streams for each association the module must be 
+able to handle. 
+max_o_streams 
+Maximum number of output streams for each association the module must be 
+able to handle. 
+ms_per_tick 
+Number of milliseconds between each system tick message. 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+19 
+options 
+Bitmap of options. 
+Option Value Description 
+SCTP_CFG_OPT_CRC32 0x0001 Module will use CRC32 as the checksum. 
+SCTP_CFG_OPT_NO_ABORT_INIT 0x0002 Module will ignore rather than abort 
+incoming connection attempts for none 
+present SCTP ports. 
+By default, the SCTP module will use Adler32 (RFC2960) checksums. 
+Note: When using the SCTPN module the SCTP_CFG_OPT_CRC32 must be set as 
+Adler32 is not supported; the SCTP_CFG_OPT_NO_ABORT_INIT option must not 
+be set when. 
+reserved 
+Reserved space. This must be set to zero. 
+Description 
+First message sent to the SCTP module to start the module and configure 
+general parameters. 
+The module sending the message should request a response and check the 
+returned status to ensure the configuration message has been accepted by 
+SCTP. 
+5.2 Add Host Network Address Request 
+Synopsis 
+Add an IP network address to the list of those available for SCTP. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_HOST_IP_ADDR_ADD (0x7283) 
+id 0 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 17 
+Section  5 SCTP Management Interface 
+20 
+Parameter Area 
+Offset Size Name 
+0 1 ip_type 
+1 16 ip_addr 
+Parameters 
+ip_type & ip_addr 
+The IP address format and IP address. Refer to Section 10 on page 57. 
+Description 
+Sent to the SCTP module to add a network address to the list of host network 
+addresses supplied by SCTP, during association initialization. 
+The module sending the message should request a response and check the 
+returned status to ensure the IP address has been accepted by SCTP. 
+Added addresses will only be available for use by associations that are 
+initiated after the address has been added. 
+Added addresses will not be available for use by restarted associations. 
+Addresses added are NOT checked for validity on the host. 
+5.3 Remove Host Network Address Request 
+Synopsis 
+Remove an IP network address from the list of those available for SCTP. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_HOST_IP_ADDR_REM (0x7284) 
+id 0 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 17 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+21 
+Parameter Area 
+Offset Size Name 
+0 1 ip_type 
+1 16 ip_addr 
+Parameters 
+ip_type & ip_addr 
+The IP address format and IP address. Refer to Section 10 on page 57. 
+Description 
+Sent to the SCTP module to remove a network address from the list of host 
+network addresses supplied by SCTP, during association initialization. 
+The module sending the message should request a response and check the 
+returned status to ensure the IP address has been removed by SCTP. 
+The removed IP address will still be used by currently active associations until 
+such time as they are shut down. 
+5.4 Configure Association Request 
+Synopsis 
+Configure an association for use by SCTP. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_AS_CONFIG (0x7286) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 80 
+Section  5 SCTP Management Interface 
+22 
+Parameter Area 
+Offset Size Name 
+0 2 peer_port 
+2 2 host_port 
+4 2 max_i_streams 
+6 2 max_o_streams 
+8 4 rto_min 
+12 4 rto_max 
+16 4 rto_init 
+20 4 cookie_life 
+24 4 heartbeat 
+28 2 max_retx_init 
+30 2 max_retx_cookie 
+32 2 max_retx_shutdown 
+34 2 max_retx_heartbeat 
+36 2 max_retx_data 
+38 4 T1_init 
+42 4 T2_init 
+46 2 cong_abate 
+48 2 cong_onset 
+50 2 cong_discard 
+52 4 rx_window 
+56 2 options 
+58 22 Reserved for expansion 
+Parameters 
+peer_port 
+SCTP port of peer (zero to allow connection from any peer port). 
+host_port 
+SCTP port of host (zero to allow connection to any host port). 
+max_i_streams 
+Association-specific maximum number of SCTP streams that the peer can 
+request for data transmission to the host. 
+max_o_streams 
+Association-specific maximum number of SCTP streams that the host will 
+request for data transfer to the peer. 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+23 
+rto_min 
+Minimum RTO in milliseconds. 
+rto_max 
+Maximum RTO in milliseconds. 
+rto_init 
+Initial RTO in milliseconds. 
+cookie_life 
+Cookie lifetime in milliseconds. 
+heartbeat 
+Minimum time between heartbeats in milliseconds. 
+max_retx_init 
+Maximum number of times an INIT message is re-transmitted before the 
+association attempt is aborted. 
+max_retx_cookie 
+Maximum number of times a COOKIE_ECHO message is re-transmitted 
+before the association attempt is aborted. 
+max_retx_shutdown 
+Maximum number of times a SHUTDOWN message is re-transmitted before 
+the association is closed. 
+max_retx_heartbeat 
+Maximum number of times a HEARTBEAT message is lost before the network 
+address marked failed. 
+max_retx_data 
+Maximum number of times a data chunk will be retransmitted before the 
+association is aborted. 
+T1_init 
+Starting timeout of an INIT chunk. 
+T2_init 
+Starting timeout of a SHUTDOWN chunk. 
+Note: This parameter is not supported by the SCTPN module. 
+cong_abate 
+Number of memory buffers in the transmission queues that indicate the 
+abatement of congestion. 
+Section  5 SCTP Management Interface 
+24 
+cong_onset 
+Number of memory buffers in the transmission queues that indicate the onset 
+of congestion. 
+cong_discard 
+Number of memory buffers in the transmission queues that indicate the 
+discarding of messages due to congestion. 
+rx_window 
+The size of the associations receive window, in octets. 
+options 
+Bitmap of options. 
+Value Description 
+SCTP_AS_CNF_OPT_CLIENT Association will be a client and will initiate the 
+connection 
+SCTP_AS_CNF_OPT_SERVER Association will be a server and will await a 
+connection 
+SCTP_AS_CNF_OPT_NO_RESTART Association will ABORT if a restart is detected 
+SCTP_AS_CNF_OPT_KEEP_ALIVE Association will not shutdown on excess 
+heartbeat loss 
+SCTP_AS_CNF_OPT_FULL_CFG Association must be fully configured with all the 
+peer’s network addresses 
+Description 
+Sent by the user module to configure the parameters of an SCTP association. 
+The module sending the message should request a response and check the 
+returned status to ensure the SCTP configuration has been accepted by SCTP. 
+An association can only be configured when it is in the configuring state. 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+25 
+5.5 Add Peer Network Address Request 
+Synopsis 
+Add an IP network address to those available on which to contact the peer. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_ADDR_ADD (0x7287) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 17 
+Parameter Area 
+Offset Size Name 
+0 1 ip_type 
+1 16 ip_addr 
+Parameters 
+ip_type & ip_addr 
+The IP address format and the IP address. Refer to Section 10 on page 57. 
+Description 
+Sent to the SCTP module to add a network address to the list of valid peer IP 
+addresses for this association. 
+The module sending the message should request a response and check the 
+returned status to ensure the IP address has been added by SCTP. 
+Addresses can only be added when the association is in the Configuration 
+State. 
+For a server application, the IP addresses configured are the addresses from 
+which SCTP will accept association creation requests. Wildcard addresses 
+(consisting of a zero IP address) are valid only if no other addresses have 
+been specified. 
+For a client application, the IP addresses configured are the addresses that 
+SCTP uses when attempting to create an association. Wildcard addresses are 
+NOT valid. 
+Section  5 SCTP Management Interface 
+26 
+If the association has been configured with the 
+SCTP_AS_CNF_OPT_FULL_CFG 
+flag, the host MUST supply all the IP network addresses of the peer; 
+otherwise the association initiation will fail. 
+5.6 Remove Peer Network Address Request 
+Synopsis 
+Remove an IP network address from those available to contact the peer on. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_ADDR_REM (0x7288) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 17 
+Parameter Area 
+Offset Size Name 
+0 1 ip_type 
+1 16 ip_addr 
+Parameters 
+ip_type & ip_addr 
+The IP address format and IP address. Refer to Section 10 on page 57. 
+Description 
+Sent to the SCTP module to remove a network address from the list of valid 
+peer IP addresses for this association. 
+The module sending the message should request a response and check the 
+returned status to ensure the IP address has been removed by SCTP. 
+Addresses can only be removed when the association is in the Configuration 
+State. 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+27 
+5.7 Set Primary Address Request 
+Synopsis 
+Indicate the primary address of the peer. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_PRIMARY (0x7289) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 17 
+Parameter Area 
+Offset Size Name 
+0 1 ip_type 
+1 16 ip_addr 
+Parameters 
+ip_type & ip_addr 
+The IP address format and IP address. Refer to Section 10 on page 57. 
+Description 
+Configure the association to use the indicated address as the primary 
+destination address of the association. 
+An address will be accepted but not used if it is currently not reachable. 
+Until the primary address is selected via this message, the first peer address 
+present in the SCTP association initialization message will be used. 
+Section  5 SCTP Management Interface 
+28 
+5.8 Global Statistics Request 
+Synopsis 
+Retrieve global statistical information for the module. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_R_GLOBAL_STATS (0x6290) 
+id 0 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Reset Flag 
+err_info 0 
+len 46 
+Parameter Area 
+Offset Size Name 
+0 2 est_current 
+2 4 est_client 
+6 4 est_server 
+10 4 aborted 
+14 4 shutdown 
+18 4 OOB 
+22 4 chunks_tx 
+26 4 chunks_rx 
+30 4 chunks_retx 
+34 4 chunks_unorder_tx 
+38 4 chunks_unorder_rx 
+42 4 bad_checksum 
+Parameters 
+Reset Flag 
+Reserved for future use. Set to zero. 
+est_current 
+Number of associations currently in either ESTABLISHED or 
+SHUTDOWN_RECEIVED states. 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+29 
+est_client 
+Total number of associations established from this host. 
+est_server 
+Total number of associations established from a peer. 
+aborted 
+Total number of associations ended by ABORT. 
+shutdown 
+Total number of associations ended gracefully. 
+OOB 
+Total number of out of the blue packets received. 
+Note: This parameter is not supported by the SCTPN module. 
+chunks_tx 
+Total number of chunks transmitted (not re-transmits). 
+chunks_rx 
+Total number of chunks received. 
+chunks_retx 
+Total number of chunks re-transmitted. 
+Note: This parameter is not supported by the SCTPN module. 
+chunks_unorder_tx 
+Total number of unordered chunks sent. 
+chunks_unorder_rx 
+Total number of unordered chunks received. 
+bad_checksum 
+Total number of chunks that failed the checksum. 
+Note: This parameter is not supported by the SCTPN module. 
+Description 
+If the statistics are not read before their maximum values are reached, then 
+the counts will wrap. 
+Section  5 SCTP Management Interface 
+30 
+5.9 Read Association Configuration Request 
+Synopsis 
+Read configuration options for an individual association. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_R_CONFIG (0x6291) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 85 
+Parameter Area 
+Offset Size Name 
+0 80 Parameters as defined for SCTP_ASSOC_CONFIG 
+80 1 state 
+81 2 i_streams 
+83 2 o_streams 
+Parameters 
+state 
+Current state of the association. 
+Status Description 
+CONFIGURING Association is being configured. 
+CLOSED Association is active but unused. 
+COOKIE_WAIT Association has attempted to initially contact the peer. 
+COOKIE_ECHOED Association peer has responded and we are waiting for 
+confirmation of the established state. 
+ESTABLISHED Association is available for data transfer. 
+SHUTDOWN_PENDING Host has indicated an association should be gracefully 
+closed. 
+SHUTDOWN_SENT Host is attempting to gracefully close an association. 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+31 
+Status Description 
+SHUTDOWN_RECEIVED Peer has indicated an association should be gracefully 
+closed.  
+SHUTDOWN_ACK_SENT Association is shutting down.  
+Note: The COOKIE_ECHOED, SHUTDOWN_ACK_SENT, SHUTDOWN_RECEIVED and 
+SHUTDOWN_SENT status values are never returned by the SCTPN module. 
+i_streams 
+Number of input streams in the current association (contains valid value only 
+for associations in the ESTABLISHED state). 
+o_streams 
+Number of output streams in the current association (contains valid value 
+only for associations in the ESTABLISHED state). 
+Description 
+Retrieves the parameters used to configure the association. 
+5.10 Read Association Statistics Request 
+Synopsis 
+Gets association statistical information for the association. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_R_STATS (0x6292) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Reset Flag 
+err_info 0 
+len 49 
+Section  5 SCTP Management Interface 
+32 
+Parameter Area 
+Offset Size Name 
+0 4 est_client 
+4 4 est_server 
+8 4 aborted 
+12 4 shutdown 
+16 4 chunks_tx 
+20 4 chunks_rx 
+24 4 chunks_retx. 
+28 4 chunks_unordered_tx 
+32 4 chunks_unordered_rx 
+36 2 t1_expires. 
+38 2 t2_expires. 
+40 1 peer_addr 
+41 4 period 
+45 4 time_oos 
+Parameters 
+est_client 
+Total number of associations established from this host on this association. 
+est_server 
+Total number of associations established from a peer on this association. 
+aborted 
+Total number of associations ended by ABORT on this association. 
+shutdown 
+Total number of associations ended gracefully on this association. 
+chunks_tx 
+Total number of chunks transmitted (not re-transmits) on this association. 
+chunks_rx 
+Total number of chunks received on this association. 
+chunks_retx 
+Total number of chunks retransmitted on this association. 
+Note: This parameter is not supported by the SCTPN module. 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+33 
+chunks_unordered_tx 
+Total number of unordered chunks sent on this association. 
+chunks_unordered_rx 
+Total number of unordered chunks received on this association. 
+t1_expires 
+Number of times T1 expired during INIT phases on this association. 
+Note: This parameter is not supported by the SCTPN module. 
+t2_expires 
+Number of times T2 expired during SHUTDOWN phases on this association. 
+Note: This parameter is not supported by the SCTPN module. 
+peer_addr 
+Number of peer network addresses present for this association (set to zero in 
+associations not in the ESTABLISHED state). 
+period 
+Number of timer ticks that have passed since the statistics were last reset. 
+time_oos 
+Number of timer ticks that the association has been out of service since the 
+last reset. 
+Description 
+If the statistics are not read before their maximum values are reached, then 
+the counts will wrap. 
+Section  5 SCTP Management Interface 
+34 
+5.11 Read Association Peer Address Statistics 
+Synopsis 
+Retrieve statistical information for a network address within an established 
+association. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_R_PEER_ADDR_STATS (0x6293) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 31 
+Parameter Area 
+Offset Size Name 
+0 1 addr_num (Input) 
+1 1 ip_type 
+2 16 ip_addr 
+18 1 status 
+19 4 rto 
+23 4 lost_heartbeat 
+27 4 lost_data 
+Parameters 
+addr_num 
+Supplied by the originating module to specify the number of the network 
+addresses that statistics are to be read. 
+ip_type & ip_addr 
+The IP address format and IP address. Refer to Section 10 on page 57. 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+35 
+status 
+Address status. 
+Status Description 
+INACTIVE Network address has been marked inactive. 
+ACTIVE Network address has been marked as available for data transfer. 
+rto 
+Current RTO for the interface. 
+lost_heartbeat 
+Number of heartbeat messages lost on the interface. 
+Note: This parameter is not supported by the SCTPN module. 
+lost_data 
+Number of data chunks lost on the interface. 
+Note: This parameter is not supported by the SCTPN module. 
+Description 
+Information is reset when the association transitions into the established 
+state. 
+Addresses that have not been configured result in a returned address type of 
+ADR_NONE. 
+Section  5 SCTP Management Interface 
+36 
+ 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+37 
+6 User Layer Interface to SCTP 
+The user layer protocol communicates with the Stream Control Transmission 
+Protocol (SCTP) module using the following primitives, based on those 
+present in RFC2960. 
+AS_ACTIVATE Make an association available for client or server connections. 
+AS_SHUTDOWN Shutdown a currently active association. 
+AS_ABORT Abort a currently active association. 
+AS_DATA_REQ Send a packet of data to a peer. 
+6.1 SCTP Status Codes 
+The following status codes will be returned within requested confirmation 
+messages from SCTP. 
+Mnemonic Value Description 
+none 0 Success. 
+SCTPE_BAD_ID 1 Inappropriate or invalid id in request message. 
+SCTPE_BAD_MSG 5 Inappropriate or unrecognized message type. 
+SCTPE_BAD_PARAM 6 Invalid parameters contained in message. 
+6.2 Association Activate Request 
+Synopsis 
+Move the association from the Configuration State into the active state.  
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_ACTIVATE (0x728a) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 0 
+Section  6 User Layer Interface to SCTP 
+38 
+Description 
+The association is moved from the configuration state into the active state, 
+allowing the association to accept incoming or start outgoing connection 
+procedures with its peer. 
+The module sending the message should request a response and check that 
+all configuration information was accepted and that the activation has 
+succeeded. 
+At least one peer IP address must be configured prior to activation. 
+Once the association has been activated, if the host port is zero it is 
+configured to an ephemeral port. 
+If the association has been configured with a peer port (set to non zero), the 
+association will attempt to initiate an association with its peer. This will be 
+indicated to you by the reception of an association status change message 
+detailing a state of CONNECTING. 
+If the association has been configured without a peer port (set to zero), the 
+activated association will await an incoming association from the configured 
+peer. 
+Established associations will be indicated to you via the association status 
+message detailing a state of CONNECTED. 
+6.3 Association Shutdown Request 
+Synopsis 
+Attempt to shutdown an association after all outstanding data has been 
+acknowledged. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_SHUTDOWN (0x728b) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 0 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+39 
+Description 
+Once shutdown starts, the status of the connection will be indicated to the 
+user via the SCTP_MSG_ASSOC_STATUS message. 
+Once you have successfully requested that the association be shutdown, all 
+further attempts to send data on this association will be rejected. 
+Once the shutdown has completed, SCTP will send you an association status 
+message with a status of CLOSED and will re-enter the un-configured state. 
+6.4 Association Abort Request 
+Synopsis 
+Initiates the termination of an association with the loss of all outstanding 
+data. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_ABORT (0x728c) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Non zero on error 
+err_info 0 
+len 2 
+Parameter Area 
+Offset Size Name 
+0 2 error 
+Parameters 
+error 
+Error code sent to the peer to indicate the reason for the abort. See RFC2960 
+section 3.3.10 for a detailed description of error codes. 
+Note: This parameter is not supported by the SCTPN module. 
+Section  6 User Layer Interface to SCTP 
+40 
+Description 
+Once an association is aborted, then no new data will be accepted for 
+transmission and all outstanding data will be lost. 
+Once the association has shutdown, then it will send you an association 
+status message with a status of closed and will re-enter the un-configured 
+state. 
+6.5 Association Data Transfer Request 
+Synopsis 
+Queue a data packet for transmission on an association. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_TX_REQ (0xc280) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len data len + 8 
+Parameter Area 
+Offset Size Name 
+0 data len data 
+data len 2 flags 
+ data len +2 2 stream 
+data len + 4 4 ppid 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+41 
+Parameters 
+data 
+Octets of data for transmission. 
+flags 
+SCTP transmission flags. 
+Status Description 
+SCTP_UNBUNDLED Do not bundle the packet for first transmission. 
+SCTP_UNORDERED Use un-sequenced delivery 
+Note: The SCTP_UNBUNDLED flag is not supported by the SCTPN module. 
+stream 
+SCTP stream number for transmission. 
+ppid 
+SCTP Payload Protocol Identifier. 
+Description 
+Data packets with more than 300 octets are not supported. 
+Data packets will be rejected if the association is not currently established or 
+an invalid stream ID is used.  
+If a response message has been requested, it is returned when either the 
+packet is rejected (see above) or the packet has been queued for 
+transmission. There is no method to determine when its peer has 
+acknowledged a specific data packet. 
+If you attempt to send data faster than the peer will accept, SCTP will buffer 
+the data. If the amount of data exceeds a predetermined amount, you will be 
+notified by a congestion status message indicating that congestion has 
+occurred. Once the amount of data is dropped to a lower predetermined level, 
+then a second congestion status message is sent to you indicating congestion 
+has abated. If you continue to send data after being notified congestion has 
+occurred and a second level is passed, you will be informed that the data sent 
+is being discarded. 
+Section  6 User Layer Interface to SCTP 
+42 
+ 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+43 
+7 SCTP Interface to User Layer 
+The Stream Control Transmission Protocol (SCTP) module communicates with 
+the user layer protocol using the following primitives, based on those present 
+in RFC2960. 
+AS_DATA_IND A packet of data has been received from the peer. 
+AS_STATUS_CHANGE A change in the status of the association has occurred. 
+AS_NETWORK_STATUS A change in the status of a peer address has occurred. 
+AS_CONG_STATUE A change in the congestion status has occurred. 
+7.1 Association Data Transfer Indication 
+Synopsis 
+Indicates the arrival of a data packet from the peer. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_RX_IND (0x8281) 
+id Association ID 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len data len + 8 
+Parameter Area 
+Offset Size Name 
+0 data len data 
+data len 2 flags 
+data len + 2 2 stream 
+data len + 4 4 ppid 
+Parameters 
+data 
+Actual octets of data received. 
+Section  7 SCTP Interface to User Layer 
+44 
+flags 
+Combinable SCTP transmission flags. 
+Status Description 
+SCTP_UNORDERED Packet used un-sequenced delivery 
+stream 
+SCTP stream number for transmission. 
+ppid 
+SCTP Payload Protocol Identifier. 
+Description 
+In the event of a data chunk of more then 300 octets being received from its 
+peer, SCTP will acknowledge the packet as normal. However, the packet will 
+then be discarded (you will never see the packet) and a management 
+message will be generated. 
+7.2 Association Status Change 
+Synopsis 
+A change in the association status has occurred. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_STATUS_CHANGE (0x028d) 
+id Association ID 
+src Originating Module ID 
+dst User Application 
+rsp_req 0 
+hclass 0 
+status status 
+err_info 0 
+len 4 
+Parameter Area 
+Offset Size Name 
+0 2 i_streams 
+2 2 o_streams 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+45 
+Parameters 
+status 
+Status Description 
+STATUS_CLOSED Association has entered the closed state. 
+STATUS_CONNECTING Association is attempting to connect to a peer. 
+STATUS_CONNECTED Association is available for data transfer. 
+STATUS_CLOSING Association is attempting a graceful shutdown. 
+STATUS_RESTART The peer has restarted the association. Data queued by the 
+association before it was restarted will be lost. 
+i_streams 
+Number of SCTP streams allocated for peer-to-host data transfer. 
+o_streams 
+Number of SCTP streams allocated for host-to-peer data transfer. 
+Description 
+Sent to your application to indicate a change in state of the association. 
+7.3 Association Network Status 
+Synopsis 
+Indicates a status change has occurred on a network address within the 
+association. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_NETWORK_STATUS (0x028e) 
+id Association ID 
+src Originating Module ID 
+dst User Application 
+rsp_req 0 
+hclass 0 
+status status 
+err_info 0 
+len 17 
+Section  7 SCTP Interface to User Layer 
+46 
+Parameter Area 
+Offset Size Name 
+0 1 ip_type 
+1 16 ip_addr 
+Parameters 
+status 
+Status Description 
+ADDRESS_INACTIVE Network address has been marked inactive. 
+ADDRESS_ACTIVE Network address has been marked as available for data 
+transfer. 
+ip_type & ip_addr 
+The IP address format and IP address. Refer to Section 10 on page 57. 
+Description 
+This indicates that either a network address that was previously available has 
+now been marked as inactive, or vice versa. The definition of an inactive 
+address is one that has failed to respond to a configurable number of 
+sequential heartbeat requests. 
+7.4 Association Congestion Status 
+Synopsis 
+Indicates a status change has occurred with regards to transmit congestion 
+on an association. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_CONG_STATUS (0x028f) 
+id Association ID 
+src Originating Module ID 
+dst User Application 
+rsp_req 0 
+hclass 0 
+status status 
+err_info 0 
+len 0 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+47 
+Parameters 
+status 
+Status Description 
+SCTP_TX_CONG_ABATE Transmission queue is free to accept more messages 
+SCTP_TX_CONG_ONSET Transmission queue is experiencing congestion 
+SCTP_TX_CONG_DISCARD Transmission queue has been filled to capacity and has 
+started to discard messages queued for transmission 
+Description 
+Sent to you to indicate the level of congestion on the association has 
+changed. 
+If you receive an SCTP_TX_CONG_ONSET message you should reduce the 
+rate at which messages are sent to SCTP. If the congestion clears then an 
+SCTP_TX_CONG_ABATE message is sent and you can continue as before. 
+However if the level of congestion rises after a SCTP_TX_CONG_ONSET 
+message has been sent, the system will send you an 
+SCTP_TX_CONG_DISCARD message. At this point, SCTP will discard any data 
+messages sent by you until the level of congestion has dropped to a safe 
+level, at which time an SCTP_TX_CONG_ABATE message will be sent. 
+Section  7 SCTP Interface to User Layer 
+48 
+ 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+49 
+8 SCTP Trace Messages 
+8.1 Trace Mask Configuration Request 
+Synopsis 
+Configure SCTP to trace the specified messages and events. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_TRACE_MASK (0x5285) 
+id 0 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 12 
+Parameter Area 
+Offset Size Name 
+0 4 op_evt_mask 
+4 4 ip_evt_mask 
+8 4 reserved 
+Parameters 
+op_evt_mask 
+The output event mask. This is a 32 bit value with bits set to 1 to cause a 
+trace message to be sent to the system management module whenever a 
+message is issued by SCTP for the event indicated. 
+Bit Number Mnemonic Description 
+0 DATA_IND SCTP_MSG_RX_IND 
+1 STATUS_CHG SCTP_MSG_STATUS_CHANGE 
+2 NET_CHG SCTP_MSG_NETWORK_STATUS 
+3 CONG_CHG SCTP_MSG_CONG_STATUS 
+4 DATA_REQ SCTP_MSG_IP_DATA_xxx_REQ 
+5-31 Reserved Reserved - Should be set to zero. 
+Note: The DATA_REQ bit is not supported by the SCTPN module. 
+Section  8 SCTP Trace Messages 
+50 
+ip_evt_mask 
+The input event mask. This is a 32 bit value with bits set to 1 to cause a trace 
+message to be sent to the system management module whenever a message 
+is received by SCTP for the event indicated. 
+Bit Number Mnemonic Description 
+0 ACT_ASSOC SCTP_MSG_ACTIVATE 
+1 SHUT_REQ SCTP_MSG_SHUTDOWN 
+2 ABORT_REQ SCTP_MSG_ABORT 
+3 DATA_REQ SCTP_MSG_TX_REQ 
+4 PRI_ADDR SCTP_MSG_PRIMARY 
+5-31 Reserved Reserved - Should be set to zero 
+reserved 
+Currently reserved. MUST be set to zero. 
+Description 
+Can be used to debug user-level applications by detailing the exact 
+information exchanged on the USER/SCTP interface. 
+8.2 Trace Event Indication 
+Synopsis 
+Message sent to the trace module containing the message to be traced. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type MGT_MSG_TRACE_EV (0x0003) 
+id 0 
+src Originating Module ID 
+dst Management Module ID 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 18 + data len 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+51 
+Parameter Area 
+Offset Size Name 
+0 1 src_id 
+1 1 dst_id 
+2 2 id 
+4 2 type 
+6 2 status 
+8 4 timestamp 
+12 4 p_msg 
+16 2 length 
+18 data len data 
+Parameters 
+src_id 
+Source module identifier of the traced message. 
+dst_id 
+Destination module identifier of the traced message. 
+id 
+Message identifier of the traced message. 
+type 
+Type of the traced message. 
+status 
+Status id of the traced message. 
+timestamp 
+Timestamp for the traced message. 
+p_msg 
+Pointer to the traced message. 
+length 
+Length of the traced message. 
+data 
+Data from the parameter area of the traced message. 
+Section  8 SCTP Trace Messages 
+52 
+Description 
+Used by SCTP to inform the trace entity of various message events. 
+Notification of message can be enabled or disabled using the set trace mask 
+message. 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+53 
+9 SCTP to SCTPD Interface 
+The following are used by the message-based interface between SCTP and 
+the SCTP daemon SCTPD. Except for the configuration message, these 
+messages are internal to SCTP / SCTPD and are shown here for reference 
+only. These messages are not used by the SCTPN module. 
+9.1 SCTPD Configuration Request 
+Synopsis 
+Sent to the SCTP module at startup to configure various parameters. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_IP_CONFIG (0x7295) 
+id 0 
+src Originating Module ID 
+dst IP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 2 
+Parameter Area 
+Offset Size Name 
+0 1 mngt_id 
+1 1 trace_id 
+2 1 sctp_id 
+Parameters 
+mngt_id 
+Module ID of the management module. 
+trace_id 
+Module ID of the message trace module. 
+sctp_id 
+Module ID of the SCTP module. 
+Section  9 SCTP to SCTPD Interface 
+54 
+Description 
+The module sending the message should request a response and check the 
+returned status to ensure the configuration message has been accepted by 
+SCTPD. 
+9.2 IP Data Transmission Request 
+Synopsis 
+Request sending data via IP. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_IP_DATA_MID_REQ (0x7296) 
+SCTP_MSG_IP_DATA_END_REQ (0x7297) 
+id 0 
+src Originating Module ID 
+dst Module_id of SCTPD module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 17 + data len 
+Parameter Area 
+Offset Size Name 
+0 1 ip_type 
+1 16 ip_addr 
+17 data len data 
+Parameters 
+ip_type & ip_addr 
+The IP address format and IP address. Refer to Section 10 on page 57. 
+data 
+Data to be transmitted via IP. 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+55 
+Description 
+Used by SCTP to transfer data to the network layer of the underlying 
+operating system. 
+The network layer buffers all the SCTP_MSG_IP_DATA_MID_REQ information 
+until a SCTP_MSG_IP_DATA_END_REQ message is received. At this point all 
+the data is sent via the IP network to the network address supplied in the 
+final message. 
+9.3 IP Data Reception Indication 
+Synopsis 
+Indicates reception of a data packet from IP. 
+Message Format 
+Message Header 
+Field Name Meaning 
+type SCTP_MSG_IP_DATA_MID_IND (0x7298) 
+SCTP_MSG_IP_DATA_END_IND (0x7299) 
+id 0 
+src Originating Module ID 
+dst SCTP Module 
+rsp_req Used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 17 + data len 
+Parameter Area 
+Offset Size Name 
+0 1 ip_type 
+1 16 ip_addr 
+17 data len data 
+Parameters 
+ip_type & ip_addr 
+The IP address format and IP address. Refer to Section 10 on page 57. 
+data 
+Data to be transmitted via IP. 
+Section  9 SCTP to SCTPD Interface 
+56 
+Description 
+Used by the network layer to transfer data to SCTP. 
+SCTP buffers all the SCTP_MSG_IP_DATA_MID_IND information until a 
+SCTP_MSG_IP_DATA_END_IND message is received. At this point, all the 
+data is processed. 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+57 
+10 Network Address Representation 
+The SCTP module is designed to facilitate future support for IPv6 addresses. 
+Currently only IPv4 addresses are supported, but the interface to the module 
+is designed to accommodate IPv6 addresses in the future. 
+10.1 Network Address Structure for an invalid 
+address 
+Invalid / not present network addresses will be represented in the following 
+way: 
+Address Type ADR_NONE 
+Address Value Undefined. 
+10.2 Network Address Structure for Internet Protocol 
+Version 4 
+IPv4 network addresses will be represented in the following way: 
+Address Type ADR_IPV4 
+Address Value 16 octets containing the following: 
+• Octet 0 MSB of network address 
+• ... 
+• Octet 3 LSB of network address 
+• Octet 4  undefined 
+• ... 
+• Octet 15 undefined 
+ 
+Section  10 Network Address Representation 
+58 
+ 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+59 
+11 Module Command Line Interface 
+11.1 SCTP 
+ 
+sctp [-v -m<module_id> -b<buffers>] 
+ 
+Where: 
+• -v displays the module version and command line option information. 
+• -m<module_id> sets to configure the module id to be used by the module. 
+• -b<buffers> sets the number of message buffers sctp should use. 
+11.2 SCTPD 
+ 
+sctpd [-v -m<module_id>] 
+ 
+Where: 
+• -v displays the module version and command line option information. 
+• -m<module_id> sets to configure the module id to be used by the module. 
+11.3 SCTPN 
+ 
+sctpn [-v -m<module_id>] 
+ 
+Where: 
+• -v displays the module version and command line option information. 
+• -m<module_id> sets to configure the module id to be used. 
+ 
+Section  11 Module Command Line Interface 
+60 
+ 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+12 Example SCTP Message Flows 
+The following diagrams show the flow of messages between the user 
+application and SCTP module for the following general situations. 
+Note  For simplicity AS_NETWORK_STATUS messages are not shown. 
+Figure 3. Example SCTP Message Flows: Configure as Client and Connect to Peer 
+Server 
+User Application SCTP Module SCTP Peer 
+AS_CONFIG 
+AS_ADDR_ADD 
+AS_ACTIVATE INIT 
+INIT_ACK 
+COOKIE_ECHO 
+COOKIE_ACK 
+AS_STATUS_CHANGE [ connecting] 
+AS_STATUS_CHANGE [ connected ] 
+AS_DATA_REQ DATA 
+SACK 
+DATA 
+SACK 
+AS_DATA_IND 
+Configure as client and connect to peer server. 
+ 
+61 
+Section  12 Example SCTP Message Flows 
+Figure 4. Example SCTP Message Flows: Configure as Server and Connect from Peer 
+Client 
+User Application SCTP Module SCTP Peer 
+Configure as server and connect from peer client. 
+AS_CONFIG 
+AS_ADDR_ADD 
+AS_ACTIVATE 
+INIT 
+INIT_ACK 
+COOKIE_ECHO 
+COOKIE_ACK 
+AS_STATUS_CHANGE [ connected ] 
+DATA 
+AS_DATA_IND 
+SACK 
+ 
+Figure 5. Example SCTP Message Flows: Association Shutdown by User Application 
+User Application SCTP Module SCTP Peer 
+Association shutdown by user application 
+AS_SHUTDOWN 
+SHUTDOWN_COMP 
+SHUTDOWN 
+SHUTDOWN_ACK 
+AS_STATUS_CHANGE [ closing ] 
+AS_STATUS_CHANGE [ closed ] 
+ 
+62 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+Figure 6. Example SCTP Message Flows: Association Shutdown by Peer Application 
+User Application SCTP Module SCTP Peer 
+Association shutdown by peer application 
+SHUTDOWN_COMP 
+SHUTDOWN 
+SHUTDOWN_ACKAS_STATUS_CHANGE [ closing ] 
+AS_STATUS_CHANGE [ closed ] 
+ 
+ 
+63 
+Section  12 Example SCTP Message Flows 
+64 
+Dialogic® SS7 Protocols SCTP Programmer's Manual Issue 4 
+65 
+Appendix A 
+A.1 Message Type Table 
+The following table lists, by message type, all the messages described in this 
+manual. 
+Message Type Mnemonic  Description 
+0x028d SCTP_MSG_STATUS_CHANGE  Indicates the association has changed state 
+0x028e SCTP_MSG_NETWORK_STATUS  Indicates a network address has changed state 
+0x028f SCTP_MSG_CONG_STATUS  Indicates the congestion status of an association has 
+changed 
+0x5285 SCTP_MSG_TRACE_MASK  Set trace options for the SCTP module 
+0x6290 SCTP_MSG_R_GLOBAL_STATS  Reads the global statistics for the SCTP module 
+0x6291 SCTP_MSG_R_CONFIG  Reads the configuration for an association 
+0x6292 SCTP_MSG_R_STATS  Read the per association statistics 
+0x6293 SCTP_MSG_R_PEER_ADDR_STATS  Read the statistics on an associations network interface 
+0x7282 SCTP_MSG_CONFIG  Configure the SCTP module 
+0x7283 SCTP_MSG_HOST_IP_ADDR_ADD  Add an IP address for the host 
+0x7284 SCTP_MSG_HOST_IP_ADDR_REM  Remove an IP address from the host 
+0x7286 SCTP_MSG_AS_CONFIG  Configure an SCTP association 
+0x7287 SCTP_MSG_ADDR_ADD  Add a peer IP address to an association 
+0x7288 SCTP_MSG_ADDR_REM  Remove a peer address from an association 
+0x7289 SCTP_MSG_PRIMARY  Designate a peer IP address as the primary 
+0x728a SCTP_MSG_ACTIVATE  Attempt activation of an SCTP association 
+0x728b SCTP_MSG_SHUTDOWN  Shutdown an association after all data has been 
+transferred 
+0x728c SCTP_MSG_ABORT  Abort an association losing all data currently in transit 
+0x7295 SCTP_MSG_IP_CONFIG  Configure the IP daemon 
+0x7296 SCTP_MSG_IP_DATA_MID_REQ  Data transmission request with more data packet 
+fragments to follow 
+0x7297 SCTP_MSG_IP_DATA_END_REQ  Data transmission request marking the end of the data 
+packet 
+0x7298 SCTP_MSG_IP_DATA_MID_IND  Indicates the reception of a data packet with more 
+fragments to follow 
+0x7299 SCTP_MSG_IP_DATA_END_IND  Indicates the end of a received data packet 
+0x8281 SCTP_MSG_RX_IND  Indication of data reception 
+0xc280 SCTP_MSG_TX_REQ  Request data transmission 
+ 
+ 
