@@ -1,0 +1,4145 @@
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Dialogic® SS7 Protocols 
+SCCP Programmer's Manual 
+ 
+Document Reference  U05SSS 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ Section 1 Introduction 
+page 3 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+The product may contain design defects or errors known as errata, which may cause the product to deviate 
+from published specifications. 
+Information in this document is provided in connection with Dialogic® products.  No license, express or implied, 
+by estoppel or otherwise, to any Dialogic intellectual property rights is granted by this document.  Except as 
+provided in Dialogic's Terms and Conditions of Sale for such products, Dialogic assumes no liability whatsoever, 
+and Dialogic disclaims any express or implied warranty, relating to sale and/or use of Dialogic products including 
+liability or warranties relating to fitness for a particular purpose, merchantability, or infringement of any patent, 
+copyright or other intellectual property right.  Dialogic is a registered trademark of Dialogic Corporation.  The 
+names of actual companies and products mentioned herein are the trademarks of their respective owners.  
+Dialogic encourages all users of its products to procure all necessary intellectual property licenses required to 
+implement their concepts or applications, which licenses may vary from country to country. Dialogic products 
+are not designed, intended or authorized for use in any medical, life saving, or life sustaining applications or for 
+any other application in which the failure of the Dialogic product could create a situation where personal injury 
+or death may occur.  Dialogic may make changes to specifications and product descriptions at any time, without 
+notice.   
+Copyright © 1994-2007 Dialogic Corporation. All rights reserved. 
+SCCP Programmer's Manual Issue 7 
+page 4 
+REVISION HISTORY 
+ISSUE DATE CHANGES 
+1 25-Jul-94 1. Parameter names for user primitives changed. Sequence control, 
+Return option and Message priority parameters added. 
+2. Use of ITU format messages dropped in favour of Name-Length- 
+Data format, (which permit the use of additional local parameters). 
+3. Parameter changes to: Translation table configuration, N- 
+COORD and global statistics messages. 
+4. MTP message structure added as an appendix. 
+5. Coding of primitive type octet in management messages 
+changed to provide unique values for requests and indications. 
+2 18-Nov-94 1. Parameter area of add & remove concerned resource message 
+modified to include type of concerned resource. 
+2. Local sub-system heartbeat detection mechanism added. 
+3. Support for multiple SCCP instances at a single signalling point 
+added including multiple instance broadcast indication message. 
+3 18-Apr-96 1. Support for ANSI operation added as a run-time configuration 
+option. 
+2. Selection between 24bit or 14 bit point codes now a run-time 
+configuration option. 
+3. Hop counter parameter added to N-UNITDATA / N-NOTICE. 
+4. Management primitive format changed to support larger point 
+codes. 
+4 12-Dec-97 Connection Orientated operation API and configuration included. 
+5 20-Dec-00 Correct offset and message sizes in message formats. 
+The options breakdown shown in the parameter area now includes 
+ANSI settings. 
+Addition of detailed information on Global Title Translation. 
+6 24-Jul-03 Branding changed. 
+Details of supported SCCP Tracing now included. 
+7 30-Mar-07 Support of SCP_MSG_RESET 
+Additions of new options in SCP_MSG_CONFIG, and support of on 
+behalf reassembly of segmented messages. 
+Minor changes and updates 
+Support of SCP_MSG_GTT_TEST, SCP_MSG_GTT_GET, 
+SCP_MSG_R_GTT_MASK and SCP_MSG_R_GTT 
+GTT Enhancement 
+Support for SCCP Segmentation and Reassembly Procedures 
+Support for Network Context configuration. 
+Addition of further GTT, SSR and Address handling options. 
+ 
+ Section 1 Introduction 
+page 5 
+CONTENTS 
+1 Introduction.........................................................................................................................................7 
+2 Abbreviations......................................................................................................................................8 
+3 Related Documentation.....................................................................................................................9 
+4 Feature Overview..............................................................................................................................10 
+5 General Description.........................................................................................................................11 
+5.1 Module Overview.............................................................................................................................11 
+5.2 SCCP Module Dimensions..............................................................................................................11 
+5.3 Module Configuration......................................................................................................................12 
+5.4 Module Operation............................................................................................................................13 
+5.5 Connection Identification.................................................................................................................13 
+5.6 Local connection reference.............................................................................................................14 
+5.7 Global Title Translation....................................................................................................................14 
+5.7.1 Base algorithm..............................................................................................................................15 
+5.7.2 Enhanced algorithm......................................................................................................................17 
+5.7.3 Handling of nature of address......................................................................................................19 
+5.8 Constant definitions.........................................................................................................................19 
+6 Interface to System Services...........................................................................................................20 
+6.1 System Functions............................................................................................................................20 
+6.2 Timer Operation...............................................................................................................................20 
+7 Interface to Message Transfer Part................................................................................................21 
+8 Interface to User Application..........................................................................................................22 
+8.1 Message Specifications...................................................................................................................23 
+8.1.1 SCCP-Transmit Request..............................................................................................................23 
+8.1.2 SCCP-Receive Indication.............................................................................................................29 
+8.2 Parameter Definitions......................................................................................................................35 
+8.2.1 Parameter Names........................................................................................................................35 
+8.2.2 Parameter Format........................................................................................................................36 
+8.2.3 Data Segmentation.......................................................................................................................45 
+8.2.4 Address information ordering.......................................................................................................45 
+8.2.5 Quality of Service.........................................................................................................................46 
+9 Management Interface......................................................................................................................47 
+9.1 Management Request.....................................................................................................................48 
+9.1.1 N-STATE User In Service (UIS)...................................................................................................49 
+9.1.2 N-STATE User Out of Service (UOS)..........................................................................................49 
+9.1.3 N-STATE User Congestion..........................................................................................................49 
+9.1.4 N-COORD User withdrawal request (UOR).................................................................................50 
+9.1.5 N-COORD User withdrawal grant (UOG).....................................................................................50 
+9.2 Management Indication...................................................................................................................51 
+9.2.1 N-STATE User In Service (UIS)...................................................................................................52 
+9.2.2 N-STATE User Out of Service (UOS)..........................................................................................52 
+9.2.3 N-COORD User withdrawal indication (UOR)..............................................................................52 
+9.2.4 N-COORD User withdrawal confirmation (UOG).........................................................................53 
+9.2.5 N-PCSTATE Signalling Point Allowed..........................................................................................53 
+9.2.6 N-PCSTATE Signalling Point Prohibited......................................................................................53 
+9.2.7 N-PCSTATE Signalling Point Congested.....................................................................................54 
+10 Non-Primitive Interface..................................................................................................................55 
+10.1 Module Configuration Request......................................................................................................56 
+SCCP Programmer's Manual Issue 7 
+page 6 
+10.2 Configure Timers Request............................................................................................................66 
+10.3 Configure Sub-System Resource Request...................................................................................70 
+10.4 End Sub-System Resource Request.............................................................................................73 
+10.5 Add Concerned Resource Request..............................................................................................75 
+10.6 End Concerned Resource Request..............................................................................................77 
+10.7 Add Translation Request...............................................................................................................78 
+10.8 Modify Translation Request...........................................................................................................79 
+10.9 End Translation Request...............................................................................................................80 
+10.10 Get Translation Request.............................................................................................................81 
+10.11 Test Translation Request............................................................................................................82 
+10.12 Read SCCP Global Statistics Request.......................................................................................83 
+10.13 Read SCCP SSR Statistics Request...........................................................................................85 
+10.14 Read SCCP RAM Request.........................................................................................................87 
+10.15 Read GTT Index Mask................................................................................................................88 
+10.16 Read Translation.........................................................................................................................89 
+10.17 Read SCCP SSR Request..........................................................................................................90 
+10.18 Restart Request...........................................................................................................................91 
+10.19 Multiple Instance Broadcast Indication........................................................................................92 
+10.20 SCCP Trace Mask Request........................................................................................................94 
+10.21 Trace Event Indication.................................................................................................................98 
+10.22 Maintenance Event Indication.....................................................................................................99 
+10.22.1 Management  Event Indication...............................................................................................103 
+10.23 Software Event Indication..........................................................................................................104 
+10.24 Read Revision Request.............................................................................................................106 
+10.25 Module Reset............................................................................................................................107 
+Appendix A. TIMer Services.........................................................................................................108 
+A.1 Timer Services........................................................................................................................108 
+A.2 Keep Time..............................................................................................................................108 
+A.3 Time Expiry.............................................................................................................................109 
+Appendix B. Segmentation/Reassembly Support......................................................................110 
+B.1 Introduction.............................................................................................................................110 
+B.2 Software Requirements..........................................................................................................111 
+B.3 Using the New Development Package...................................................................................111 
+B.4 Configuring Protocol Modules to support Long Messages....................................................113 
+B.5 Application Changes...............................................................................................................113 
+B.6 Affected Messages.................................................................................................................116 
+B.7 INAP API Changes.................................................................................................................117 
+Appendix C. Message Type Reference.......................................................................................118 
+ 
+ Section 1 Introduction 
+page 7 
+1 Introduction 
+The SCCP module is a portable software implementation of the Signalling System 
+Number 7, Signalling Connection Control Part (SCCP). It supports classes 0, 1 and 2 
+operation in accordance with ITU-T recommendations Q.711 to Q.714 (1993 or later), 
+ANSI T1 (1992 or later) and BTNR145 using run-time options to select the particular 
+mode of operation required.  
+The module is available in two configurations, one supporting connectionless (Class 
+0 and 1) operation and the other supporting both connection-oriented (Class 2) and 
+connectionless operation. Connectionless procedures are implemented according to 
+ITU & ANSI recommendations. The SCCP management procedures and connection- 
+oriented operation are implemented according to ITU-T recommendations.  
+This is the Programmer's Manual, intended for users developing their own application 
+programs that will interface with and use the functionality provided by the SCCP 
+module. 
+The module uses the services provided by the Message Transfer Part (MTP) to 
+exchange signalling messages with remote signalling points. SCCP contains 
+procedures to keep account of the current status and availability of Local Sub- 
+Systems (LSS), Remote Signalling Points (RSP) and Remote Sub-Systems (RSS). It 
+also performs global title translation and allows signalling to be routed to back-up 
+signalling points or sub-systems in the event that the primary destination is 
+inaccessible.  
+During Class 2 connection oriented service SCCP maintains a connection record for 
+each active connection, allowing data messages to be routed on the basis of a 
+connection id alone. 
+The SCCP module is event driven and uses standard structured message types. It is 
+intended to be used in conjunction with the MTP module either on hardware 
+platforms or on user supplied hardware. However the software is portable and the 
+well-defined message structure and the independent nature of the module allows the 
+SCCP module to be used with alternative MTP implementations if required. 
+This manual provides an overview of the internal operation of the SCCP module and 
+defines the structure of all messages that can be sent to, or issued by, the module. It 
+also describes all the configuration parameters. 
+SCCP Programmer's Manual Issue 7 
+page 8 
+2 Abbreviations 
+- CCITT The International Telegraph & Telephone Consultative 
+Committee 
+- ITU-T The Telecommunication Standardisation Sector of the 
+International Telecommunication Union (Formerly the CCITT) 
+- TCAP Transaction Capabilities Application Part 
+- SCCP Signalling Connection Control Part 
+- MTP Message Transfer Part 
+- LSS Local Sub-System 
+- RSP Remote Signalling Point 
+- RSS Remote Sub-System 
+- SIF Signalling Information Field 
+- SIO Service Information Octet 
+- ANSI American National Standards Institute 
+- GT Global Title 
+- GTT Global Title Translation 
+- MSB Most Significant Bit 
+- LSB Least Significant Bit 
+ Section 3 Related Documentation 
+page 9 
+3 Related Documentation 
+- ITU-T Recommendations Q.711, Q.712, Q.713, Q.714 & Q.791 
+- ANSI T1.112-1992 
+- U10SSS, Software Environment Programmer’s Manual 
+SCCP Programmer's Manual Issue 7 
+page 10 
+4 Feature Overview 
+Key features of the SCCP module include: 
+- Software implementation of ITU-T Q.711-Q.714 (1993 or later) and ANSI 
+T1.112-1992 or later. 
+- Support for Class 0 and Class 1 connectionless operation. 
+- Support for Class 2 connection oriented operation. 
+- Support for Type A User parts such as ISUP. 
+- Implementation of SCCP management procedures. 
+- Support for multiple congestion levels at signalling points and sub-systems. 
+- Support for multiple distributed SCCP instances at a single signalling point. 
+- Automatic detection of local sub-system failure. 
+- Monitoring and Measurements in accordance with ITU-T Q.791. 
+- Support for 'concerned' sub-systems and signalling points. 
+- Dynamic configuration of Global Title Translation tables. 
+- Support for Segmentation and Reassembly procedures 
+ Section 5 General Description 
+page 11 
+5 General Description 
+5.1 Module Overview 
+The SCCP module implements the ITU-T recommendations Q.711 - Q.714 relating to 
+classes 0, 1 and 2 and also the ITU-T SCCP management procedures.  
+The management procedures track the status and congestion level of Local Sub- 
+Systems, Remote Signalling Points and Remote Sub-Systems. The total number of 
+entities supported is fixed at compile time, a typical binary distribution allows for a 
+total (LSS + RSP + RSS) up to 256.  Each entity may be configured with up to 8 (also 
+a compile time constant) concerned entities that receive notification whenever the 
+status of the LSS, RSP or RSS changes. 
+The total number of simultaneous Class 2 connections that the module supports is 
+also determined at compile time.  
+The module is normally run as a single process but may be run as a number of 
+separate instances (distributed over multiple processors for example) with each 
+instance co-operating with the others to exchange management messages relating to 
+changes of availability of sub-systems and signalling points. 
+The module is event driven; it has a single input queue into which events from other 
+modules (MTP, User, Management etc.) are written. The module processes each 
+event in turn until the input queue is empty in which case it will do nothing until the 
+next event is received. Output from the module is directed depending on the type of 
+event to either the MTP module, the User module (on a per local sub-system basis), 
+the Management module or the Maintenance module. In addition the module requires 
+that a periodic timer tick notification be issued to it (using the input queue) typically 
+every tenth of a second. (The timer tick message can either be generated by a timer 
+module or using the services of the selected operating system). 
+5.2 SCCP Module Dimensions 
+The following capabilities of the SCCP module are determined at compile time. 
+- The maximum required number of Local Sub Systems (LSS). 
+- The maximum required number of Remote Signalling Points (RSP). 
+- The maximum required number of Remote Sub Systems (RSS). 
+- The maximum required number of concerned entities which each LSS, 
+RSP or RSS may have. 
+- The maximum required number of simultaneous connections terminated at 
+Local Sub Systems. 
+- The maximum required number of simultaneous connections for which the 
+SCCP module acts as an intermediate node. 
+- The number of available connection identifier values used to associate 
+user primitives with a particular connection. 
+- The maximum number of translation table entries supported. 
+SCCP Programmer's Manual Issue 7 
+page 12 
+ Host based  
+(Linux, 
+WindowsTM, 
+SolarisTM) 
+SS7G21 
+SS7G22 
+SS7HDP 
+SS7HDC 
+The maximum required number of resources 
+(LSS + RSP + RSS). 256 256 128 
+The maximum required number of concerned 
+entities which each LSS, RSP or RSS may 
+have. 
+8 8 4 
+The maximum required number of 
+simultaneous connections terminated at 
+Local Sub Systems. 
+2048 2048 2048 
+The maximum required number of 
+simultaneous connections for which the 
+SCCP module acts as an intermediate node. 
+0 0 0 
+The number of available connection identifier 
+values used to associate user primitives with 
+a particular connection. 
+2048 2048 2048 
+The maximum number of translation table 
+supported. 10 10 10 
+The maximum number of translation table 
+entries supported. 256 256 150 
+Maximum number of address digits in Global 
+Title 22 22 22 
+* depending on run-time license 
+5.3 Module Configuration 
+To allow the module to be as flexible as possible and to allow different users to 
+achieve the required operation, there are a number of run-time configuration options 
+and parameters that must be specified by the user. These configuration parameters 
+are sent to the module's input event queue in the same manner as all other 
+messages. 
+The first message that must be sent to the module is a global configuration message 
+(any messages received prior to the global configuration message will be discarded). 
+It contains the local point code for the module, the maximum length SIF field 
+supported by the local MTP, the SIO value to use in outgoing messages and the 
+module id for all modules that exchange messages with the SCCP. 
+Next the user should configure the local sub-systems using a configure sub-system 
+resource message. This message contains the sub-system number, the user module 
+id for that sub-system and the sub-system multiplicity indicator. 
+ Section 5 General Description 
+page 13 
+Before configuring a remote sub-system it is first necessary to load the remote 
+signalling point configuration parameters into the SCCP module (in some cases the 
+SCCP will only know of the remote signalling point and will not know details of 
+specific remote sub-systems). The remote signalling point configuration is loaded 
+using the configure sub-system resource message. The parameters are just the 
+signalling point code. 
+Once a remote signalling point has been configured any sub-systems can be added 
+using the configure sub-system resource message and specifying both the signalling 
+point code and the sub-system number. 
+Once a resource (LSS, RSP or RSS) has been configured, any concerned sub- 
+systems or signalling points for that resource can be configured using an add 
+concerned resource message. Concerned entities may be freely added and removed 
+at any time after the resource has been configured. (Note that there is a limit to the 
+number of concerned entities that can be assigned to a resource). 
+5.4 Module Operation 
+When all signalling points and sub-systems have been configured the module is 
+ready for operation. Changes of status of local sub-systems are notified to SCCP 
+using a management request message (e.g. User In Service (UIS), User Out of 
+Service (UOS)). Protocol messages (e.g. Unitdata messages) are issued to the 
+SCCP from the local sub-systems. 
+Changes of status for remote signalling points and sub-systems are notified to the 
+user using the management indication message whilst protocol messages (e.g. 
+Unitdata or Unitdata Service) are notified to the user using the receive indication 
+message. 
+5.5 Connection Identification 
+SCCP service class 2 provides connection-oriented operation. This permits the 
+establishment of a logical connection between local and remote entities for the 
+exchange of data. The SCCP module uses a logical connection identifier (connection 
+id) to associate user primitives with a particular connection. This value has local 
+significance only and is assigned when the connection is established. Data 
+messages are then exchanged over a particular connection using this connection id 
+rather than explicit addresses. The connection id is fixed for the duration of the 
+connection and must be present in all user primitives passed over the connection. 
+The connection id is conveyed in the MSG header id field of the SCP_MSG_TX_REQ 
+and SCP_MSG_RX_IND messages sent and received by SCCP. The format of these 
+messages is given in later sections of this document. 
+The range of values that may be used for the connection id is specified at module 
+configuration, and ranges from min_id to max_id. SCCP is allocated a range of 
+connection identifiers within these values for incoming connections, ranging from 
+base_id to top_id. 
+SCCP Programmer's Manual Issue 7 
+page 14 
+The SCCP module selects connection identifiers for incoming connections in the 
+range base_id to top_id. The connection id for an outgoing connection is selected by 
+the local sub-system (user application), from the range min_id to max_id, but 
+excluding any values between base_id and top_id. The application code is 
+responsible for ensuring that each connection_id is used by only one local sub- 
+system at any single point in time. This may be easily achieved by allocating a unique 
+range of connection id values to each local sub-system. 
+5.6 Local connection reference 
+Peer SCCP entities use a connection reference to associate messages with a 
+particular connection. The 3-byte local reference is generated automatically by the 
+SCCP module in such a manner to ensure that the same value is not re-used until 
+some time after the connection has terminated. The local connection reference is 
+made up of three fields; the instance number, the connection id and a sequence 
+number as shown in the following diagram: 
+ 
+4 bits 8 bits 12 bits 
+Sequence Number Instance Resource Number 
+MSB  LSB 
+ 
+The Instance Number allows SCCP to be distributed over a number of separate 
+hardware platforms, each using a different instance number in the local connection 
+reference.  
+ 
+The data associated with each active connection (such as address and state 
+information) is stored in an internal resource allocated when the connection is 
+initiated. The index of that resource appears in the ‘Resource Number’ field of the 
+connection reference. 
+The Sequence Number is incremented by one for each connection that uses the 
+same internal resource. 
+5.7 Global Title Translation 
+SCCP provides a facility called Global Title Translation (GTT).  GTT is used to 
+convert a Global title (GT) into an address that will allow SCCP to route a data packet 
+to the correct destination.  GTT is used perhaps when the point code scheme of one 
+network is unknown to another network. 
+This may occur if two nodes need to communicate data to each other, but the nodes 
+reside in different networks.  The address information that the originating node would 
+provide would be a Global Title (GT) which can be thought of as being an alias for at 
+least a point code and possibly a subsystem number or another GT.  SCCP using 
+GTT is able to perform this translation, then MTP can use the point code to route to 
+the next node if the destination has not been already reached. 
+ Section 5 General Description 
+page 15 
+Before GTT can be used, it is necessary to configure the translations that will be 
+required.  This is done by sending one or more Add Translation Request messages 
+to the SCCP module (see section 10.7).  In the simplest case, each message 
+contains the GT (“target address”) and the address to which the GT will be translated 
+(“primary address”), which consists of a point code and optionally a subsystem 
+number or GT.  These translations are stored in a table in the SCCP module.  When 
+a message is received from MTP containing a GT, the table is searched to find an 
+entry that matches the GT.  If such an entry is found, the primary address is returned.  
+If the point code (and the subsystem number, if present) contained in the address are 
+configured on the system, the message is processed, otherwise it is routed on to the 
+next signalling point.  If no entry is found in the table a maintenance event is 
+generated indicating that a routing failure has occurred. 
+A backup address can also be specified in the Add Translation Request message.  
+This address would be used only if the point code in the primary address had been 
+marked as prohibited (eg.  a point code may be taken out of service for maintenance 
+purposes.  MTP will inform SCCP that the point code is unreachable). 
+The maximum number of global title translations that may be stored depends on the 
+platform being used.  Whether SCCP is running on a board, on the host or on a SIU, 
+the maximum number of combinations of numbering plan and translation type (part of 
+the criteria for the addition of translations) is equal to 10.   
+The maximum number of translations allowed per assembly is listed in the table 
+below: 
+ 
+ 
+ 
+For more advanced pattern matching, the GTT mask may also be specified.  This 
+allows greater flexibility and also means that many more translations can be 
+performed without having to configure each one.  Specifying a GT mask causes the 
+match to be made on a subset of the digits.  The remaining digits may either be 
+removed or transferred from the target address to the translation output.  This could 
+be used to match on a prefix or area code, and for the removal or addition of prefix 
+digits, for example. 
+5.7.1 Base algorithm 
+The algorithms used in GTT are divided in two parts: the first one for the matching 
+rules; the second one for the translation itself. 
+5.7.1.1 Pattern Matching Algorithm 
+For each rule, we compare the length of the address to translate with the length of 
+the GTT mask (SCPPN_GTT_MASK). If they do not match, the rule is skipped. 
+We compare, digit per digit, the target address (SCPPN_TARGET_ADDR) with the 
+address to translate  The comparison is based on the GTT mask 
+(SCPPN_GTT_MASK). The GTT mask value 0 corresponds to an exact match; a 
+GTT mask value 1 and 2 are equivalent to wildcards. 
+SS7G21 
+SS7G22 
+Host 
+based SS7HDP 
+SS7HDC 
+256 256 150 
+SCCP Programmer's Manual Issue 7 
+page 16 
+Address to 
+translate 1 2 3 4 5 6 
+Target 
+address  9 2 3 1 0 0 
+GTT Mask 1 0 0 2 2 2 
+Match 
+Result Ok 
+(wildcard) 
+Ok 
+(2 match 2) 
+Ok 
+(3 match 3) 
+Ok 
+(wildcard) 
+Ok 
+(wildcard) 
+Ok 
+(wildcard) 
+ 
+If more than one rule is matching, the selected rule will be based on highest matching 
+score (the number of digit matching the rule, wildcards not included). 
+For the matching algorithm, the Primary (SCPPN_PRIMARY_ADDR) and backup 
+(SCPPN_BACKUP_ADDR)  translation are not involved. 
+ 
+5.7.1.2 Translation Algorithm 
+The address resulting from the translation will be 
+The primary (or backup) address (SCPPN_PRIMARY_ADDR or 
+SCPPN_BACKUP_ADDR) 
+This address is appended with digits from the address to translate for which the 
+corresponding GTT mask (SCPPN_GTT_MASK) is 2 
+The target address of the rule (SCPPN_TARGET_ADDR) is not involved in the part. 
+ Section 5 General Description 
+page 17 
+5.7.1.3 Example configurations of address pattern matching 
+In the following table, address indicators, sub-system number and point code have 
+been excluded for clarity. The backup translation is optional and has not been shown 
+in the table below.  The digit ‘x’ indicates ‘any digit’.  
+ 
+Operation Global Title 
+(SCPPN_TAR 
+GET_ADDR) 
+Primary 
+translation 
+(SCPPN_PRIMA 
+RY_ADDR) 
+GTT mask 
+(SCPPN_GTT 
+_MASK) 
+Address 
+signals output 
+from GTT 
+function # 
+Translate ‘9876543’ to 
+the number ‘3456789’ 
+9876543 3456789 0000000 3456789 
+Translate ‘01234xxxx’ to the 
+number ‘12345678’ 012340000 12345678 000001111 12345678 
+Translate ‘xxxx567’ to the 
+number ‘12345678’ 0000567 12345678 1111000 12345678 
+Translate the number 
+‘9876xxxxx’ by removing the 
+prefix digits ‘9876’ 
+987600000 no digits 000022222 xxxxx 
+Replace the prefix digits ‘1234’ 
+from a 7 digit number 
+‘1234xxx’ with ‘321’ 
+1234000 321 0000222 321xxx 
+ 
+# This will also include a point code (as a minimum) and optionally a sub-system 
+number. 
+5.7.2 Enhanced algorithm 
+This algorithm is not directly based on the digits anymore, but is based on operations 
+(defined in the SCPPN_GTT_MASK) that are applied to parts of the address, using 
+the corresponding primary and backup address information. Therefore, a ‘E’ 
+separator has been introduced to split the mask and addresses in parts.  
+Each part of the address is made of 0 or more digits. Each part of the GTT mask 
+consists of exactly one digit. 
+Important Note: The rules of the enhanced algorithm have a higher priority than the 
+rules from the base algorithm. It is hence recommended not to mix both types of 
+rules. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+GTT Mask meaning 
+SCCP Programmer's Manual Issue 7 
+page 18 
+GTT mask 0 1 2 3 4 
+Matching Match Ignore Ignore Not 
+involved Match 
+Operation Replace w/ 
+Primary Replace w/ Primary Keep Target Insert Primary Replace w/ Primary 
+Remarks     Can be used to match after 
+a variable length ignore. In 
+this case must be the last 
+one.  
+ 
+Note: A part can be variable length by setting the corresponding mask to Ignore (1 or 
+2) and the corresponding target address to null. 
+ 
+Example 
+ 
+5.7.2.1 Pattern Matching Algorithm 
+We compare, part per part, the target address (SCPPN_TARGET_ADDR) with the 
+address to translate. The comparison is based on the GTT mask 
+(SCPPN_GTT_MASK). The GTT mask value 0 or 4 for a part corresponds to an 
+exact match; a GTT mask value 1 or 2 is equivalent to wildcards. A GTT mask value 
+3 is not involved in the pattern matching algorithm. 
+The selected rule is the first matching rule. It has a priority higher than any other 
+base rules. 
+5.7.2.2 Translation Algorithm 
+The address resulting from the translation will be based on the GTT mask for each 
+part. If the GTT mask is 0, 1, 3 or 4, the digits from the corresponding part of the 
+primary address are used (SCPPN_PRIMARY_ADDR). If the mask is 2, the digits 
+from the corresponding part of the target address are used  
+ Section 5 General Description 
+page 19 
+5.7.2.3 Examples 
+SCPPN_CALLED 
+_ADDR SCPPN_TARGET_ADRR SCPPN_PRIMARY_ADDR SCPPN_GTT_MASK Result 
+1234567 34567890 34567890 0E 34567890 
+xxxx567 0000E567 9876543 1E0 9876543 
+x23abcd 0E23E0000   E800E 1E0E2 
+ 
+800abcd 
+23a 
+23ab 
+23abc 
+23abcd 
+23E 0800E 0E2 0800a 
+0800ab 
+0800abc 
+0800abcd 
+23abcd 23E00EE00 800EE1E 0E2E3E2 800ab1cd 
+ 
+5.7.3 Handling of nature of address 
+Numbers input to the translation function may be supplied as ‘national’, ‘international’ 
+or ‘subscriber’. In order to correlate each different form of the same number, it may 
+be necessary to ‘normalise’ the target address and table entries, by the addition of a 
+national (area) or international prefix, to make all numbers international. 
+This functionality is not supported by the current implementation. Different forms of 
+the same number are treated as different addresses. No correlation is made between 
+the target address and table entry nature of address indicator. 
+5.8 Constant definitions  
+To assist the user when writing an application, a ‘C’ language header file (scp_inc.h) 
+is available containing all the definitions and constants necessary to interface with the 
+SCCP module. This file contains definitions for all the mnemonics listed in this 
+Programmer’s Manual. 
+SCCP Programmer's Manual Issue 7 
+page 20 
+6 Interface to System Services 
+6.1 System Functions 
+In addition to the primitive interface and the management interface to the SCCP 
+module (which are described in later sections) the module requires a few basic 
+system services to be supplied by the underlying operating system.  This functionality 
+is usually supplied by the appropriate Development Package.  
+The following functions are required for inter-task communication: 
+ 
+ GCT_send  Sends a message to another task. 
+ GCT_receive  Accept next message from input event queue,   
+     blocking the task if no message is ready. 
+ GCT_grab  As receive but not blocking if the event queue is empty. 
+Though not used directly by the SCCP module the following functions are required for 
+message allocation for inter-task communication : 
+ 
+ getm  Allocate a message from the system. 
+ relm   Release a message back to the system. 
+6.2 Timer Operation 
+In order to provide internal implementation of the SCCP protocol timers the module 
+needs to receive a periodic timer tick message. This is usually achieved using either 
+the Enhanced Driver Module or the Timer module in which case the following 
+messages are used by the SCCP module: 
+ 
+ KEEP_TIME  Issued by SCCP to initialise the timer services. 
+ REMOVE_TIME Issued by SCCP to give up timer services. 
+ TM_EXP  Issued by the timer module to notify of timeout. 
+The format of these messages is described in the Software Environment 
+Programmer’s Manual. 
+The user should note that whilst the timer functionality is usually provided by the 
+given SS7 Protocol modules, the timer functionality required by the SCCP module is 
+very basic (just a single message being issued on a periodic basis). In most cases it 
+is a trivial exercise to implement this functionality using the users own choice of 
+operating environment if required. 
+ Section 7 Interface to Message Transfer Part 
+page 21 
+7 Interface to Message Transfer Part 
+The SCCP module communicates with the Message Transfer Part (MTP) using the 
+following primitives, all of which are defined in ITU-T Recommendation Q.704: 
+ 
+ MTP-TRANSFER-REQ Transmit request to MTP. 
+ MTP-TRANSFER-IND Receive indication from MTP. 
+ MTP-PAUSE   Point code unavailable indication from MTP. 
+ MTP-RESUME  Point code available indication from MTP. 
+ MTP-STATUS  Signalling point congested or remote user 
+      unavailable indication from MTP. 
+The message format used to convey these primitives is defined in the Programmer’s 
+Manual for the product in use. 
+The SCCP module is usually used in conjunction with the MTP module. However, the 
+use of primitives in accordance with Q.704 ensures that it can also be integrated with 
+other MTP implementations as and when required. 
+SCCP Programmer's Manual Issue 7 
+page 22 
+8 Interface to User Application 
+All primitives at the application interface (i.e. between the SCCP module and the 
+Local Sub-System) are passed by sending messages between the modules. The 
+following messages are used: 
+ 
+ SCCP-TRANSMIT-REQ Conveys primitive from local sub-system to SCCP. 
+ SCCP-RECEIVE-IND Conveys primitive from SCCP to local sub-system. 
+ 
+The basic structure of each message (irrespective of the SCCP primitive contained 
+within it) is the same. The message contains a message header, the length of the 
+user data and the user data itself. The message must be contained in a single buffer 
+which should be allocated by the sending module (using the getm function) and 
+either released (using the relm function) or passed to another module by the 
+receiving module. The getm and relm functions are described in Section 6. 
+The data in the parameter area contains the primitive type and the primitive 
+parameters. The first byte in the parameter area is the primitive type octet and the 
+last byte is a zero byte to indicate that there are no further parameters in the 
+parameter area. All parameters associated with the primitive are placed between the 
+primitive type code and the final (zero) byte. Therefore the parameter area is 
+formatted as follows: 
+      
+Primitive 
+Type Parameter Parameter  Parameter Zero 
+      
+ 
+The parameters may be placed in any order. The first byte of a parameter is the 
+parameter name, the second byte is the length of the parameter data to follow 
+(excluding the parameter name and the length byte itself), this is followed by the 
+parameter data. The encoding of the parameter data aligns exactly with the 
+parameter format specified in the appropriate ITU-T recommendation whenever 
+possible. Therefore each parameter is formatted as follows: 
+   
+Name Length Data 
+1 byte 1 byte ‘Length’ bytes (1 to 255) 
+ 
+Within each message there are mandatory parameters which must always be 
+present and optional parameters which may or may not be present. In some cases 
+optional parameters may have default values that are inserted by the SCCP module 
+if not provided by the user as described in the parameter specification. 
+The following sections define the message format and content of the parameter area 
+for each of the messages exchanged between the SCCP module and the local sub- 
+system. 
+ Section 8 Interface to User Application 
+page 23 
+8.1 Message Specifications 
+8.1.1 SCCP-Transmit Request 
+Synopsis: 
+ 
+Protocol message sent from the local sub-system user to the SCCP module 
+for transmission to the network. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_TX_REQ (0xc740) 
+id connection_id (see below) 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len Number of bytes of user data 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type octet. 
+1 len - 2 Parameters in Name-Length-Data format. 
+len - 1 1 Set to zero indicating end of message 
+ 
+Description: 
+ 
+This message is used by the application to send primitives to SCCP for 
+transmission to the network. Message data is formatted in Name-Length-Data 
+format. 
+ 
+All User primitives for classes 0, 1, and 2 specified by the ITU-T in 
+recommendation Q.711 are supported.  
+ 
+Primitives used with Connection Oriented services must have the connection 
+id of the connection to which the primitive refers in the id field of the message 
+header.  
+ The id field must be set to zero for primitives that refer to connectionless 
+services. 
+SCCP Programmer's Manual Issue 7 
+page 24 
+ This message also transports the User part type A interface elements 
+REQUEST type 1 and REQUEST type 2.   
+ Certain primitives and primitive parameters have been specified by the ITU-T 
+for further study. The SCCP module permits the inclusion of these elements 
+but will ignore their contents. The affected elements appear shaded. 
+Parameter area contents: 
+ 
+The primitive type octet is coded as follows: 
+Primitive Mnemonic Value 
+(Decimal) Value (Hex) 
+N-UNITDATA request SCPPT_N_UNITDATA_REQ 1 1 
+N-CONNECT request SCPPT_N_CONNECT_REQ 4 4 
+N-CONNECT response SCPPT_N_CONNECT_RESP 6 6 
+N-DATA request SCPPT_N_DATA_REQ 8 8 
+N-EXPEDITED-DATA request # SCPPT_N_EXP_DATA_REQ 10 A 
+N-RESET request # SCPPT_N_RESET_REQ 12 C 
+N-RESET response # SCPPT_N_RESET_RESP 14 E 
+N 
+-DISCONNECT request 
+SCPPT_N_DISCONNECT_RE 
+Q 16 10 
+N-INFORM request SCPPT_N_INFORM_REQ 18 12 
+REQUEST_TYPE_1 SCPPT_REQUEST_TYPE_1 20 14 
+REQUEST_TYPE_2 SCPPT_REQUEST_TYPE_2 22 16 
+ 
+# This primitive (class 3) is not currently supported and will be discarded if 
+issued by the user. 
+ Parameter formats are defined in section 8.2. 
+ Section 8 Interface to User Application 
+page 25 
+ The following tables list the parameters associated with each transmit request 
+primitive and shows whether the parameter is MANDATORY (in which case 
+the message will be discarded if the parameter is omitted) or OPTIONAL (in 
+which case the parameter may be omitted). 
+Primitive Parameters Status 
+N-UNITDATA request SCPPN_CALLED_ADDR MANDATORY 
+ SCPPN_CALLING_ADDR MANDATORY 
+ SCPPN_SEQ_CTRL OPTIONAL 
+ SCPPN_RET_OPT OPTIONAL 
+ SCPPN_MSG_PRI OPTIONAL 
+ SCPPN_USER_DATA MANDATORY 
+ SCPPN_HOP_COUNTER OPTIONAL 
+  
+ If the Hop Counter parameter is present, an Extended Unitdata Message 
+(XUDT) will be issued to the network. If this parameter is not present, a 
+Unitdata message (UDT) will be issued. 
+Primitive Parameters Status 
+N-CONNECT request SCPPN_CALLED_ADDR MANDATORY 
+ SCPPN_CALLING_ADDR MANDATORY 
+ SCPPN_EXP_DATA # OPTIONAL 
+ SCPPN_USER_DATA OPTIONAL 
+ SCPPN_MSG_PRI OPTIONAL 
+ SCPPN_FLOW_CNTRL # OPTIONAL 
+ SCPPN_CREDIT # OPTIONAL 
+ SCPPN_CONF_SELECT OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+ 
+# This parameter (class 3) is not currently supported and will be discarded if issued 
+by the user. 
+ 
+ 
+ 
+SCCP Programmer's Manual Issue 7 
+page 26 
+Primitive Parameters Status 
+N-CONNECT response SCPPN_RESP_ADDR OPTIONAL 
+ SCPPN_EXP_DATA # OPTIONAL 
+ SCPPN_USER_DATA OPTIONAL 
+ SCPPN_MSG_PRI OPTIONAL 
+ SCPPN_FLOW_CNTRL # OPTIONAL 
+ SCPPN_CREDIT # OPTIONAL 
+ SCPPN_CONF_SELECT OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+ 
+# This parameter (class 3) is not currently supported and will be discarded if issued 
+by the user. 
+Primitive Parameters Status 
+N-DATA request SCPPN_USER_DATA MANDATORY 
+ SCPPN_MSG_PRI OPTIONAL 
+ SCPPN_CONFIRM_REQ OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+  
+Primitive Parameters Status 
+N-EXPEDITED-DATA 
+request # SCPPN_USER_DATA MANDATORY 
+ SCPPN_MSG_PRI OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+ 
+# This primitive (class 3) is not currently supported and will be discarded if issued by 
+the user. 
+ 
+Primitive Parameters Status 
+N-RESET request # SCPPN_REASON_RESET OPTIONAL 
+ SCPPN_MSG_PRI OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+ 
+ 
+ 
+ Section 8 Interface to User Application 
+page 27 
+Primitive Parameters Status 
+N-RESET response # SCPPN_MSG_PRI OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+ 
+# This primitive (class 3) is not currently supported and will be discarded if issued by 
+the user. 
+Primitive Parameters Status 
+N-DISCONNECT request SCPPN_RESP_ADDR OPTIONAL 
+ SCPPN_REASON_DISCONNE 
+CT OPTIONAL 
+ SCPPN_USER_DATA OPTIONAL 
+ SCPPN_MSG_PRI OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+ 
+Interface Element Parameters Status 
+REQUEST type 1 SCPPN_EXP_DATA # OPTIONAL 
+ SCPPN_FLOW_CNTRL # OPTIONAL 
+ SCPPN_CREDIT # OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+ SCPPN_CONF_SELECT OPTIONAL 
+ 
+# This parameter (class 3) is not currently supported and will be discarded if issued 
+by the user. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+SCCP Programmer's Manual Issue 7 
+page 28 
+Interface Element Parameters Status 
+REQUEST type 2 SCPPN_REPLY_REQ OPTIONAL 
+ SCPPN_REFUSE_IND OPTIONAL 
+ SCPPN_SOURCE_REF MANDATORY 
+ SCPPN_OPC MANDATORY 
+ SCPPN_PRO_CLASS OPTIONAL 
+ SCPPN_CREDIT # OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+ 
+# This parameter (class 3) is not currently supported and will be discarded if issued 
+by the user. 
+ Section 8 Interface to User Application 
+page 29 
+8.1.2 SCCP-Receive Indication 
+Synopsis: 
+ 
+Protocol message issued by SCCP to the local sub-system user to indicate 
+receipt of a message by SCCP. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_RX_IND (0x8742) 
+id connection_id (see below) 
+src SCP_TASK_ID 
+dst Local sub-system module_id 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len Number of bytes of user data 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type octet. 
+1 len - 2 Parameters in Name-Length-Data format. 
+len - 1 1 Set to zero indicating end of message 
+ 
+Description: 
+ 
+This message is used by SCCP to advise the application of primitives received 
+from the network by SCCP. Message data is formatted in Name-Length-Data 
+format. 
+ 
+ 
+All User primitives in classes 0, 1 and 2 specified by the ITU-T in 
+recommendation Q.711 are supported.  
+ 
+ Primitives used with Connection Orientated services must have the connection 
+id of the connection to which the primitive refers in the id field of the message 
+header.  
+ The id field is set to zero for primitives that refer to connectionless services  
+ Certain primitives and primitive parameters have been specified by the ITU-T 
+for further study. The SCCP module permits the inclusion of these elements 
+but will ignore their contents. The affected elements appear shaded. 
+SCCP Programmer's Manual Issue 7 
+page 30 
+ 
+Parameter area contents: 
+ 
+The primitive type octet is coded as follows: 
+Primitive Mnemonic Value 
+(Decimal) Value (Hex) 
+N-UNITDATA indication SCPPT_N_UNITDATA_IND 2 2 
+N-NOTICE indication SCPPT_N_NOTICE_IND 3 3 
+N-CONNECT indication SCPPT_N_CONNECT_IND 5 5 
+N-CONNECT confirmation SCPPT_N_CONNECT_CONF 7 7 
+N-DATA indication SCPPT_N_DATA_IND 9 9 
+N-EXPEDITED-DATA 
+indication # SCPPT_N_EXP_DATA_IND 11 B 
+N-RESET indication # SCPPT_N_RESET_IND 13 D 
+N-RESET confirmation # SCPPT_N_RESET_CONF 15 F 
+N-DISCONNECT indication SCPPT_N_DISCONNECT_IND 17 11 
+N-INFORM indication SCPPT_N_INFORM_IND 19 13 
+REPLY SCPPT_REPLY 21 15 
+ 
+# This primitive (class 3) is not currently supported and will not be issued to the user. 
+ Parameter formats are defined in section 8.2. 
+ The following tables list the parameters associated with each receive 
+indication primitive and shows whether the parameter is MANDATORY (in 
+which case it will always be present in messages issued by SCCP), or 
+OPTIONAL (in which case the parameter may or may not be present 
+depending on the circumstances). 
+Primitive Parameters Status 
+N-UNITDATA indication SCPPN_SEQ_CTRL OPTIONAL 
+ SCPPN_RET_OPT OPTIONAL 
+ SCPPN_CALLED_ADDR MANDATORY 
+ SCPPN_CALLING_ADDR MANDATORY 
+ SCPPN_USER_DATA MANDATORY 
+ SCPPN_HOP_COUNTER OPTIONAL 
+ 
+ Section 8 Interface to User Application 
+page 31 
+Primitive Parameters Status 
+N-NOTICE indication SCPPN_REASON_FOR_RET MANDATORY 
+ SCPPN_CALLED_ADDR MANDATORY 
+ SCPPN_CALLING_ADDR MANDATORY 
+ SCPPN_USER_DATA MANDATORY 
+ SCPPN_HOP_COUNTER OPTIONAL 
+  
+ If the Hop Counter parameter will only be present as a result of receiving 
+either an Extended Unitdata (XUDT) message or an Extended Unitdata 
+Service (XUDTS) message. 
+SCCP Programmer's Manual Issue 7 
+page 32 
+ 
+Primitive Parameters Status 
+N-CONNECT indication SCPPN_CALLED_ADDR MANDATORY 
+ SCPPN_CALLING_ADDR MANDATORY 
+ SCPPN_EXP_DATA # OPTIONAL 
+ SCPPN_USER_DATA OPTIONAL 
+ SCPPN_FLOW_CNTRL # OPTIONAL 
+ SCPPN_CREDIT # OPTIONAL 
+ SCPPN_CONF_SELECT OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+Primitive Parameters Status 
+N-CONNECT confirmation SCPPN_RESP_ADDR OPTIONAL 
+ SCPPN_EXP_DATA # OPTIONAL 
+ SCPPN_USER_DATA OPTIONAL 
+ SCPPN_FLOW_CNTRL # OPTIONAL 
+ SCPPN_CREDIT # OPTIONAL 
+ SCPPN_CONF_SELECT OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+ 
+# This parameter (class 3) is not currently supported and will not be issued to the 
+user. 
+ Section 8 Interface to User Application 
+page 33 
+ 
+Primitive Parameters Status 
+N-DATA indication SCPPN_USER_DATA MANDATORY 
+ SCPPN_SEGMENTING OPTIONAL 
+ SCPPN_CONFIRM_REQ OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+  
+Primitive Parameters Status 
+N-EXPEDITED-DATA 
+indication # SCPPN_USER_DATA MANDATORY 
+ SCPPN_CONNECT_ID OPTIONAL 
+ 
+Primitive Parameters Status 
+N-RESET indication # SCPPN_ORIGINATOR OPTIONAL 
+ SCPPN_REASON_RESET OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+ 
+Primitive Parameters Status 
+N-RESET confirmation # SCPPN_CONNECT_ID OPTIONAL 
+ 
+# This primitive (class 3) is not currently supported and will not be issued to the user.  
+Primitive Parameters Status 
+N-DISCONNECT 
+indication SCPPN_ORIGINATOR OPTIONAL 
+ SCPPN_RESP_ADDR OPTIONAL 
+ SCPPN_REASON_DISCONNE 
+CT OPTIONAL 
+ SCPPN_USER_DATA OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+ 
+ 
+ 
+ 
+ 
+SCCP Programmer's Manual Issue 7 
+page 34 
+Interface Element Parameters Status 
+REPLY SCPPN_SOURCE_REF MANDATORY 
+ SCPPN_PRO_CLASS OPTIONAL 
+ SCPPN_CREDIT OPTIONAL 
+ SCPPN_CONNECT_ID OPTIONAL 
+ 
+Parameters of the REPLY element are directly equivalent to those included in the 
+Connection Request (CR) SCCP message normally issued by SCCP to a remote 
+node to establish a connection. 
+ Section 8 Interface to User Application 
+page 35 
+8.2 Parameter Definitions 
+8.2.1 Parameter Names 
+The following parameter names are defined for use in messages between the local 
+sub-system and SCCP. The parameters are used in TRANSMIT REQUEST 
+messages, RECEIVE INDICATION messages and global title configuration 
+messages as detailed in the appropriate message specifications. 
+Parameter Mnemonic Value 
+(Decimal) Value (Hex) 
+Return option SCPPN_RET_OPT 1 1 
+Sequence control SCPPN_SEQ_CTRL 2 2 
+Message priority SCPPN_MSG_PRI 3 3 
+Calling address SCPPN_CALLING_ADDR 4 4 
+Called address SCPPN_CALLED_ADDR 5 5 
+User data SCPPN_USER_DATA 6 6 
+Reason for return SCPPN_REASON_FOR_RET 7 7 
+Target address SCPPN_TARGET_ADDR 8 8 
+Primary address SCPPN_PRIMARY_ADDR 9 9 
+Backup address SCPPN_BACKUP_ADDR 10 A 
+Hop Counter SCPPN_HOP_COUNTER 11 B 
+Expedited Data Selection # SCPPN_EXP_DATA 12 C 
+Protocol Class SCPPN_PRO_CLASS 13 D 
+Flow Control # SCPPN_FLOW_CNTRL 14 E 
+Flow Control Window Size # SCPPN_CREDIT 15 F 
+Responding Address SCPPN_RESP_ADDR 16 10 
+Reset Reason SCPPN_REASON_RESET 17 11 
+Disconnect Reason SCPPN_REASON_DISCONNECT 18 12 
+Connection Identification SCPPN_CONNECT_ID 19 13 
+ 
+# Class 3 parameter is not currently supported and is discarded by SCCP. 
+SCCP Programmer's Manual Issue 7 
+page 36 
+ 
+Parameter Mnemonic Value 
+(Decimal) Value (Hex) 
+Receipt Confirmation Selection SCPPN_CONF_SELECT 20 14 
+Confirmation request SCPPN_CONFIRM_REQ 21 15 
+Originator SCPPN_ORIGINATOR 22 16 
+Source Local Reference SCPPN_SOURCE_REF 23 17 
+Originator Point Code SCPPN_OPC 24 18 
+REPLY request SCPPN_REPLY_REQ 25 19 
+Connection refuse indication SCPPN_REFUSE_IND 26 1A 
+More Data Segments  SCPPN_SEGMENTING 27 1B 
+GTT Mask SCPN_GTT_MASK 28 1C 
+Segmentation SCPPN_SEGMENTATION  29 1D 
+MTP SIO and label SCPPN_MTP_SIO_LABEL   30 1E 
+Network Context SCPPN_NC 31 1F 
+Code Shift Information 
+Element SCPPN_CODE_SHIFT 255 FF 
+ 
+8.2.2 Parameter Format 
+The data section of each parameter (where possible) is encoded in the same manner 
+as the corresponding parameter in messages transferred over the network in 
+accordance with ITU-T Recommendation Q.713 - SCCP Formats and Codes and 
+ANSI T1.112.3. Parameters of local significance not defined in these 
+recommendations are defined in this document. 
+The coding for each parameter type is given in the following tables: 
+Parameter name SCPPN_BACKUP_ADDR 
+Parameter length Variable, in the range 3 to 18 
+Parameter data Backup translation address parameter encoded in 
+accordance with the Q.713 or ANSI T1-112.3 definition of 
+Called Party Address commencing with the address indicator 
+and signalling point code and optionally containing sub- 
+system number and global title. 
+ 
+ Section 8 Interface to User Application 
+page 37 
+Parameter name SCPPN_CALLED_ADDR 
+Parameter length Variable, in the range 2 to 18 
+Parameter data Called Party Address parameter encoded in accordance with 
+the Q.713 or ANSI T1-112.3 definition of Called Party 
+Address commencing with the address indicator and 
+containing optionally signalling point code, sub-system 
+number and global title. 
+ 
+Parameter name SCPPN_CALLING_ADDR 
+Parameter length Variable, in the range 2 to 18 
+Parameter data Calling Party Address parameter encoded in accordance 
+with the Q.713 or ANSI T1-112.3 definition of Calling Party 
+Address commencing with the address indicator and 
+containing optionally signalling point code, sub-system 
+number and global title. 
+ 
+Parameter Name SCPPN_CODE_SHIFT 
+Parameter Length Fixed : set to 1 
+Parameter Data Used to indicate a change in Name-Length-Data format. 
+0: Subsequent parameters use single octet length 
+1: Subsequent parameters use two octet length 
+A single message can contain multiple Code Shift parameters. 
+This is typically used when Segmentation/Reassembly support 
+is required. See Appendix B. 
+ 
+Parameter Name SCPPN_CREDIT 
+Parameter Length Fixed : set to 1 
+Parameter Data Indicates the proposed or selected Credit (window size). 
+Coded in accordance with the ITU Q.713 and ANSI T1-112.3 
+definition of “Credit”  
+Note: the SCCP module currently ignores this parameter. 
+ 
+Parameter Name SCPPN_EXP_DATA 
+Parameter Length Fixed, set to 1 
+Parameter Data Specifies if the sub-system requires the use of expedited data 
+during a connection. Single octet set either 0 or 1 as follows: 
+0 = Sub-system may use expedited data 
+1 = Sub-system may not use of expedited data 
+SCCP Programmer's Manual Issue 7 
+page 38 
+Note: the SCCP module currently ignores this parameter. 
+ 
+Parameter Name SCPPN_FLOW_CNTRL 
+Parameter Length Fixed : set to 1 
+Parameter Data Controls the level of service during connection orientated 
+operation. Single octet coded as follows: 
+0 = Use class 2 service, flow control is not required. 
+1 = Use class 3 service, flow control is required. 
+Omitting this parameter is equivalent to selecting Use class 2 
+service; flow control is not required. 
+Note: the SCCP module currently ignores this parameter. 
+ 
+Parameter name SCPPN_GTT_MASK 
+Parameter length Variable, in the range 1 to 11 
+Parameter data Digit pattern consisting of an array of digits in the same format 
+as the  ‘address signals’ field of the target address global title 
+(SCPN_TARGET_ADDR). The digit values define the 
+behaviour of the translation function on that digit position. 
+Omitting this parameter is equivalent to specifying match all 
+digit positions, replace target address with primary or backup 
+translation. 
+ 
+Parameter data format : 
+ 
+ 8 7 6 5 4 3 2 1 
+Octet 1 2nd digit 1st digit 
+Octet 2 4th digit 3rd digit 
+   
+Octet m filler ‘0’ (if 
+necessary) nth digit 
+ 
+ Section 8 Interface to User Application 
+page 39 
+ 
+The following values are supported in the GTT mask : 
+ 
+ 
+Value Pattern Matching Algorithm Translation Function 
+0 The target address digit in this 
+position must match the 
+corresponding digit position in the 
+table entry. 
+The corresponding digit in the ‘address 
+signals’ of the primary or backup 
+translation will replace the target 
+address digit. 
+1 Ignore this digit position in the target 
+address when matching to this table 
+entry. 
+The corresponding digit in the ‘address 
+signals’ of the primary or backup 
+translation will replace the target 
+address digit. 
+2 Ignore this digit position in the target 
+address when matching to this table 
+entry. 
+The digit in this position in the target 
+address will be added to the end of the 
+‘address signals’ in the primary or 
+backup translation. 
+ 
+Parameter name SCPPN_HOP_COUNTER 
+Parameter length Fixed, set to 1 
+Parameter data Hop counter parameter, used to detect the number of SCCP 
+relay points a message passes through to prevent ‘looping’ 
+of messages. 
+ 
+Parameter name SCPPN_MSG_PRI 
+Parameter length Fixed, set to 1 
+Parameter data Single octet set to 0, 1, 2 or 3 to indicate the priority assigned 
+to the message. If the parameter is omitted a default priority 
+of 2 is assumed. The parameter is only applicable when the 
+SCCP module is used in conjunction with other SCCP nodes 
+in the network which support multiple message priorities. 
+ 
+SCCP Programmer's Manual Issue 7 
+page 40 
+ 
+Parameter name SCPPN_MTP_SIO_LABEL 
+Parameter length Fixed, set to 1 
+Parameter data Generated only if the SCPXF_ONBEHALF_REASSEMBLY 
+flag is set. It contains the data stored in the MTP SIO Label. 
+   
+ 
+Parameter name SCPPN_NC 
+Parameter length Fixed, set to 1 
+Parameter data If the module is configured to act as Network Context 0 then 
+this parameter is not generated. For other Network Contexts 
+the value configured in the Module Configuration Request is 
+included. 
+   
+ 
+Parameter Name SCPPN_OPC 
+Parameter Length Fixed , Set to 2 (Configuration option SCPF_24PC = 0) 
+            Set to 3 (Configuration option SCPF_24PC = 1) 
+Parameter Data The local point code conveyed to the Type A User Part for 
+transmission embedded in the user protocol. 
+Note: the SCCP module currently ignores this parameter. 
+ 
+ 
+Parameter Name SCPPN_ORIGINATOR 
+Parameter Length Fixed , Set to 1 
+Parameter Data Parameter indicates the source of the disconnection or 
+connection refusal. Single octet coded as follows: 
+0xff = Undefined 
+0 = Network Service User 
+1 = Network Service Provider 
+ 
+ Section 8 Interface to User Application 
+page 41 
+Parameter name SCPPN_PRIMARY_ADDR 
+Parameter length Variable, in the range 3 to 18 
+Parameter data Primary translation address parameter encoded in 
+accordance with the Q.713 or ANSI T1-112.3 definition of 
+Called Party Address commencing with the address indicator 
+and signalling point code and optionally containing sub- 
+system number and global title. 
+ 
+Parameter Name SCPPN_PRO_CLASS 
+Parameter Length Fixed : set to 1 
+Parameter Data Parameter used in the User Part Type A interface elements 
+REQUEST Type 2 and REPLY. 
+This is a parameter of the SCCP message “Connection 
+Request” conveyed to the Type A user for transmission 
+embedded in the user protocol. 
+Coded as the SCCP parameter “Protocol Class” specified in 
+ITU-T Q.713 & ANSI T1.112 
+ 
+ 
+ 
+ 
+Parameter Name SCPPN_REFUSE_IND 
+Parameter Length Fixed , Set to 1 
+Parameter Data Indicates the status of connection establishment on the Type A 
+User Part interface. Single octet coded as follows: 
+0 = Connection establishment is proceeding normally. 
+1 = Connection establishment has failed. 
+Omitting this parameter indicates Connection establishment is 
+proceeding normally. 
+Note: the SCCP module currently ignores this parameter. 
+ 
+SCCP Programmer's Manual Issue 7 
+page 42 
+ 
+Parameter Name SCPPN_REPLY_REQ 
+Parameter Length Fixed , Set to 1 
+Parameter Data Indicates if the Type A User Part expects a response to a 
+REQUEST Type 2. Single octet coded as follows: 
+0 = No REPLY required. 
+1 = REPLY required. 
+Omitting this parameter indicates No REPLY required. 
+Note: the SCCP module currently ignores this parameter. 
+ 
+Parameter Name SCPPN_REASON_DISCONNECT 
+Parameter Length Fixed , Set to 1 
+Parameter Data Indicates the reason for the release of a connection. Single 
+octet coded as follows : 
+Disconnection 
+0 =   Normal Condition 
+1 =   End User Congestion 
+2 =   End User Failure 
+3 =   SCCP User originated 
+4 =   Abnormal Condition of transient nature 
+5 =   Abnormal Condition of non-transient nature 
+6 =   Access failure 
+7 =   Access Congestion 
+8 =   Subsystem Congestion 
+9 =   Abnormal Condition 
+10 =  Invalid State 
+11 =  Release in progress 
+Connection refusal 
+12 = Destination address unknown (non-transient condition) 
+13 = Destination inaccessible (non transient condition) 
+14 = Destination inaccessible 
+15 = End user originated 
+16 = End user congestion 
+17 = End user failure 
+18 = SCCP user originated 
+19 = QOS unavailable (non transient condition) 
+20 = QOS unavailable (transient condition) 
+21 = Access failure 
+22 = Access congestion 
+23 = Sub-system congestion 
+24 = Reason unspecified (transient) 
+25 = Reason unspecified (non - transient) 
+26 = Incompatible information in NSDU 
+27 = Local Error 
+28 = Invalid State 
+ Section 8 Interface to User Application 
+page 43 
+29 = No translation 
+30 = In restart phase 
+31 = Non-transient condition 
+32 = Transient condition 
+ 
+Parameter name SCPPN_REASON_FOR_RET 
+Parameter length Fixed, set to 1 
+Parameter data Single octet indicating the reason for message return as 
+contained in the Return Cause field of the received Unitdata 
+Service message. 
+In addition to the values listed in Q.713 the following values 
+may be generated locally: 
+252 = Formatted sif exceeds max_sif. 
+253 = Formatted sif exceeds 272 octets 
+(where sif is the Signalling Information Field and max_sif is 
+a configuration parameter). 
+ 
+Parameter Name SCPPN_REASON_RESET 
+Parameter Length Fixed , Set to 1 
+Parameter Data Indicates the reason for the invocation of the reset procedure. 
+Single octet coded as follows : 
+0 = Unspecified 
+1 = User Synchronisation 
+2 = Network Congestion 
+3 = Undefined 
+ 
+Parameter Name SCPPN_RESP_ADDR 
+Parameter Length Variable in the range 1 to 18 
+Parameter Data Coded in accordance with the ITU Q.713 and ANSI T1-112.3 
+definition of “Called Party Address” commencing with the 
+address indicator and containing optionally:  
+Signal Point Code, Sub-System Number and Global Title. 
+ 
+SCCP Programmer's Manual Issue 7 
+page 44 
+Parameter name SCPPN_RET_OPT 
+Parameter length Fixed, set to 1 
+Parameter data Single octet set to either 0 or 1 as follows: 
+0 = Discard Message on error  
+1 = Return Message on error 
+Omitting the return option parameter is equivalent to 
+selecting Discard Message on error. 
+ 
+Parameter Name SCPPN_SEGMENTATION 
+Parameter Length Fixed , Set to 1 
+Parameter Data Generated only if the SCPXF_ONBEHALF_REASSEMBLY 
+flag is set. It contains the data stored in the SCCP 
+Segmentation Parameter. 
+ 
+Parameter Name SCPPN_SEGMENTING 
+Parameter Length Fixed , Set to 1 
+Parameter Data Indicates if more data segments are to follow. Single octet 
+coded as follows:  
+0 = Last data segment. 
+1 = Further data segments follow. 
+Omitting this parameter indicates last data segment. 
+ 
+Parameter name SCPPN_SEQ_CTRL 
+Parameter length Fixed, set to 1 
+Parameter data Single octet in the range 0 to 31. Used to determine the SLS 
+value in messages sent to the network. The presence of this 
+parameter indicates that class 1 operation is selected, 
+otherwise class 0 operation is assumed. 
+ 
+Parameter Name SCPPN_SOURCE_REF 
+Parameter Length Fixed , Set to 3 
+Parameter Data This is the connection identifier conveyed to the Type A User 
+Part for transmission embedded in the user protocol. 
+Note: the SCCP module currently ignores This parameter. 
+ 
+ 
+ Section 8 Interface to User Application 
+page 45 
+Parameter name SCPPN_TARGET_ADDR 
+Parameter length Variable, in the range 2 to 18 
+Parameter data Target address for loading into the Global Title Translation 
+table encoded in accordance with the Q.713 or ANSI T1- 
+112.3 definition of Called Party Address commencing with 
+the address indicator and containing global title and 
+optionally signalling point code and sub-system number. 
+ 
+Parameter name SCPPN_USER_DATA 
+Parameter length Variable, in the range 1 to 255 
+Parameter data Variable length data containing SCCP-user data to be 
+transferred transparently between the SCCP user functions. 
+ 
+8.2.3 Data Segmentation 
+Data blocks exchanged between SCCP and local sub-systems are segmented into 
+blocks no bigger than 255 octets. An N-DATA primitive request from a local sub- 
+system must be sent for each 255-octet block. 
+A parameter, SCPPN_SEGMENTING, indicates if more segments are to follow.   
+8.2.4 Address information ordering 
+ In the called, calling, responding, primary, backup and target address parameters, 
+the ordering of the address information depends on the mode of operation 
+selected at run-time by the SCPF_ANSI option. 
+ If configured for ANSI operation, address information ordering is as follows: 
+Address indicator 
+Sub-system number (if present) 
+Point code (if present) 
+Global title (if present) 
+ 
+Otherwise the default CCITT (ITU-T) format is used as follows: 
+Address indicator 
+Point code (if present) 
+Sub-system number (if present) 
+Global title (if present) 
+SCCP Programmer's Manual Issue 7 
+page 46 
+8.2.5 Quality of Service 
+The Quality of service required for the transfer of data is indicated by the primitive 
+type and parameters used to exchange the data with peer SCCP entities. 
+Use of N-UNITDATA primitives indicate Class 0 or Class 1 operation, the Sequence 
+Control parameter optionally specifying Class 1 (return message on routing failure). 
+Use of the connection-oriented primitives indicate Class 2 or Class 3 operation. Class 
+3 operation is requested by including the Flow Control parameter. The required Class 
+3 flow control window size is specified using the Credit parameter. 
+ Section 9 Management Interface 
+page 47 
+9 Management Interface 
+The management interface allows the user to interface with the SCCP Management 
+(SCMG) entity within the SCCP module. The interface is message based and uses 
+the same message structure (MSG) as described in the previous section but the 
+coding of the parameter area is different. 
+Two messages are currently defined, one for management requests from the user 
+and the other for management indications from the SCCP module. The following 
+management primitives are supported: 
+ 
+Management primitives issued to SCCP: 
+ 
+ N-STATE Request  User In Service (UIS) 
+ N-STATE Request  User Out of Service (UOS) 
+ N-STATE Request  User congestion 
+ N-COORD Request  User withdrawal request (UOR) 
+ N-COORD Response User withdrawal grant (UOG) 
+ 
+Management primitives issued by SCCP: 
+ 
+ N-STATE Indication  User In Service (UIS) 
+ N-STATE Indication  User Out of Service (UOS) 
+ N-COORD Indication User withdrawal indication (UOR) 
+ N-COORD Confirmation User withdrawal confirmation (UOG) 
+ N-PCSTATE Indication Signalling point accessible 
+ N-PCSTATE Indication Signalling point inaccessible 
+ N-PCSTATE Indication Signalling point congested 
+SCCP Programmer's Manual Issue 7 
+page 48 
+9.1 Management Request 
+Synopsis: 
+ 
+SCCP Management Request from User. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_SCMG_REQ (0xc744) 
+id Local sub-system number 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len Number of bytes in parameter area 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type (N-STATE-REQ or N-COORD- 
+REQ) 
+1 len-1 Variable length data containing the SCMG 
+format identifier, the affected SSN, the 
+affected PC the Sub-system multiplicity 
+indicator and the congestion level. Some 
+fields only exist for certain message types. 
+The tables below detail the structure of the 
+parameter area for individual management 
+primitives. 
+ 
+Description: 
+ 
+This message is used by the application sub-system to notify the SCCP of 
+changes in the status of the sub-system and to request and grant permission 
+for a sub-system to be taken out of service using the co-ordinated state 
+change procedure. Receipt of a management request by the SCCP causes 
+the status of the local sub-system to be updated and in most cases one or 
+more management messages to be issued to the network. 
+ Section 9 Management Interface 
+page 49 
+Confirmation Message: 
+ 
+The module sending the message can optionally request that the SCCP 
+module return a confirmation when the message has been processed. This is 
+achieved by setting the sending layer's bit in the rsp_req field, which will 
+cause a confirmation message of the same format to be returned. The status 
+field in this message is zero on success or an error code otherwise. 
+Parameter Description: 
+ The coding of the parameter field is based on the coding specified in Table 
+22/Q.713 but includes an additional field at the beginning to indicate the 
+primitive type. The usage of the various parameter fields for each 
+management message is listed below in tabular form: 
+9.1.1 N-STATE User In Service (UIS) 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type - N-STATE-REQ (1) 
+1 1 Format id - Sub-system Allowed SSA (1) 
+2 [4#] 6 Not used, must be set to zero 
+9.1.2 N-STATE User Out of Service (UOS) 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type - N-STATE-REQ (1) 
+1 1 Format id - Sub-system Prohibited SSP (2) 
+2 [4#] 6 Not used, must be set to zero 
+9.1.3 N-STATE User Congestion 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type - N-STATE-REQ (1) 
+1 1 Format id - Sub-system Congested SSC (7) 
+2 [3#] 5 Not used, must be set to zero 
+[5#] 7 1 Congestion Level (0, 1, 2 or 3) 
+ 
+SCCP Programmer's Manual Issue 7 
+page 50 
+9.1.4 N-COORD User withdrawal request (UOR) 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive Type - N-COORD-REQ (3) 
+1 1 Format id - Sub-system Out of Service 
+request SOR (4) 
+2 1 Not used, must be set to zero 
+3 [2#] 4 Point code of replicate sub-system (note least 
+significant byte first as per Q.713) 
+[5#] 7 1 Not used, must be set to zero 
+9.1.5 N-COORD User withdrawal grant (UOG) 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type - N-COORD-REQ (3) 
+1 1 Format id - Sub-system Out of Service Grant 
+SOG (5) 
+2 1 Sub-system number of system being 
+withdrawn 
+3 [2#] 4 Point code of system being withdrawn (note 
+least significant byte first as per Q.713) 
+[5#] 7 1 Not used, must be set to zero 
+ 
+Note: [#] shows the offset and size value for backward compatibility with earlier 
+software releases. This format will only be used when the ‘Use extended 
+Management Primitive Format’ run-time option (SCPF_XMPRIM) has NOT been 
+selected. The non-extended primitive format encodes the least significant 16 bits of 
+the point code in two octets according to Q.713, with the least significant byte first. 
+ Section 9 Management Interface 
+page 51 
+9.2 Management Indication 
+Synopsis: 
+ 
+Message issued by SCCP Management to local sub-system. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_SCMG_IND (0x8745) 
+id Local sub-system number 
+src SCP_TASK_ID 
+dst LSS module_id 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len Number of bytes in parameter area 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type octet. 
+1 len-1 Variable length data containing the SCMG 
+format identifier, the affected SSN, the 
+affected PC the Sub-system multiplicity 
+indicator and the congestion level. Some 
+fields only exist for certain message types. 
+The tables below detail the structure of the 
+parameter area for individual management 
+primitives. 
+ 
+Description: 
+ 
+This message is used by SCCP management to notify the local sub-system of 
+a change in the status of other sub-systems (local and remote) and signalling 
+points, to indicate a request from a sub-system to be withdrawn, or a 
+confirmation that a local-sub-system can be withdrawn using the co-ordinated 
+state change procedure. 
+Parameter Description: 
+ The coding of the parameter field is based on the coding specified in Table 
+22/Q.713 but includes an additional field at the beginning to indicate the 
+primitive type. The usage of the various parameter fields for each 
+management message is listed below in tabular form: 
+SCCP Programmer's Manual Issue 7 
+page 52 
+9.2.1 N-STATE User In Service (UIS) 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type - N-STATE-IND (2) 
+1 1 Format id - Sub-system Allowed SSA (1) 
+2 1 Affected sub-system number 
+3 [2#] 4 Affected point code (note least significant 
+byte first as per Q.713) 
+[5#] 7 1 Sub-system multiplicity indicator 
+9.2.2 N-STATE User Out of Service (UOS) 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type - N-STATE-IND (2) 
+1 1 Format id - Sub-system Prohibited SSP (2) 
+2 1 Affected sub-system number 
+3 [2#] 4 Affected point code (note least significant 
+byte first as per Q.713) 
+[5#] 7 1 Sub-system multiplicity indicator 
+9.2.3 N-COORD User withdrawal indication (UOR) 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type - N-COORD-IND (4) 
+1 1 Format id - Sub-system Out of Service 
+Request UOR (4) 
+2 1 Affected sub-system number (i.e. the sub- 
+system that is being withdrawn) 
+3 [2#] 4 Affected point code (note least significant 
+byte first as per Q.713). This is the point code 
+of the system requesting to be withdrawn. 
+[5#] 7 1 Sub-system multiplicity indicator 
+ 
+ Section 9 Management Interface 
+page 53 
+9.2.4 N-COORD User withdrawal confirmation (UOG) 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type - N-COORD-IND (4) 
+1 1 Format id - Sub-system Out of Service Grant 
+SOG (5) 
+2 [3#] 5 Not used, must be set to zero 
+[5#] 7 1 Sub-system multiplicity indicator 
+9.2.5 N-PCSTATE Signalling Point Allowed 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type - N-PCSTATE-IND (5) 
+1 1 Format id - Signalling Point Allowed (128) 
+2 1 Not used, set to zero 
+3 [2#] 4 Affected point code (note least significant 
+byte first as per Q.713) 
+[5#]7 1 Not used, set to zero 
+9.2.6 N-PCSTATE Signalling Point Prohibited 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type - N-PCSTATE-IND (5) 
+1 1 Format id - Signalling Point Prohibited (129) 
+2 1 Not used, set to zero 
+3 [2#] 4 Affected point code (note least significant 
+byte first as per Q.713) 
+[5#] 7 1 Not used, set to zero 
+SCCP Programmer's Manual Issue 7 
+page 54 
+9.2.7 N-PCSTATE Signalling Point Congested 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 Primitive type - N-PCSTATE-IND (5) 
+1 1 Format id - Signalling Point Congested (130) 
+2 1 Not used, set to zero 
+3 [2#] Affected point code (note least significant 
+byte first as per Q.713) 
+[5#] 7 1 Congestion level (0, 1, 2 or 3) 
+ 
+Note: [#] shows the offset and size value for backward compatibility with earlier 
+software releases. This format will only be used when the ‘Use extended 
+Management Primitive Format’ run-time option (SCPF_XMPRIM) has NOT been 
+selected. The non-extended primitive format encodes the least significant 16 bits of 
+the point code in two octets according to Q.713, with the least significant byte first. 
+ Section 10 Non-Primitive Interface 
+page 55 
+10 Non-Primitive Interface 
+In addition to the primitive interface for passing protocol messages and management 
+messages between the SCCP module and the user modules, the SCCP module 
+supports a non-primitive interface for implementation specific functionality. 
+The non-primitive interface is used to support requests by the user for configuration 
+and diagnostic purposes and to allow SCCP to report protocol based and software 
+error events to the local system management module. 
+This section describes the formats of all the messages used in the non-primitive 
+interface. 
+When the SCCP module returns a confirmation message containing a status value 
+the status will be one of the following: 
+Mnemonic Value Description 
+SCPE_BAD_ID 1 Inappropriate or invalid id in request 
+message 
+SCPE_BAD_MSG 5 Inappropriate or unrecognised 
+message type. 
+SCPE_BAD_PARAM 6 Invalid parameters contained in 
+message. 
+SCPE_NO_RESOURCES 7 Insufficient internal resources. 
+ 
+Refer to section 5.3 Module Configuration for details on how configuration messages 
+are used. 
+ 
+SCCP Programmer's Manual Issue 7 
+page 56 
+10.1 Module Configuration Request 
+Synopsis: 
+ 
+Message used to configure the SCCP module for operation. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_CONFIG (0x7740) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 60 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 cnf_ver - must be set to one 
+1 1 sio - Service Information Octet value 
+2 2 options 
+4 1 module_id - SCCP module id 
+5 1 mtp_id - MTP module id 
+6 1 mngt_id - Management module id 
+7 1 maint_id - Maintenance module id 
+8 4 point_code - Local point code 
+12 2 max_sif 
+14 1 sccp_instance 
+15 1 smb_id - Broadcast module id 
+16 2 smb_flags - Broadcast flags 
+18 2 num_uc - Required number of User 
+connections 
+20 2 uc_onset - Onset of congestion point for user 
+connections  
+22 2 uc_abmt 
+24 2 num_ic 
+26 2 ic_onset 
+28 2 ic_abmt 
+30 2 num_data 
+32 2 data_onset 
+34 2 data_abmt 
+36 2 num_edata 
+ Section 10 Non-Primitive Interface 
+page 57 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+38 2 edata_onset 
+40 2 edata_abmt 
+42 2 ext_options 
+44 2 base_id 
+46 2 top_id 
+48 2 min_id 
+50 2 max_id 
+52 1 isup_id 
+53 2 nc 
+55 1 hop_counter 
+56 2 error_offset 
+58 2 reserved – set to zero 
+ 
+Description: 
+ 
+This message is used to configure the SCCP module for operation. It should 
+be the first message sent to the module (any messages received before a 
+valid configuration message will be discarded) and should only be issued 
+once. 
+ The message contains parameters relating to the environment in which the 
+SCCP module is operating such as the identity of other modules with which it 
+needs to communicate. It also contains run-time options (such as the local 
+point code, the service information octet (SIO) and the maximum SIF 
+capability of the local MTP). 
+In order to simplify the identification of configuration errors the message supports 
+an error_offset field. The module ignores this field on reception of the  
+SCP_MSG_CONFIG message but sets the field in the SCP_MSG_CONFIG 
+confirmation (0x3740) if an error in the configuration is found. In this situation 
+then the status field will also be set to a non-zero value. The error offset field 
+gives information about the byte offset of the parameter area in 
+SCP_MSG_CONFIG message which causes the configuration to fail. In order 
+to do this the SCP_MSG_CONFIG message length must be long enough, i.e. 
+at least 60 bytes.  
+sio 
+The value used for the Service Information Octet in all messages sent to the 
+network (eg. 0x83 for national networks) 
+ 
+ 
+ 
+SCCP Programmer's Manual Issue 7 
+page 58 
+options 
+Run time options assigned according to the following table: 
+Bit Mnemonic Description 
+0 SCPF_TFRM If set to 1, messages sent to the MTP use the T_FRAME 
+format, otherwise they use the MSG format (set bit if 
+running SCCP on the board). Note: This option is typically 
+not required and is only maintained for backwards 
+compatibility with certain board level products. 
+1 SCPF_PLIST Must be set to 1 
+2 SCPF_ROI If set to 1 SCCP will include the return option and 
+sequence control parameters in N-UNITDATA Indications 
+to the user, otherwise these fields will not be included. 
+3 SCPF_SMB If set to 1 SCCP will use the SCCP Management 
+Broadcast (SMB) mechanism to communicate with other 
+SCCP instances at the same signalling point, otherwise 
+the SCCP module is configured as a single instance. 
+4 SCPF_MPRI If set to 1, management messages will be assigned 
+priority values in accordance with BTNR 145/ ANSI 
+T1.111. 
+Set to 1 for ANSI operation. 
+5 SCPF_XUDT If set to 1, XUDT and XUDTS messages received from 
+the network will be recognised and conveyed to the user, 
+otherwise these messages will be discarded. 
+Set to 1 for ANSI operation. 
+6 SCPF_24PC If set to 1, 24 bit point codes will be used, otherwise 14 bit 
+point codes will be used. 
+Set to 1 for ANSI operation. 
+7 SCPF_PRI_BA If set to 1, message priority is encoded in the MTP-label 
+SSF bits BA, otherwise message priority is encoded in 
+accordance with BTNR145. 
+Set to 1 for ANSI operation. 
+8 SCPF_XMPRIM If set to 1, extended format management primitives will be 
+used. This bit should be set for application software 
+conforming to this release of the Programmer’s Manual. 
+9 SCPF_PC_CABT If set to 1, the SCCP module will expect to be informed of 
+changes in signalling point congestion level by the MTP. 
+Otherwise, a congestion abatement timer, Tx will be used 
+to control signalling point congestion abatement. 
+Set to 1 for ANSI operation. 
+ Section 10 Non-Primitive Interface 
+page 59 
+Bit Mnemonic Description 
+10 SCPF_ANSI If set to 1, ANSI specific operation is enabled. Typically, 
+for operation in accordance with ANSI T1.112-1992 bits 
+4,5,6,7,8,9,10,11 and 12 all need to be set. 
+Set to 1 for ANSI operation. 
+11 SCPF_TOE If set to 1, a connection will be terminated on receipt of 
+any unexpected SCCP message, otherwise unexpected 
+messages are discarded This operation is required for 
+ANSI operation. 
+12 SCPF_TFR If set to 1 the internal connection reference is frozen after 
+the termination of a connection for the duration of timer 
+Tfr. This operation is required for ANSI operation. 
+13 SCPF_ACK_ALL This option controls the behaviour of class 3 flow control. 
+If set to 1 all incoming data messages are acknowledged 
+automatically by the Data Acknowledgement message. 
+Otherwise, the Data Acknowledgement message is only 
+sent after the number of buffered data messages equals 
+the “credit” set by the user. (i.e. the flow control window is 
+full). 
+Note: This option setting is currently ignored. 
+14 SCPF_TCONN_INC Controls the operation of timer T_conn_inc for incoming 
+connections. 
+If set to 1, this timer is started on receipt of a Connection 
+Request from a remote SCCP node. If a valid N- 
+CONNECT response is not issued by the user within this 
+time, the connection refusal procedure is automatically 
+initiated. (Connection Refused is returned to the remote 
+SCCP and N-DISCONNECT to the local sub-system). 
+If set to zero, this functionality is disabled. 
+15 SCPF_XOP Set to indicate that the ext_options field contains 
+additional configuration options.  The use of this bit is not 
+currently enforced. 
+ 
+module_id 
+ SCCP module id – typically 0x33. 
+mtp_id 
+ All MTP-TRANSFER-REQ  messages are sent to this module. 
+mngt_id 
+ Module identifier defining the destination for all management indications  
+SCCP Programmer's Manual Issue 7 
+page 60 
+maint_id 
+ Module identifier defining the destination for all maintenance indications  
+point_code 
+ The source point code to be used in messages sent by SCCP module to the 
+network. 
+max_sif 
+The maximum length for the Signalling Information Field (SIF) supported by 
+the MTP. Usually set to either 62 or 272. 
+sccp_instance 
+The instance number of this SCCP module. This field is used to allow multiple 
+instances of the SCCP module to run at a single signalling point. Each 
+instance exchanges SCCP management messages with the other instances 
+using the SCCP Management Broadcast mechanism (SMB) to ensure that all 
+instances are aware of the current state of all sub-system resources. 
+smb_id 
+ Broadcast module id 
+smb_flags 
+Flags relating to the SCCP Management Broadcast mechanism. Further 
+details available on request. 
+num_uc 
+Maximum number of simultaneous user connections (connections terminating 
+at this SCCP node) that the module is required to support. This value is 
+compared to a compile time constant to determine if the module has sufficient 
+internal resources to handle the requested number of user connections. 
+uc_onset 
+User Connection congestion onset. User connection congestion will be 
+indicated to the maintenance process when the total number of active user 
+connections exceeds this value. 
+uc_abmt 
+User Connection congestion abatement. User connection congestion 
+abatement is indicated to the maintenance process when the total number of 
+active connections SCCP users control returns below this value. 
+num_ic 
+Maximum number of simultaneous intermediate node connections that the 
+module is required to support. This value is compared with a compile time 
+constant to ensure that the module has sufficient resources to handle the 
+requested number of intermediate node connections. 
+ Section 10 Non-Primitive Interface 
+page 61 
+ic_onset 
+Intermediate node congestion onset. Intermediate node congestion is 
+indicated to the maintenance process when the total number of active 
+intermediate node connections exceeds this value.  
+ ic_abmt 
+Intermediate node congestion abatement point. Intermediate node congestion 
+will be indicated to the maintenance process when the total number of active 
+intermediate node connections SCCP returns below this value. 
+num_data 
+Maximum number of buffers required for storing class 3 data messages under 
+flow control. This value is compared with a compile time constant to ensure 
+that the module has sufficient resources to handle the requested number of 
+class 3 data buffers. 
+Note: This parameter must currently be set to zero. 
+data_onset 
+Class 3 data congestion will be indicated to the maintenance process when 
+the total number of active class 3 data buffers exceeds this value. 
+Note: This parameter must currently be set to zero. 
+data_abmt 
+Class 3 data congestion abatement will be indicated the maintenance process 
+when the total number of active class 3 data buffers returns below this value. 
+Note: This parameter must currently be set to zero. 
+num_edata 
+Maximum number of buffers required for storing class 3 expedited data 
+messages under flow control. This value is compared with a compile time 
+constant to ensure that the module has sufficient resources to handle the 
+requested number of class 3 expedited data buffers. 
+Note: This parameter must currently be set to zero. 
+edata_onset 
+Expedited data congestion will be indicated to the maintenance process when 
+the total number of active expedited data buffers SCCP exceeds this value. 
+edata_abmt 
+Expedited data congestion abatement will be indicated the maintenance 
+module when the total number of active expedited data buffers returns below 
+this value. 
+SCCP Programmer's Manual Issue 7 
+page 62 
+ext_options 
+Further bit mapped options shown in the following table. 
+Bit Mnemonic Description 
+0 SCPXF_NO_CGP If set, the local point code will not be added to the calling 
+party address. If not set, the local point code will be 
+inserted into the calling party address.      
+Note: The point code will not be inserted if the  
+SCPXF_DEL_CGPC is set. 
+1 SCPXF_INCL_CDPC If set, any point code present in the called party address 
+will be included. If not set, any point code in the called 
+party address will be removed. 
+2 SCPXF_DEL_CGPC If set, this option will remove any point code present in the 
+calling party address. If not set, the behaviour determined 
+by the SCPXF_NO_CGP option will be followed. Note: 
+This option is typically used in conjunction with 
+SCPXF_CG_RTE_GT. 
+3 SCPXF_CG_RTE_GT If set and a GT is present, this option will 
+change the routing indicator to ‘Route on GT’. If 
+not set or no GT is present, then the address will 
+not be changed. 
+Note: This option is typically used in conjunction with 
+SCPXF_DEL_CGPC. 
+4 SCPXF_ 
+ROT_SEQ_CTRL If set, SCCP should perform a circular rotate right by one position of the (8 bit) sequence 
+control value prior to using it. It should then use 
+the resulting least significant 5 bits as a key to 
+look-up the SLS value from its internal table. If 
+not set, SCCP uses directly the least significant 
+5 bits as a key to look-up the SLS value from its 
+internal table. 
+Note: This option may typically be used in dual 
+resilient configurations. 
+ Section 10 Non-Primitive Interface 
+page 63 
+Bit Mnemonic Description 
+5 SCPXF_ 
+ONBEHALF_REASSE 
+MBLY 
+If set, and if the received XUDT or XUDTS is 
+part of a segmented message, then two 
+additional parameters 
+(SCPPN_SEGMENTATION and 
+SCPPN_MTP_SIO_LABEL), are formatted in 
+the N-UNITDATA-IND and N-NOTICE-IND sent 
+to the SCCP-User. 
+If not set, a received XUDT or XUDTS part of a 
+segmented message is rejected by the SCCP 
+module with an error cause error cause 
+"destination cannot perform reassembly”. 
+Note: this option must not be set when using the  
+TCAP module, as that module does not support 
+on behalf reassembly of SCCP segments. 
+6 SCPXF_8BIT_SLS If set, use 8-bit SLS values, use with 
+SCPF_24PC . If not set use 5-bit SLS. 
+7 SCPXF_SEGMENTAT 
+ION Enable support for Segmentation/Reassembly 
+procedures.  
+8 SCPXF_NO_CALLING 
+_PC Do not insert Calling Point Code for messages 
+from MTP to the SCCP user 
+9 SCPXF_FORCE_ 
+XUDT Set this extended option to force XUDT 
+messages to be sent in preference to UDT 
+messages. The XUDT message will include the 
+hop counter value specified in the hop_counter 
+parameter. If this hop counter parameter is not 
+specified then a default value of 15 (0xf) is used 
+instead. 
+10 SCPXF_VALIDATE_ 
+PCLASS Set this extended option to validate message 
+types against SCCP protocol classes. Invalid 
+messages will be rejected with a message 
+SCP_MSG_MAINT_IND (0x761) and a status 
+value of SCPEV_STX_ERR (0xb). 
+11 SCPXF_IGNORE_ 
+GTT_NAT_IND The default GTT handling will take the value 
+national/spare bit from the configured primary or 
+secondary address. If this extended option is set 
+then the value of the national/spare bit will be 
+copied from the original pre-translated address. 
+The handling of addresses which do not require 
+translation is unchanged. 
+SCCP Programmer's Manual Issue 7 
+page 64 
+Bit Mnemonic Description 
+12 SCPXF_SCMG_SST_ 
+SUPPORT The mode can optionally support the handling of 
+received SST message for SCCP Management 
+itself (sub-system 1). Set this extended option to 
+make the module respond with a SSA if it 
+receives an SST for the local point code and 
+SSN 1. 
+13 SCPXF_SWAP_ 
+UDT_ADDR By default the module uses the local pc and an 
+unknown SSN for the calling party address of 
+the UDTS/XUDTS. If this extended option is set 
+then the called and calling party addresses in 
+the UDT/XUDT are swapped for the 
+UDTS/XUDTS. The option has no affect on the 
+addresses which are not in UDTS/XUDTS 
+messages. 
+ 
+base_id 
+The first connection id that may be used by the SCCP module for incoming 
+connections. The subsequent top_id - base_id connection id’s are used solely 
+by SCCP for incoming connections. Local sub-systems must not use values 
+within this range for outgoing connections. 
+top_id 
+The highest connection id that the SCCP module may use for incoming 
+connections. Depending on the setting of base_id and top_id, this value may 
+be assigned for use with either an outgoing or incoming connection. 
+min_id 
+The first connection id. Depending on the setting of base_id and top_id, this 
+value may be assigned for use with either an outgoing or incoming connection. 
+max_id 
+The last connection id present in the system. The total number of requested 
+connection id’s is max_id - min_id. This is compared to a compile time 
+constant to ensure that the SCCP module has sufficient internal resources to 
+handle the requested number of connection id’s. 
+isup_id 
+Module id of the Type A ISDN user Part. 
+nc 
+Used in systems supporting Network Context handling to indicate which 
+network context should be implemented by this SCCP instance. Set to zero if 
+Network Context handling is not required. 
+ Section 10 Non-Primitive Interface 
+page 65 
+hop_counter 
+ Default hop counter value to be used for XUDT/XUDTS messages where the 
+user does not which to specify a different value per-message or for situations 
+where an SCCP message is sent automatically by the module such as XUDTS 
+messages. 
+error_offset 
+Should be set to 0 by the user. The error offset field gives information about 
+the byte offset of the parameter area in SCP_MSG_CONFIG message which 
+causes the configuration to fail. It will be set to zero if there is no error.  
+SCCP Programmer's Manual Issue 7 
+page 66 
+10.2 Configure Timers Request 
+Synopsis: 
+ 
+Message used to configure the SCCP module timer values. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_CNF_TIM (0x7748) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req used to request a confirmation 
+class 0 
+status 0 
+err_info 0 
+len 40 (or zero, see below) 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 tim_ver - must be set to one 
+1 1 Reserved for future use, must be set to zero 
+2 2 T_stat_info timer value 
+4 2 T_coord_chg timer value 
+6 2 T_ignore_sst timer value 
+8 2 Tx timer value 
+10 2 Ts timer value 
+12 2 T_hbt timer value 
+14 2 T_bpa (broadcast propagation allowance) 
+16 2 T_conn (connection timer) 
+18 2 T_ias (transmit inactivity timer) 
+20 2 T_iar (receive inactivity timer) 
+22 2 T_rel (release timer) 
+24 2 T_rpt_rel (repeat release timer) 
+26 2 T_int (interval timer) 
+28 2 T_reset (reset timer) 
+30 2 T_fr (local ref freeze timer - ANSI only) 
+32 2 T_conn_inc (incoming connection timer, 
+T_CONN_INT option only) 
+34 2 T_guard (restart guard timer) 
+36 4 Reserved for future use, must be set to zero 
+ 
+ Section 10 Non-Primitive Interface 
+page 67 
+Description: 
+ 
+This message is used to configure the SCCP management timers. The 
+message can be issued at any time after the SCM_MSG_CONFIG message. 
+Timer values are in multiples of the SCCP timer tick period which should 
+usually be 100ms. The new timer values take effect when the timer is next 
+started. 
+ The timers may be set to their default values (shown in the following table 
+which assumes a tick period of 100ms) by sending a message with the 
+parameter length set to zero. 
+Timer Default value     (in 
+timer ticks) Equivalent value (in seconds) 
+T_stat_info 300 30 
+T_coord_chg 50 5 
+T_ignore_sst 10 1 
+Tx 20 2 
+Ts 20 2 
+T_hbt 300 30 
+T_bpa 10 1 
+T_conn 1200 120 
+T_ias 1200 120 
+T_iar 3600 360 
+T_rel 200 20 
+T_rpt_rel 200 20 
+T_int 600 60 
+T_reset 200 20 
+T_fr 6000 600 
+T_conn_inc 1200 120 
+T_guard 9600 960 
+ 
+T_stat_info 
+SCCP management timer, delay between requests for sub-system status 
+information. 
+T_coord_chg 
+SCCP management timer, maximum time allowed for a SOG to be received in 
+response to a SOR before the co-ordinated state change is aborted. 
+T_ignore_sst 
+SCCP management timer, time period after receiving SOG during which any 
+received SST messages will be discarded. 
+SCCP Programmer's Manual Issue 7 
+page 68 
+Tx 
+SCCP management timer signalling point congestion abatement timer. Time 
+between reducing the congestion of a signalling point by one level. 
+Ts 
+SCCP management sub-system congestion abatement timer. Time between 
+reducing the congestion of a sub-system by one level. 
+T_hbt 
+Local sub-system heartbeat detection timer. When the local sub-system 
+heartbeat mechanism is enabled this timer is started each time a UIS request 
+is received from the local sub-system. If the timer expires the local sub-system 
+is marked as prohibited. 
+T_bpa 
+Broadcast propagation allowance. This timer value is used in conjunction with 
+the distributed SCCP broadcast mechanism which allows multiple instances of 
+the SCCP module to run at a single signalling point. It represents the 
+additional time by which management timers are extended when running at 
+the non-controlling SCCP instance. The parameter is only applicable if the 
+distributed SCCP broadcast mechanism is enabled and otherwise should be 
+set to zero. 
+T_conn 
+Waiting for connection confirm timer. A connection attempt is terminated if a 
+connection confirm is not received in response to a connection request within 
+this time. 
+T_ias 
+Transmit inactivity timer. Periodic “Inactivity Test” IT messages are sent to the 
+remote SCCP when no other messages have been sent on the connection for 
+the timer duration. 
+T_iar 
+Receive inactivity timer. The connection is terminated if no messages are 
+received from the remote SCCP node for the duration of this timer. 
+T_rel 
+Release timer. Used to re-send the “connection released” RLSD message to 
+the remote SCCP node in the event that a “release confirm” RLC message is 
+not received in response. 
+T_rpt_rel 
+On the initial expiry of “T_rel” the timer is restarted with duration “T_rpt_rel” 
+and RLSD subsequently sent at “T_rpt_rel” intervals. 
+T_int  
+On the initial expiry of “T_rel” timer “T_int” is started. This is used to terminate 
+the connection if “release confirm” RLC is not received. 
+ Section 10 Non-Primitive Interface 
+page 69 
+T_reset 
+Reset timer. This timer controls class 3 flow control reset. The connection is 
+terminated on expiry of this timer if the remote SCCP node fails to confirm the 
+reset. 
+Note: This parameter must currently be set to zero. 
+T_fr 
+Local reference freeze timer. This timer is required for ANSI operation only 
+and is used to determine the period for which the internal SCCP “connection 
+reference”  must be “frozen” to prevent its re-use. This mechanism ensures 
+that connections do not erroneously handle messages bearing the “connection 
+reference” of a previous connection under error conditions. 
+The internal structure of the SCCP module guards against connection 
+reference re-use. 
+T_conn_inc 
+Incoming connection timer. This optional timer is started on receipt of a 
+Connection Request from a remote SCCP node. If a valid N-CONNECT 
+response is not issued by the user within this time, the connection refusal 
+procedure is automatically initiated. (Connection Refused is returned to the 
+remote SCCP and N-DISCONNECT to the local sub-system). If this timer is 
+not used, connection resources within the SCCP module may become 
+permanently assigned to incoming connections if no N-CONNECT-Response 
+primitive is issued by local sub-systems response to an incoming N- 
+CONNECT-Indication. After a prolonged period, these resources may become 
+exhausted. 
+T_guard 
+Restart Guard timer. This timer operates during the SCCP node restart when 
+the validity of the connection data is unknown. During this period, any existing 
+connections may be terminated by remote SCCP nodes by use of the inactivity 
+test. All received messages (except RLSD) are discarded. Once this timer 
+expires, a Maintenance Indication is issued and the SCCP module resumes 
+normal operation. 
+SCCP Programmer's Manual Issue 7 
+page 70 
+10.3 Configure Sub-System Resource Request 
+Synopsis: 
+ 
+Message used to configure local-sub-systems, remote sub-systems and 
+remote signalling points in the SCCP module. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_CNF_SSR (0x7741) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 40 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 cnf_ver - must be set to zero 
+1 1 ssr_type - Resource type: LSS, RSP or RSS 
+2 1 Module_id - Local sub-system module_id 
+3 1 mult_ind - Multiplicity Indicator 
+4 4 spc – Signalling point code 
+8 1 ssn – Sub-system number 
+9 1 mgmt_id – Per subsystem management  
+module 
+10 2 ssr_flags - Run time options (see below) 
+12 4 pc_mask – RSP point code mask 
+16 24 Reserved for future use, must be set to zero 
+ 
+Description: 
+ 
+This message is used to configure all the resources known to the SCCP 
+module. One resource is configured each time the message is issued. Before 
+a remote sub-system can be configured the remote signalling point must be 
+made known to the SCCP module. 
+ Resources can be removed (using the SCP_MSG_END_SSR message) and 
+re-configured without needing to re-start or re-configure the module as a 
+whole. However before attempting to remove a local sub-system it must be 
+marked as prohibited. 
+ Section 10 Non-Primitive Interface 
+page 71 
+ The point code mask (pc_mask) is used to provide partial point code 
+matching during message routing.  Bits set to 1 in the mask will not be used in 
+point code comparison for this RSP, ie. a message with a dpc which when 
+masked match this RSP, the message will be routed to this point code.  SCCP 
+will always look for a full match before looking for a partial match. 
+ssr_type 
+The type of sub-system resource to which the message refers, either local 
+sub-system, remote sub-system or remote signalling point. This field is coded 
+as shown in the table below, the remaining fields in the parameter area have 
+different meanings depending on the value of this field. 
+module_id 
+The module id of the local sub-system user module. Used only for configuring 
+local sub-systems, otherwise it must be set to zero.  Typically the value would 
+be 0x14 indicating TCAP. 
+mult_ind 
+The sub-system multiplicity indicator. This is a configuration parameter 
+(relating only to local sub-systems). It is used by the SCCP module whenever 
+it issues an SCCP management message to the network which relates to the 
+local sub-system. 
+spc 
+Signalling Point Code of the remote signalling point or remote sub-system. 
+ssn 
+Sub-system number of either the local sub-system or the remote sub-system. 
+ The following table shows the parameters used to configure each type of 
+resource: 
+Parameter RSP RSS LSS 
+ssr_type 1 2 3 
+module_id 0 0 module_id 
+mult_ind 0 0 mult_ind 
+spc spc spc 0 
+ssn 0 ssn ssn 
+ 
+mgmt_id 
+Module id to which management indications for this sub-system should be 
+sent. If this parameter is set to zero, management indications will be sent to 
+the configured SCCP user module. 
+ 
+ssr_flags 
+Run time options assigned according to the following table: 
+Bit Mnemonic Description 
+SCCP Programmer's Manual Issue 7 
+page 72 
+0 SSRF_HBT Local sub-system heartbeat detection 
+enable. If set to 1, the SCCP module will 
+expect to receive UIS requests from the 
+local sub-system on a periodic basis whilst 
+the LSS is available. If no UIS message is 
+received for a period determined by the 
+timer Thbt then SCCP will assume that the 
+LSS is no longer available. If set to 0 the 
+heartbeat detection mechanism is 
+disabled. This bit must always be set to 
+zero if the resource is not a LSS. 
+1 SSRF_NAT If this bit is not set then the SSR is 
+assumed to be international.  For national, 
+set bit. 
+2 SSRF_RSS_AVAIL Set this option to indicate that the 
+specified Remote Sub-System should be 
+available immediately on reception of an  
+MTP Resume for the appropriate Remote 
+Signalling Point. 
+The default behavior for the module is to 
+initiate a sub-system test (SST) procedure 
+30 seconds after an MTP-Resume has 
+been received for a remote signaling 
+point. This option is only appropriate for 
+remote sub-systems and has no affect on 
+remote signalling points or local sub- 
+systems. 
+3 - 
+15  Reserved for future use, must be set to zero 
+ 
+pc_mask 
+ Remote signalling point code mask. 
+ Section 10 Non-Primitive Interface 
+page 73 
+10.4 End Sub-System Resource Request 
+Synopsis: 
+ 
+Message used to remove local-sub-systems, remote sub-systems and remote 
+signalling points from the SCCP module configuration. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_END_SSR (0x7742) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 40 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 cnf_ver - must be set to zero 
+1 1 ssr_type - Resource type: LSS, RSP or RSS 
+2 1 module_id - Local sub-system module_id 
+3 1 mult_ind - Multiplicity Indicator 
+4 4 spc - Signalling point code 
+8 1 ssn - Sub-system number 
+9 1 Reserved for future use, must be set to zero 
+10 2 ssr_flags - must be set to zero 
+12 28 Reserved for future use, must be set to zero 
+ 
+Description: 
+ 
+This message is used to remove previously configured resources from the 
+SCCP module. One resource is released each time the message is issued.  
+ Resources can be removed and re-configured (using the 
+SCP_MSG_CNF_SSR message) without needing to re-start or re-configure 
+the module as a whole. However before attempting to remove a local sub- 
+system it must be marked as prohibited. 
+ The parameter area is the same as for the SCP_MSG_CNF_SSR message  
+SCCP Programmer's Manual Issue 7 
+page 74 
+(see previous section). The following table shows the parameters used to end each 
+type of resource: 
+Parameter RSP RSS LSS 
+ssr_type 1 2 3 
+module_id 0 0 0 
+mult_ind 0 0 0 
+spc spc spc 0 
+ssn 0 ssn ssn 
+ 
+ Section 10 Non-Primitive Interface 
+page 75 
+10.5 Add Concerned Resource Request 
+Synopsis: 
+ 
+Message used to add a concerned resource to either a local-sub-system, 
+remote sub-system or remote signalling point in the SCCP module. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_ADD_CONC (0x7743) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len 32 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 cnf_ver - must be set to zero 
+1 1 ssr_type - Resource type (LSS/RSP/RSS) 
+2 4 ssr_spc - Signalling point code 
+6 1 ssr_ssn - Sub-system number 
+7 1 conc_type - Concerned type (LSS/RSP) 
+8 4 conc_spc - Concerned signalling point code 
+12 1 conc_ssn - Concerned sub-system number 
+13 19 Reserved for future use, must be set to zero 
+ 
+Description: 
+ 
+This message is used to add 'concerned' resources to any of the resources 
+already configured within the SCCP module. The concerned resource (which 
+must be either a local sub-system or a remote signalling point but NOT a 
+remote sub-system) will receive notification whenever the status of the other 
+resource changes. 
+ Concerned resources can be freely added and removed subject to not 
+exceeding the maximum number of concerned entities for any resource. 
+SCCP Programmer's Manual Issue 7 
+page 76 
+ssr_type 
+The type of the SSR resource which is to be monitored by the concerned 
+resource. This resource must already have been configured using the 
+Configure Sub-System Request message. Values are as defined for 
+SCP_MSG_CNF_SSR message. 
+ssr_spc 
+The signalling point code of the resource which is to be monitored. This field is 
+only used when the ssr_type is RSP or RSS and should otherwise be set to 
+zero. 
+ssr_ssn 
+The sub-system number of the resource which is to be monitored. This field is 
+only used when the ssr_type is LSS or RSS and should otherwise be set to 
+zero. 
+conc_type 
+The type of the concerned resource. The concerned resource must be either a 
+Local sub-system (LSS) or a Remote signalling point (RSP) and should 
+already have been made known to the SCCP module using the Configure 
+Sub-System Request message. 
+conc_spc 
+The signalling point code of the concerned resource that will be notified when 
+the status of ssr_spc, ssr_ssn changes. This field is only used when 
+conc_type is RSP and should otherwise be set to zero. 
+conc_ssn 
+The sub-system number code of the concerned resource that will be notified 
+when the status of ssr_spc, ssr_ssn changes. This field is only used when 
+conc_type is LSS and should otherwise be set to zero. 
+ Section 10 Non-Primitive Interface 
+page 77 
+10.6 End Concerned Resource Request 
+Synopsis: 
+ 
+Message used to remove a concerned resource from either a local-sub- 
+system, remote sub-system or remote signalling point in the SCCP module. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_END_CONC (0x7744) 
+Id 0 
+Src Sending module_id 
+Dst SCP_TASK_ID 
+rsp_req used to request a confirmation 
+Hclass 0 
+Status 0 
+err_info 0 
+Len 32 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 cnf_ver - must be set to zero 
+1 1 ssr_type - Resource type (LSS/RSP/RSS) 
+2 4 ssr_spc - Signalling point code 
+6 1 ssr_ssn - Sub-system number 
+7 1 conc_type - Concerned type (LSS/RSP ) 
+8 4 conc_spc - Concerned signalling point code 
+12 1 conc_ssn - Concerned sub-system number 
+13 19 Reserved for future use, must be set to zero 
+ 
+Description: 
+ 
+This message is used to remove 'concerned' resources from the list of 
+concerned entities already configured for a resource within the SCCP module. 
+ Concerned resources can be freely added and removed subject to not 
+exceeding the maximum number of concerned entities for any resource. 
+ 
+ Parameter types as defined for the SCP_MSG_ADD_CONC message. 
+ 
+SCCP Programmer's Manual Issue 7 
+page 78 
+10.7 Add Translation Request 
+Synopsis: 
+ 
+Message used to add a translation to the SCCP global title translation table. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_GTT_ADD (0x7745) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len Number of bytes in parameter area 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 len - 1 Variable length data in Name-Length-Data 
+format containing Target address, Primary 
+address and optionally Backup address and 
+GTT Mask. The format of each parameter is 
+described in section 8.2. 
+len - 1 1 Set to zero indicating end of message 
+ 
+Description: 
+ 
+This message is used to add a primary and (optionally) a backup translation 
+for the specified global title to the SCCP global title translation table. 
+ The parameter area contains between two and four parameters in Name- 
+Length-Data format. The Target address is the global title to be entered into 
+the Global Title Translation Table. The Primary address is the primary 
+translation for the global title. The GTT Mask is a digit pattern used to define 
+the behaviour of the translation.  The Backup address (if present) is the back- 
+up translation for the global title. The back-up translation will be used 
+whenever the primary address is marked as prohibited. 
+ 
+ Section 10 Non-Primitive Interface 
+page 79 
+10.8 Modify Translation Request 
+Synopsis: 
+ 
+Message used to modify a translation in the SCCP global title translation table. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_GTT_MOD (0x7747) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len Number of bytes in parameter area 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 len - 1 Variable length data in Name-Length-Data 
+format containing Target address plus either 
+Primary address, Backup address, GTT Mask 
+or all three. The format of each parameter is 
+described in section 8.2. 
+len - 1 1 Set to zero indicating end of message 
+ 
+Description: 
+ 
+This message is used to modify an existing global title translation table entry. 
+ The parameter area is the same as for the SCP_MSG_GTT_ADD message. 
+The Target address must already exist in the translation table, otherwise an 
+error status will be returned.  
+ The existing translations in the translation table will be replaced by the new 
+addresses supplied. Note that it is possible to modify the primary translation, 
+the backup translation, or GTT Mask or all three. If the Primary address is not 
+supplied then the existing primary translation is retained. If the Backup 
+address is not supplied then the existing backup translation is retained 
+ 
+SCCP Programmer's Manual Issue 7 
+page 80 
+10.9 End Translation Request 
+Synopsis: 
+ 
+Message used to remove a translation from the SCCP global title translation 
+table. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_GTT_REM (0x7746) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req used to request a confirmation 
+hclass 0 
+status 0 
+err_info 0 
+len Number of bytes in parameter area 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 len - 1 Variable length data in Name-Length-Data 
+format containing Target address to be 
+removed from the global title translation table. 
+The format of the parameter is described in 
+section 8.2. 
+len - 1 1 Set to zero indicating end of message 
+ 
+Description: 
+ 
+This message is used to remove a translation from the SCCP Global Title 
+Translation Table. 
+ The parameter area contains the global title to be removed from the 
+translation table. 
+ 
+ Section 10 Non-Primitive Interface 
+page 81 
+10.10 Get Translation Request 
+Synopsis: 
+ 
+Message used to retrieve a translation from the SCCP global title translation 
+table. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_GTT_GET (0x774b) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len Number of bytes in parameter area 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 len - 1 Variable length data in Name-Length-Data 
+format containing Target address 
+(SCPPN_TARGET_ADDR)  to be retrieved 
+from the global title translation table. The 
+format of the parameter is described in 
+section 8.2. 
+len - 1 1 Set to zero indicating end of message 
+ 
+Description: 
+ 
+This message is used to get a translation from the SCCP Global Title 
+Translation Table. 
+ The parameter area contains the global title (target address) to get from the 
+translation table. 
+ The result (containing the target address [SCPPN_TARGET_ADDR], the 
+primary address [SCPPN_PRIMARY_ADDR], a backup address if present 
+(SCPPN_BACKUP_ADDR) and the GTT mask [SCPPN_GTT_MASK]]) is sent 
+by the SCCP module through the confirmation message. The module sending 
+the message must set the sending layer's bit in the rsp_req field to cause a 
+confirmation message containing the result to be returned. 
+SCCP Programmer's Manual Issue 7 
+page 82 
+10.11 Test Translation Request 
+Synopsis: 
+ 
+Message used to test a translation. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+Type SCP_MSG_GTT_TEST (0x774c) 
+Id Can be used to identify the request. 
+Src Sending module_id 
+Dst SCP_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+Hclass 0 
+Status 0 
+err_info 0 
+Len Number of bytes in parameter area 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 len – 1 Variable length data in Name-Length-Data 
+format containing Called address 
+(SCPPN_CALLED_ADDR)  to be tested from 
+the global title translation table. The format of 
+the parameter is described in section 8.2. 
+len - 1 1 Set to zero indicating end of message 
+ 
+Description: 
+ 
+This message is used to check the result of a translation. 
+ The parameter area contains the called address (SCPPN_CALLED_ADDR) to 
+test the translation. 
+ The id can be used to identify a request when multiple requests are sent to the 
+SCCP module without waiting for a response. This id is not modified by the 
+SCCP module. 
+ The result (containing a translated SCPPN_CALLED_ADDR) is sent by the 
+SCCP module through the confirmation message. The module sending the 
+message must set the sending layer's bit in the rsp_req field to cause a 
+confirmation message containing the result of the translation to be returned. 
+ A status 0 indicates a successful translation.  
+ Section 10 Non-Primitive Interface 
+page 83 
+ 
+10.12 Read SCCP Global Statistics Request 
+Synopsis: 
+ 
+Message used to read the global statistics maintained by the SCCP module. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_R_STATS (0x6752) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req Sending layer's bit must be set 
+hclass 0 
+status 1 to reset all statistics, otherwise 0 
+err_info 0 
+len 92 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 version - must be set to zero. 
+1 3 Reserved for future use, must be set to zero 
+4 4 rtf_ttype - Table 7/Q.791 para 7.1 
+8 4 rtf_tval - Table 7/Q.791 para 7.2 
+12 4 rtf_net_fail - Table 7/Q.791 para 7.3 
+16 4 rtf_net_cong - Table 7/Q.791 para 7.4 
+20 4 rtf_ss_fail - Table 7/Q.791 para 7.5 
+24 4 rtf_ss_cong - Table 7/Q.791 para 7.6 
+28 4 rtf_uu - Table 7/Q.791 para 7.7 
+32 4 rtf_sif_err - length exceeds max_sif 
+36 4 rtf_too_long - max. length exceeded 
+40 4 rtf_unknown - Table 7/Q.791 para 7.9 
+44 4 stx_err - Table 7/Q.791 para 7.8 
+48 4 sor_grant - Table 8/Q.791 para 8.6 
+52 4 sor_deny - Table 8/Q.791 para 8.7 
+56 4 udts_tx - Table 9/Q.791 para 9.1 
+60 4 udts_rx - Table 9/Q.791 para 9.2 
+64 4 num_msg - Table 9/Q.791 para 9.3 
+  continued
+SCCP Programmer's Manual Issue 7 
+page 84 
+ 
+continued   
+68 4 lss_msg - Table 9/Q.791 para 9.4 
+72 4 num_gtt - Table 9/Q.791 para 9.5 
+76 4 txm_cl0 - Table 9/Q.791 para 9.6 
+80 4 txm_cl1 - Table 9/Q.791 para 9.6 
+84 4 rxm_cl0 - Table 9/Q.791 para 9.7 
+88 4 rxm_cl1 - Table 9/Q.791 para 9.7 
+ 
+Description: 
+ 
+This message allows the user to read the global Q.791 statistics from the 
+SCCP module. The message should be issued by the user with the version 
+initialised as shown above and all other fields set to zero. The message 
+returned by the SCCP module will contain all the statistics. 
+ The SCCP module automatically maintains a number of counters to record the 
+number of occurrences of particular events in accordance with ITU-T 
+recommendation Q.791. The values of the counters of global scope within the 
+SCCP module can be read using this message. The counters can optionally 
+be reset to zero following the read operation. 
+ If the status field is set to 1 the counters will all be reset. If it is not required to 
+reset the counters then the status field should be set to zero and the counters 
+will continue to accumulate from the current count after the read operation. 
+Confirmation Message: 
+ 
+The module sending the message must set the sending layer's bit in the 
+rsp_req field to cause a confirmation message containing the statistics to be 
+returned. 
+ Section 10 Non-Primitive Interface 
+page 85 
+10.13 Read SCCP SSR Statistics Request 
+Synopsis: 
+ 
+Message used to read the sub-system resource status and statistics 
+maintained by the SCCP module. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_R_SSR_STATS (0x6753) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req Sending layer's bit must be set 
+hclass 0 
+status 1 to reset all statistics, otherwise 0 
+err_info 0 
+len 32 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 version - must be set to zero. 
+1 1 ssr_type - set by sending module. 
+2 4 spc - set by sending module. 
+6 1 ssn - set by sending module. 
+7 1 state - returned by SCCP 
+8 1 cong_level - returned by SCCP 
+9 4 bss_msg - Table 9/Q.791, para 9.8. 
+13 19 Reserved for future use, must be set to zero 
+ 
+Description: 
+ 
+This message allows the user to read the global Q.791 statistics from the 
+SCCP module. 
+ The SCCP module automatically maintains a number of counters to record the 
+number of occurrences of particular events in accordance with ITU-T 
+recommendation Q.791. The values of the counters relating to a particular 
+sub-system within the SCCP module can be read using this message. In 
+addition the current state (Prohibited/Allowed) and congestion level is 
+returned. The count of messages sent to a back-up sub-system can optionally 
+be reset to zero following the read operation by setting the status field to 1. 
+Otherwise the counter the status field should be set to zero and the counter 
+will continue to accumulate from the current count after the read operation. 
+SCCP Programmer's Manual Issue 7 
+page 86 
+Confirmation Message: 
+ 
+The module sending the message must set the sending layer's bit in the 
+rsp_req field to cause a confirmation message containing the status and 
+statistics to be returned. 
+ssr_type 
+As defined for SCP_MSG_CNF_SSR message. 
+spc 
+The signalling point code of the resource. 
+ssn 
+The sub-system number of the resource. 
+state 
+The current availability state of the sub-system resource from the following 
+table. 
+Mnemonic Value Meaning 
+SCPSSRS_PROHIBITED 0 Sub-system resource Prohibited 
+SCPSSRS_ALLOWED 1 Sub-system resource Allowed 
+ 
+cong_level 
+The current congestion level associated with the resource, (either 0, 1, 2 or 3). 
+bss_msg 
+The number of messages destined for the sub-system resource that were sent 
+(or attempted to be sent) to backup sub-systems due to the resource being 
+unavailable. 
+ Section 10 Non-Primitive Interface 
+page 87 
+10.14 Read SCCP RAM Request 
+Synopsis: 
+ 
+Message used for diagnostic purposes to return the address of the SCCP 
+modules internal data storage area. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_R_RAM (0x6750) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req Sending layer's bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 4 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 4 Base address of SCCP module's global RAM 
+structure written by SCCP module in 
+response message. 
+ 
+Description: 
+ 
+This message is provided solely for diagnostic purposes to allow the user to 
+locate the base address of the SCCP modules internal data structure. 
+ 
+SCCP Programmer's Manual Issue 7 
+page 88 
+10.15 Read GTT Index Mask 
+Synopsis: 
+ 
+Message used to read the GTT index mask of the SCCP translation table. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+Type SCP_MSG_R_GTT_MASK (0x6754) 
+Id 0 
+Src Sending module_id 
+Dst SCP_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+Hclass 0 
+Status 0 
+err_info 0 
+Len 320 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 Variable Used for the reply. 
+ 
+Description: 
+ 
+This message is used to retrieve information about the SCCP translation table. 
+It returns a bit mask where 1 means than the rule exists at that specific index.  
+It is intended that this message is used in conjunction with 
+SCP_MSG_R_GTT. The module sending the message must set the sending 
+layer's bit in the rsp_req field to cause a confirmation message containing the 
+mask to be returned. 
+ 
+ A status 0 indicates a successful operation.  
+ Section 10 Non-Primitive Interface 
+page 89 
+10.16 Read Translation  
+Synopsis: 
+ 
+Message used to extract a rule from the SCCP translation table based on a 
+specific index. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+Type SCP_MSG_R_GTT (0x6755) 
+Id Index of the rule 
+Src Sending module_id 
+Dst SCP_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+Hclass 0 
+Status 0 
+err_info 0 
+Len 320 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 Variable Used for the reply. 
+Variable length data in Name-Length-Data 
+format containing Target address 
+(SCPPN_TARGET_ADDR), the Primary 
+address (SCPPN_PRIMARY_ADDR), the 
+Backup address of present 
+(SCPPN_BACKUP_ADDR) and GTT mask 
+(SCPPN_GTT_MASK). The format of the 
+parameter is described in section 8.2. 
+ 
+len - 1 1 Set to zero indicating end of message 
+ 
+Description: 
+ 
+This message is used to extract a rule from the SCCP translation table. The 
+result will contain a SCCP target address, primary address, backup address (if 
+present) and GTT mask. The module sending the message must set the 
+sending layer's bit in the rsp_req field to cause a confirmation message 
+containing the rule to be returned. 
+ 
+ A status 0 indicates a successful operation.  
+SCCP Programmer's Manual Issue 7 
+page 90 
+10.17 Read SCCP SSR Request 
+Synopsis: 
+ 
+Message used for diagnostic purposes to return the address of a sub-system 
+resource structure in the SCCP module. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_R_SSR (0x6751) 
+id ssr_id  (i.e. 0 ... 1 less than number of SSRs) 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req Sending layer's bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 4 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 4 Base address of sub-system resource 
+structure written by SCCP module in 
+response message. 
+ 
+Description: 
+ 
+This message is provided solely for diagnostic purposes to allow the user to 
+locate internal data structures within the SCCP module. 
+ Section 10 Non-Primitive Interface 
+page 91 
+10.18 Restart Request 
+Synopsis: 
+ 
+Message used to invoke the SCCP connection orientated restart process.  
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_RESTART (0x 7749) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID 
+rsp_req Sending layer's bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 0 
+ 
+Description: 
+ 
+This message is provided to allow the user application to invoke the restart 
+procedure within the SCCP module.  
+ This may be invoked after a failure when the state of existing connections is 
+not known. The restart process sets all existing SCCP connections inactive 
+without exchange of messages with peer SCCP entities. Remote SCCP nodes 
+which are still maintaining connections with the local node should detect the 
+inactivity and release their connections. The user application should not use 
+connection-oriented services until restart is complete. The SCCP module will 
+discard any connection-oriented primitive requests during this time. 
+ A maintenance indication is sent to the user when the restart procedure is 
+complete. The user application (local sub-system) is responsible for re- 
+establishing any lost connections. 
+ Connectionless operation is not affected by restart.  
+SCCP Programmer's Manual Issue 7 
+page 92 
+10.19 Multiple Instance Broadcast Indication 
+Synopsis: 
+ 
+Message used to convey SCCP management status between multiple 
+instances of the SCCP module running at the same signalling point. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_SMB_IND (0x0763) 
+id 0 
+src SCP_TASK_ID 
+dst smb_id 
+rsp_req 0 
+hclass 0 
+status sccp_instance of sending SCCP module 
+err_info 0 
+len Variable 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 version 
+1 1 scmg_type  
+2 1 ssn  
+3 pc_len spc  
+3 + 
+pc_len 1 Multiplicity indicator or  Congestion Level 
+ 
+Description: 
+ 
+This message is used when the SCCP protocol is running as a number of 
+distributed instances at a single signalling point. The message is issued by 
+one instance to the smb_id module which should broadcast the message to all 
+other instances of the SCCP module. The content of the message has no 
+significance outside the SCCP module and is subject to change without notice. 
+ Section 10 Non-Primitive Interface 
+page 93 
+Parameters: 
+ 
+scmg_type 
+As defined in the format id of the SCP_MSG_SCMG_REQ messages. Also 
+defined in the sccp include file (scp_inc.h) e.g. SCPMT_SSA (1). 
+ spc 
+The signalling point code of the resource. 
+ ssn 
+The sub-system number of the resource. 
+ Multiplicity indicator 
+Multiplicity indicator for the sub-system resource. Present for messages of 
+type SSA, SSP, SST, SOR, SOG, SPA and SPP only. 
+ Congestion Level 
+Congestion level of the sub-system resource. Present for messages of type 
+SSC and SPC only. 
+ 
+SCCP Programmer's Manual Issue 7 
+page 94 
+10.20 SCCP Trace Mask Request 
+Synopsis: 
+ 
+Message used to configure SCCP to send a trace message to the trace 
+module whenever a specific message type is sent or received.  The trace 
+module is identified in the SCCP configuration request message. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCPMSGTRACEMASK (0x5754) 
+id 0 
+src Sending module ID 
+dst SCPTASKID 
+rspreq Used to request a confirmation 
+hclass 0 
+status 0 
+err info 0 
+reserved 0 
+len 12 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 4 opevt mask-Output event trace mask 
+4 4 ipevt mask-Input event trace mask 
+8 4 nonprimmask-Non-primitive trace mask 
+ 
+ Section 10 Non-Primitive Interface 
+page 95 
+op_evt_mask 
+ 
+The output event trace mask. This is a 32-bit value with bits set to 1 to cause a 
+trace message to be sent to the system trace module when SCCP sends the 
+associated protocol message.   
+31     30     29     28     27     26     25     24 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |   0  | 
+|      |      |      |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+ 
+  23     22     21     20     19     18     17     16 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |   0  | 
+|      |      |      |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+ 
+  15     14     13     12     11     10      9      8 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |   0  | 
+|      |      |      |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+ 
+   7      6      5      4      3      2      1      0 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |  MTP | USER | 
+|      |      |      |      |_     |_     |TX REQ|RX IND| 
++------+------+------+------+------+------+------+------+ 
+ 
+ USER_RX_IND – UDT message sent from SCCP to SCCP user. 
+MTP_TX_REQ – Message sent from SCCP to MTP. 
+  
+ 
+ip_evt_mask 
+ 
+The input event trace mask. This is a 32-bit value with bits set to 1 to cause a trace 
+message to be sent to the system trace module when SCCP receives the associated 
+protocol message.  
+SCCP Programmer's Manual Issue 7 
+page 96 
+ 
+31     30     29     28     27     26     25     24 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |   0  | 
+|      |      |      |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+ 
+  23     22     21     20     19     18     17     16 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |   0  | 
+|      |      |      |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+ 
+  15     14     13     12     11     10      9      8 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |   0  | 
+|      |      |      |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+ 
+   7      6      5      4      3      2      1      0 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |MTPSTT| MTP  | USER | 
+|      |      |      |      |_     |_IND  |RX IND|TX_REQ| 
++------+------+------+------+------+------+------+------+ 
+ 
+ USER_TX_REQ – A primitive from SCCP-User to SCCP. 
+MTP_RX_IND – Incoming messages from MTP to SCCP. 
+MTP_STT_IND – MTP status indications. 
+ 
+non_prim_mask 
+ 
+The non-primitive trace mask. This is a 32-bit value with bits set to 1 to cause a trace 
+message to be sent to the system trace module when SCCP receives the associated 
+non-primitive message.  
+ 
+ Section 10 Non-Primitive Interface 
+page 97 
+31     30     29     28     27     26     25     24 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |   0  | 
+|      |      |      |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+ 
+  23     22     21     20     19     18     17     16 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |   0  | 
+|      |      |      |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+ 
+  15     14     13     12     11     10      9      8 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |   0  |   0  |   0  | 
+|      |      |      |      |      |      |      |      | 
++------+------+------+------+------+------+------+------+ 
+ 
+   7      6      5      4      3      2      1      0 
++------+------+------+------+------+------+------+------+ 
+|   0  |   0  |   0  |   0  |   0  |  _0  | UNK  | MGT  | 
+|      |      |      |      |      |      | MSG  |_MSG  | 
++------+------+------+------+------+------+------+------+ 
+ 
+MGT_MSG – All management messages will be traced. 
+UNK_MSG – All unexpected messages will be traced. 
+ 
+SCCP Programmer's Manual Issue 7 
+page 98 
+10.21 Trace Event Indication 
+Synopsis: 
+The MAP trace event masks are used to enable and disable tracing of all 
+protocol and non primitive messages received or sent by MAP. The traced 
+messages are reported as event indications as shown below: 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type MGT_MSG_TRACE_EV (0x0003) 
+id 0 
+src SCCP module id 
+dst Trace module id 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 18 + length of traced data 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 1 source module id 
+1 1 destination module id 
+2 2 id 
+4 2 type 
+6 2 status 
+8 4 timestamp 
+12 4 pointer to the message being traced 
+16 2 data length 
+18 0 .. 280 data - Data taken from the contents of the 
+MSG parameter area. 
+ 
+ Section 10 Non-Primitive Interface 
+page 99 
+10.22 Maintenance Event Indication 
+Synopsis: 
+ 
+Message used by SCCP to indicate a protocol related event to the local 
+maintenance module. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_MAINT_IND (0x0761) 
+id See below 
+src SCP_TASK_ID 
+dst Maintenance module id 
+rsp_req Sending layer's bit must be set 
+hclass 0 
+status Maintenance event code (see below) 
+err_info 0 
+len 0 
+ 
+Description: 
+ 
+This message is used by SCCP to indicate a protocol related event to the 
+maintenance module in accordance with Q.791 
+ The Maintenance event code contained in the status field of the message 
+indicates the type of event. Possible values are listed in the following table 
+which also lists the meaning of the id field in each case: 
+SCCP Programmer's Manual Issue 7 
+page 100 
+ 
+Mnemonic Code id Description 
+SCPEV_RTF_TTYPE 1 0 Routing failure, no translation for 
+specified global title type 
+SCPEV_RTF_TVAL 2 0 Routing failed, no translation for 
+specified address. 
+SCPEV_RTF_NET_FAIL 3 0 Routing failed, network failure. 
+SCPEV_RTF_NET_CONG 4 0 Routing failed, network congestion. 
+SCPEV_RTF_SS_FAIL 5 0 Routing failed, sub-system failure. 
+SCPEV_RTF_SS_CONG 6 0 Routing failed, sub-system congestion. 
+SCPEV_RTF_UU 7 0 Routing failed, unequipped user. (sub- 
+system). 
+SCPEV_RTF_SIF_ERR 8 0 Routing failed, formatted message is 
+greater than the max_sif value 
+specified in the configuration message 
+but less than the maximum permitted 
+by the protocol. 
+SCPEV_RTF_TOO_LONG 9 0 Routing failed, formatted message 
+length greater than that permitted by 
+the protocol. 
+SCPEV_RTF_UNKNOWN 10 0 Routing failed, reason unknown. 
+SCPEV_STX_ERR 11 0 Message received from MTP 
+containing syntax error. 
+SCPEV_SOR_GRANT 12 sub-system id Sub-system out of service granted. 
+SCPEV_SOR_DENY 13 sub-system id Sub-system out of service  denied 
+(T_coord_chg timer expiry). 
+SCPEV_CONN_FAIL 14 connection id Indicates the connection has failed 
+due to loss of received messages 
+from the remote node. This 
+connection is now in “maintenance 
+blocking” state.  
+SCPEV_RESET_FAIL 15 connection id Indicates that a permanent connection 
+has failed due failure to reset. This 
+connection is now in the “maintenance 
+blocking” state.  
+SCPEV_RESTART_IND 16 0 Indicates that the restart procedure 
+has completed. Local sub-systems 
+may now use the connection 
+orientated services. 
+SCPEV_RTF_CANNOT_ 
+REASSEMBLY 17 0 A message has been returned to the remote end as reassembly is not 
+supported at the local node. 
+ 
+Additional information may be added in the parameter area of the 
+SCP_MSG_MAINT_IND message giving more detailed information for the event 
+including a cause value and additional parameters where appropriate.  
+ Section 10 Non-Primitive Interface 
+page 101 
+The following is an example message parameter area showing the 
+SCPEV_RTF_SS_CONG maintenance indication. 
+Parameter Area 
+OFFSET SIZE NAME 
+0 1 Cause value 
+1 3 Point code of replicate sub-system (note least 
+significant byte first as per Q.713) 
+4 1 Sub-system number 
+5 1 Message Priority 
+6 1 Congestion Level 
+ 
+The table below lists all of the maintenance indications together with the list of 
+parameters supported by that indication. 
+Maintenance event code Len Cause 
+value Additional parameters 
+1 SCPEV_RTF_TTYPE 1 0     
+2 SCPEV_RTF_TVAL 1 1     
+3 SCPEV_RTF_NET_FAIL 5 5 or 245 PC SSN   
+4 SCPEV_RTF_NET_CONG 7 6 PC 0 P CL 
+5 SCPEV_RTF_SS_FAIL 5 3 or 243 PC SSN   
+6 SCPEV_RTF_SS_CONG 7 2 or 242 PC SSN P CL 
+7 SCPEV_RTF_UU 5 4 PC SSN   
+8 SCPEV_RTF_SIF_ERR 1 252     
+9 SCPEV_RTF_TOO_LONG 1 253     
+10 SCPEV_RTF_UNKNOWN 1 7 or 8     
+11 SCPEV_STX_ERR 0      
+12 SCPEV_SOR_GRANT   0      
+13 SCPEV_SOR_DENY      0      
+14 SCPEV_CONN_FAIL     0      
+15 SCPEV_RESET_FAIL    0      
+16 SCPEV_RESTART_IND  0      
+17 SCPEV_RTF_CANNOT_ 
+REASSEMBLY 6 10 PC SSN RS  
+ 
+Parameters: 
+Data Len Description 
+Cause Value 1 See Cause Value table (below) 
+PC 3 Originating Point Code (LSB first) 
+SSN 1 Sub-system Number 
+P 1 Message Priority 
+SCCP Programmer's Manual Issue 7 
+page 102 
+Data Len Description 
+RS 1 Remaining Segment counts 
+CL 1 Congestion Level 
+ 
+Cause Values: 
+ 
+Description Value 
+No translation for an address of 
+such nature 0 
+No translation for this specific 
+address 1 
+Remote Subsystem congestion 2 
+Remote Subsystem prohibited 3 
+Unknown Local Subsystem 4 
+Unknown DPC 5 
+DPC congested 6 
+Translation Error 7 
+Hop Counter Failure 8 
+Destination cannot perform 
+reassembly 10 
+Local Subsystem Congestion 242 
+Local Subsystem Prohibited 243 
+DPC Prohibited 245 
+SIF Error (Message too long for 
+MTP3) 252 
+Message too long 253 
+ 
+ 
+ 
+ Section 10 Non-Primitive Interface 
+page 103 
+10.22.1 Management  Event Indication 
+Synopsis: 
+ Message used by SCCP to indicate an implementation specific software 
+related event to the local management module. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type MGT_MSG_EVENT_IND (0x0008) 
+id 0 
+src SCP_TASK_ID 
+dst Management module id 
+rsp_req Used to request a confirmation 
+hclass 0 
+status ERR_NO_SDLSIG (0x2e) 
+err_info 0 
+len 0 
+ 
+Description: 
+ This message is issued by the SCCP module to notify system management of 
+various software events which under normal operating conditions should not 
+occur. These events may be due to lack of system resources or errors within 
+the software. 
+ 
+ 
+SCCP Programmer's Manual Issue 7 
+page 104 
+10.23 Software Event Indication 
+Synopsis: 
+ Message used by SCCP to indicate an implementation specific software 
+related event to the local management module. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_ERROR_IND (0x0762) 
+id See below 
+src SCP_TASK_ID 
+dst Management module id 
+rsp_req Used to request a confirmation 
+hclass 0 
+status Software event code (see below) 
+err_info 0 
+len 0 
+ 
+Description: 
+This message is issued by the SCCP module to notify system management of 
+various software events which under normal operating conditions should not occur. 
+These events may be due to lack of system resources or errors within the software.  
+The Software event code contained in the status field of the message indicates the 
+type of event. Possible values are listed in the following table which also lists the 
+meaning of the id field in each case. 
+Mnemonic Value id Description 
+SCPSWE_SCPM_LOW 3 0 The internal pool of scpm 
+message buffers is running 
+short of entries. If this fault 
+persists, the software should be 
+re-built with more scpm 
+messages in the pool 
+SCPSWE_NO_SCPM 4 0 The pool of scpm message 
+buffers has been exhausted. If 
+this occurs then correct 
+operation of the module is not 
+guaranteed. 
+SCPSWE_BAD_MSG 5 Message type An unsupported (inter-module) 
+message type has been 
+received by the module. 
+ 
+Mnemonic Value id Description 
+ Section 10 Non-Primitive Interface 
+page 105 
+SCPSWE_TIM_START_ERR 8 Timer identifier An attempt was made to re-use 
+an active timer resource. 
+SCPSWE_FMT_ERR 9 0 Format error in user primitive. 
+SCPSWE_TALLOC_ERR 10 0 TFRAME allocation error 
+SCPSWE_UC_ERROR 11 0 The resources for connections 
+available to the user are 
+exhausted 
+SCPSWE_IC_ERROR 12 0 The resources available for 
+intermediate node connections 
+are exhausted 
+SCPSWE_DATA_ERROR 13 0 The available class 3 data 
+buffers are exhausted. Data 
+messages may be discarded. 
+SCPSWE_EDATA_ERROR 14 0 The available class 3 expedited 
+data buffers are exhausted 
+Expedited data messages may 
+be discarded 
+SCPSWE_UC_CONG 15 0 The number of resources for 
+connections available to the 
+user is running low 
+SCPSWE_UC_ABMT 16 0 The number of resources for 
+connections available to the 
+user has recovered 
+SCPSWE_IC_CONG 17 0 The number of resources 
+available for intermediate node 
+connections is running low 
+SCPSWE_IC_ABMT 18 0 The number of resources 
+available for intermediate node 
+connections has recovered 
+SCPSWE_DATA_CONG 19 0 The number of class 3 data 
+buffers available for queuing 
+transmit data is running low. 
+SCPSWE_DATA_ABMT 20 0 The number of class 3 data 
+buffers available for queuing 
+transmit data has recovered. 
+SCPSWE_EDATA_CONG 21 0 The number of class 3 
+expedited data buffers available 
+for queuing transmit expedited 
+data is running low. 
+SCPSWE_EDATA_ABMT 22 0 The number of class 3 
+expedited data buffers available 
+for queuing transmit expedited 
+data has recovered. 
+ 
+SCCP Programmer's Manual Issue 7 
+page 106 
+10.24 Read Revision Request 
+Synopsis: 
+ 
+Message used by SCCP to indicate an implementation specific software 
+related event to the local management module. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type GEN_MSG_MOD_IDENT (0x6111) 
+id 0 
+src Originating module ID 
+dst SCCP_TASK_ID 
+rsp_req Sending layer’s bit must be set 
+hclass 0 
+status 0 
+err_info 0 
+len 28 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 2 type - Currently undefined 
+2 1 maj_rev - Major version number 
+3 1 min_rev - Minor version number 
+4 24 text - Null terminated string giving textual 
+module identity 
+ 
+Description: 
+This message is provided to request a reply indicating the software version for 
+module under test. The parameter areas are filled in by the SCCP module and do not 
+need to be included by the user. On receipt of this request the module returns the 
+message with status "SUCCESS" to the sender including the information requested. 
+ Section 10 Non-Primitive Interface 
+page 107 
+10.25 Module Reset 
+Synopsis: 
+ 
+Message used to return the SCCP module to an un-configured state and 
+allows a new SCCP Configure Module Request to be sent with new 
+parameters. The advantage of this is that it allows SCCP configuration 
+parameters to be changed without having to restart gctload. The module id is 
+unchanged by SCP_MSG_RESET. 
+Message Format: 
+ 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type SCP_MSG_RESET (0x774a) 
+id 0 
+src Sending module_id 
+dst SCP_TASK_ID  
+rsp_req Used to request a confirmation 
+class 0 
+status 0 
+err_info 0 
+len 0 
+ 
+ 
+SCCP Programmer's Manual Issue 7 
+page 108 
+Appendix A. TIMer Services 
+A.1 Timer Services 
+The notion of time in the SCCP module is based on a periodic timer tick received 
+from every 100ms. This ‘tick’ is used to run all SCCP protocol timers. This appendix 
+details the messages that are used by the SCCP module to control timer services. 
+A.2 Keep Time 
+Synopsis: 
+ 
+This message is issued by SCCP to request the timer module to issue a 
+periodic timer tick (TIM_MSG_TM_EXP) message to the SCCP module. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type TIM_MSG_KEEP_TIME (0x7006) 
+id 0 
+src SCCP module id (SCP_TASK_ID) 
+dst Timer module ID (0x00) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 6 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 4 Reserved, should be set to zero if issued by 
+the user and are discarded when received by 
+the timer module 
+4 2 Resolution 
+ 
+ Section 10 Non-Primitive Interface 
+page 109 
+resolution 
+ 
+The number of operating system ticks between timer expiry messages being 
+issued to the SCCP module. This parameter is set internally within the SCCP 
+code. 
+A.3 Time Expiry 
+Synopsis:  
+ 
+Periodic timer tick message issued by the timer module. 
+Message Format: 
+MESSAGE HEADER 
+FIELD NAME MEANING 
+type TIM_MSG_TM_EXP (0xc002) 
+id index of timer in table 
+src Timer module ID (0x00) 
+dst SCCP module id (SCP_TASK_ID) 
+rsp_req 0 
+hclass 0 
+status 0 
+err_info 0 
+len 4 
+PARAMETER AREA 
+OFFSET SIZE NAME 
+0 4 reserved – must be set to zero 
+ 
+ 
+SCCP Programmer's Manual Issue 7 
+page 110 
+Appendix B. Segmentation/Reassembly Support 
+B.1 Introduction  
+The SCCP Segmentation and Reassembly procedures allow peer to peer 
+communication of signalling messages that are longer than the underlying (MTP) 
+protocols can inherently support in a single message. 
+Protocols above SCCP (eg TCAP, MAP, IS41 & INAP) support the handling of ‘Long 
+Messages’. A ‘Long’ message is modified (or ‘segmented’) by SCCP as it passes 
+down the stack into multiple normal length messages for transmission over MTP to 
+the destination. On arrival at the destination the receiving SCCP module reassembles 
+the segments back into a single ‘Long Message’ prior to passing the resulting 
+message up the stack to TCAP. 
+To support this capability the underlying inter-process communication mechanism 
+supports two sizes of message. The user has the ability to configure a quantity of 
+‘Long Messages’ in addition to a quantity of standard length ‘MSG’ messages). 
+As a result of this support users need to ensure the whole system is able to support 
+these changes. Support for the SCCP Segmentation Procedures requires all of the 
+following: 
+• Use of a new Development Package complete with Shared Object or DLL. 
+• All host-based protocols must be upgraded to new versions supporting the 
+‘Long Message’ capability. 
+• All user applications must be re-linked with the new gctlib library. 
+• Applications should be modified to handle the longer parameters now possible 
+when decoding reassembled messages. 
+This appendix describes the configuration and system changes required to support 
+SCCP segmentation and reassembly procedures. It is written assuming the use of 
+host based protocols but other products such as the SIU also support this 
+functionality. Please refer to the appropriate release notes for details. 
+ Section 10 Non-Primitive Interface 
+page 111 
+B.2 Software Requirements 
+Support for Segmentation and Large Messages requires a compatible development 
+package and protocol binaries. The following table lists the software versions 
+required. 
+Software Linux Windows Solaris 
+Development Package V5.00 or later  V5.00 or later V3.00 or later 
+MTP3 V4.00 or later  V5.00 or later V5.00 or later 
+SCCP V3.00 or later V5.00 or later  V3.00 or later 
+TCAP V6.00 or later V6.00 or later  V4.00 or later 
+MAP V5.00 or later  V4.00 or later V4.00 or later 
+INAP V5.00 or later  V5.00 or later V3.00 or later 
+IS41 V4.00 or later V4.00 or later V4.00 or later 
+ISUP V4.00 or later  V6.00 or later V4.00 or later 
+TUP V4.00 or later  V4.00 or later V3.00 or later 
+M2PA V2.00 or later  V2.00 or later V2.00 or later 
+M3UA V3.00 or later  V2.00 or later V3.00 or later 
+ 
+For SIU and board based protocols see the release notes for those products. 
+B.3 Using the New Development Package 
+There are changes required in using the development package in the following areas. 
+- Installing the shared library 
+- Configuring messages 
+- Allocation of messages 
+- Linking applications to the shared library 
+- Loading the shared library into memory 
+The shared library must be installed on the system and set up for use by other 
+modules. See the appropriate release notes for the development package being used 
+for details. 
+Configuring the number of messages 
+If support for ‘Long Messages’ is required then a new command (NUM_LMSGS) 
+should be used in system.txt file to specify the number of Long Messages. If this 
+command is omitted then the GCT environment will not support Long Messages and 
+operation is fully backwards compatible with previous versions of the Development 
+Package. Note that old applications will work in new GCT environment if 
+NUM_LMSGS has not been specified, and will not work if NUM_LMSGS has been 
+specified in system.txt 
+Note: It is not currently possible to specify the number of Long Messages on the 
+gctload command line. 
+SCCP Programmer's Manual Issue 7 
+page 112 
+The existing command in the system.txt file NUM_MSGS can also be used to 
+configure the number of normal sized messages in the system. The example extract 
+from a system.txt below configures 10,000 standard sized messages and 200 Long 
+Messages: 
+ NUM_MSGS   10000 
+ NUM_LMSGS 200 
+A maximum of 65000 messages are supported in each category subject to sufficient 
+available memory. Typically the number of Long Messages allocated will be 
+significantly less than the number of normal messages. 
+Note: During reassembly of messages, the SCCP module saves partially 
+reassembled messages in a ‘Long Message’ structure until the final segment arrives. 
+The parameter area of a standard MSG is 320 octets whilst for Long Messages the 
+parameter area is 4200 octets in size.  
+GCTLOAD system status 
+The gctload module has been updated so that, in system where large messages 
+have been configured, the status of both large and normal message status is 
+reported in response to a gctload -t1 command as shown below. 
+%../BIN/gctload –t1 
+GCTLOAD System status: 
+ 
+  Congestion module Id:     0x21 
+  GCTLIB library:           V1.19 
+  Partition[0] 
+    Parameter size:         320 
+    MSGs in partition:      10000 
+    MSGs allocated :        0 
+    MSGs free:              10000 
+    Maximum MSGs allocated: 1 
+    Out of MSG count:       0 
+    Congestion onset:       5000 
+    Congestion abate:       1000 
+    Congestion status:      0 
+    Congestion count:       0 
+  Partition[1] 
+    Parameter size:         4200 
+    MSGs in partition:      200 
+    MSGs allocated :        0 
+    MSGs free:              200 
+    Maximum MSGs allocated: 0 
+    Out of MSG count:       0 
+    Congestion onset:       100 
+    Congestion abate:       20 
+    Congestion status:      0 
+    Congestion count:       0 
+ 
+Allocation of messages 
+Calls to getm() (or wrapper functions such as IN_alloc_message) will cause a 
+message to be allocated from either of the message pools depending on the length 
+value specified. Any length of over 320 octets will cause one of the larger messages 
+to be allocated automatically. Users should ensure that the length parameter in the 
+getm() function call is correctly initialised. 
+ Section 10 Non-Primitive Interface 
+page 113 
+Linking applications to the shared library interface 
+Any application process being used in a system where Long Messages are 
+configured will need to be linked with the new Shared Object or DLL. 
+Full (operating system specific) details on how to achieve this are detailed in the 
+Development Package Release Notes. 
+B.4 Configuring Protocol Modules to support Long Messages 
+The SCCP, TCAP, MAP, INAP and IS41 modules have all been modified to support 
+Long Messages but must be configured to enable this support using a number of 
+configuration options mentioned below. Setting these options will require that a 
+number of Long Messages are defined using the NUM_LMSGS mentioned above in 
+section B.3. 
+The configuration changes described below will allow the modules to correctly 
+interface with each other with application changes limited to the interface to the 
+highest module in the stack. See section B.5 for details of these changes.  
+SCCP  
+To enable Large Message support and Segmentation/Reassembly the ext_options 
+parameter of the SCCP configuration message (SCP_MSG_CONFIG 0x7740) should 
+have the SCPXF_SEGMENTATION (0x0080) option set. See section 10.1.  
+TCAP 
+To enable Large Message support the flags parameter of the configuration message 
+(TCP_CONFIG_MSG 0x7780) should have the TCPF_SEGMENTATION (0x0100) 
+option set. The max_data field in the TCP_MSG_CONFIG (0x7780) message should 
+also be increased to allow longer a UNIT_DATA parameter to be sent to SCCP. If the 
+max_data field value is not sufficient then the TCAP Maintenance Indication 
+TCPEV_DATA_LEN_ERR will be generated. 
+MAP 
+To enable Large Message support the options parameter of the configuration 
+message (MAP_CONFIG_MSG 0x77e4) should have the MAPF_SEGMENTATION 
+(0x0004)option set. 
+INAP 
+To enable Large Message support the flags parameter of the configuration message 
+(INAP_CONFIG_MSG 0x77f4) should have the INAPF_SEGMENTATION (0x0010) 
+option set. 
+IS41 
+To enable Large Message support the options parameter of the configuration 
+message (IS41_MSG_CONFIG 0x77b4) should have the IS41F_SEGMENTATION 
+(0x0001) option set. 
+B.5 Application Changes  
+Changes to applications may be required in the following areas: 
+Parameter encoding  
+Parameter decoding  
+SCCP Programmer's Manual Issue 7 
+page 114 
+Configuration [If the application directly configures the protocol modules then the 
+changes described in section B.4 should be made] 
+INAP API Library usage 
+Parameter Encoding  
+One of the primary aims in supporting large messages is to allow the data contained 
+in the messages to be larger. As a result it is necessary to enhance the encoding 
+scheme to allow for individual parameters that are greater than 255 octets in length. 
+Previously the parameter length in all NLD (Name Length Data) format messages 
+has been specified by a single octet which limits the maximum length to 255 octets. 
+To overcome this limit a new coding scheme using two octets has been added for 
+use with parameters containing greater than 255 octets. Both single octet and two 
+octet methods of specifying parameter length are now used. 
+In order to determine whether single octet or two octet length encoding is in use, a 
+new Code Shift parameter is used within the parameter area of the message to 
+toggle between coding schemes. The Code Shift parameter takes the form of a 
+single parameter with fixed name and the data contained in the parameter specifies 
+the size of the length field in subsequent parameters. 
+Certain messages generated by and processed by the SCCP, TCAP, MAP, INAP 
+and IS41 modules have been updated to support the use of the Code Shift 
+parameter. Details of affected messages which are generated by the modules are 
+given in section B.6. 
+Existing Name-Length-Data encoding 
+The first byte in the parameter area is the primitive type octet and the last byte is a 
+zero byte to indicate that there are no further parameters in the parameter area. Any 
+parameters associated with the message are placed between the message type 
+code and the final (zero) byte. Therefore the parameter area is formatted as follows: 
+      
+Primitive Type Parameter Parameter ......... Parameter Zero 
+      
+ 
+The parameters may be placed in any order. The first byte of a parameter is the 
+parameter name, the second byte is the length of the parameter data to follow 
+(excluding the parameter name and the length byte itself), and this is followed by the 
+parameter data. Therefore each parameter is formatted as follows: 
+   
+Name Length Data 
+1 byte 1 byte ‘Parameter length’ bytes (1 to 255) 
+ 
+Encoding of parameters containing more than 255 bytes of data 
+ Section 10 Non-Primitive Interface 
+page 115 
+A new encoding scheme is also supported to allow for parameters greater than 255 
+bytes. 
+As before, the first byte in the parameter area is the primitive type octet and the last 
+byte is a zero byte to indicate that there are no further parameters in the parameter 
+area. Any parameters associated with the message are placed between the message 
+type code and the final (zero) byte. The modification to the existing scheme is to add 
+a new set of Code Shift parameters. These parameters indicate a changed encoding 
+scheme for all parameters following it in the same message. Therefore the parameter 
+area is formatted as follows: 
+       
+Primitive Type Parameter 
+(1 byte 
+length) 
+Parameter 
+(1 byte 
+length) 
+Code Shift 
+“Extended 
+length” 
+Parameter 
+(2 byte 
+length) 
+Parameter 
+(2 byte 
+length) 
+Zero 
+       
+ 
+For parameters following the Code Shift the encoding rules change based upon the 
+value of the Code Shift. A value of 0 indicates the existing 1 octet length in the NLD. 
+A value of 1 indicates a 2 octet length in the NLD (see below further details on the 
+Code Shift parameters). 
+This means for a parameter with length greater than 255 it would require a Code 
+Shift of 1. In this case the first byte of a parameter is the parameter name, the 
+second and third bytes contain the length of the parameter data to follow (excluding 
+the parameter name and the length bytes themselves), and this is followed by the 
+parameter data. Therefore each parameter is formatted as follows: 
+   
+Name Length Data 
+1 byte 2 byte ‘Parameter length’ bytes (0 to 4192) 
+ 
+Code shift parameter name definitions 
+The Code Shift parameter is included in all of the appropriate include files required 
+depending on which protocol module the user application is being used. In every 
+case the parameter name value is always the same 0xff hex (255 dec). 
+SCPPN_CODE_SHIFT 0xff (255) [Included in 
+SCP_INC.H] 
+TCPPN_CODE_SHIFT 0xff (255) [Included in 
+TCP_INC.H] 
+MAPPN_CODE_SHIFT 0xff (255) [Included in 
+MAP_INC.H] 
+INAPPN_CODE_SHIFT 0xff (255) [Included in 
+INAP_INC.H] 
+IS41PN_CODE_SHIFT 0xff (255) [Included in 
+IS41_INC.H] 
+ 
+The Code Shift parameter definition is as follows. 
+SCCP Programmer's Manual Issue 7 
+page 116 
+   
+Name 
+0xff 
+(Code Shift) 
+Length 
+1 
+Data 
+0: Subsequent parameters use single octet length 
+1: Subsequent parameters use two octet length 
+   
+ 
+A single message can contain multiple Code Shift parameters. 
+    
+Parameter Decoding 
+When decoding a message which may contain parameters longer than 255 bytes the 
+application needs to be modified to recognise and act upon the Code Shift parameter 
+and use the value of this to determine the encoding scheme for subsequent 
+parameters within the message. 
+B.6 Affected Messages 
+Not all messages generated by the updated modules require handling of Long 
+Messages or will contain Code Shift parameters. See the following parameters for 
+details 
+Module Messages Long 
+Message 
+Support 
+May 
+contain 
+code 
+shifts 
+Notes 
+SCCP  SCP_MSG_RX_IND 
+SCP_MSG_TX_REQ Y Y  
+TCAP TCP_MSG_CPT_REQ 
+TCP_MSG_CPT_IND Y Y  
+MAP MAP_MSG_SRV_REQ 
+MAP_MSG_SRV_IND Y N No individual MAP parameters are currently supported to have 
+a size greater than 255 therefore 
+these messages do not require 
+code shifts at present. 
+Parameters whose limit was 220 
+bytes are now limited to 255 
+bytes when the segmentation 
+flag has been set. 
+INAP INAP_MSG_SRV_REQ 
+INAP_MSG_SRV_IND Y Y May contain Code Shift parameter if the INAPPN_Component parameter 
+is longer than 255 bytes. 
+IS41 IS41_MSG_SRV_REQ 
+IS41_MSG_SRV_IND Y N No individual IS41 parameters are currently supported to have a size 
+greater than 255 therefore these 
+messages do not require code 
+shifts at present. Parameters whose 
+limit was 220 bytes are now limited 
+to 255 bytes when the 
+segmentation flag has been set. 
+General Trace messages Y n/a  
+ 
+ Section 10 Non-Primitive Interface 
+page 117 
+B.7 INAP API Changes 
+For further details on the changes required for use with the INAP API library see the 
+appropriate release notes and the INAP Programmers Manual. 
+ 
+SCCP Programmer's Manual Issue 7 
+page 118 
+Appendix C. Message Type Reference 
+The following table provides a reference of all the message types used by the SCCP 
+module. 
+Value Mnemonic Description 
+0x0761 SCP_MSG_MAINT_IND Maintenance Event Indication 
+0x0762 SCP_MSG_ERROR_IND Software Event Indication 
+0x0763 SCP_MSG_SMB_IND Multiple Instance Broadcast Indication 
+0x2111  Confirmation to GEN_MSG_MOD_IDENT 
+(0x6111)  
+0x2750  Confirmation to SCP_MSG_R_RAM (0x6750) 
+0x2751  Confirmation to SCP_MSG_R_SSR (0x6751) 
+0x2752  Confirmation to SCP_MSG_R_STATS (0x6752) 
+0x2753  Confirmation to SCP_MSG_R_SSR_STATS 
+(0x6753) 
+0x3006  Confirmation to TIM_MSG_KEEP_TIME (0x7006) 
+0x3740  Confirmation to SCP_MSG_CONFIG (0x7740) 
+0x3741  Confirmation to SCP_MSG_CNF_SSR (0x7741) 
+0x3742  Confirmation to SCP_MSG_END_SSR (0x7742) 
+0x3743  Confirmation to SCP_MSG_ADD_CONC 
+(0x7743) 
+0x3744  Confirmation to SCP_MSG_END_CONC 
+(0x7744) 
+0x3745  Confirmation to SCP_MSG_GTT_ADD (0x7745) 
+0x3746  Confirmation to SCP_MSG_GTT_REM (0x7746) 
+0x3747  Confirmation to SCP_MSG_GTT_MOD (0x7747) 
+0x3748  Confirmation to SCP_MSG_CNF_TIM (0x7748) 
+0x3749  Confirmation to SCP_MSG_RESTART (0x7749) 
+0x6111 GEN_MSG_MOD_IDENT Message sent to SCCP and returned containing 
+minor and major revision numbers and text id of 
+the module – Read Revision Request 
+0x6750 SCP_MSG_R_RAM Provides diagnostic information to allow user to 
+locate the base address of the SCCP modules 
+global RAM structure – Read SCCP RAM 
+Request 
+0x6751 SCP_MSG_R_SSR Provides diagnostic information to allow user to 
+locate the base address of the SCCP modules 
+sub-system resource structure – Read SCCP 
+SSR Request 
+0x6752 SCP_MSG_R_STATS Allows user to read Q.791 stats. from the SCCP 
+module – Read SCCP SSR Statistics Request 
+0x6753 SCP_MSG_R_SSR_STATS Allows user to read Q.791 stats. from the SCCP 
+module – Read SCCP Global Statistics Request 
+ Section 10 Non-Primitive Interface 
+page 119 
+Value Mnemonic Description 
+0x6754 SCP_MSG_R_GTT_MASK This message is used to read the index mask of 
+the SCCP translation table. 
+0x6755 SCP_MSG_R_GTT This message is used to extract a rule from the 
+SCCP translation table. 
+0x7006 TIM_MSG_KEEP_TIME This message is issued by SCCP to request a 
+periodic timer tick (TIM_MSG_TM_EXP) message 
+to the SCCP module 
+0x7740 SCP_MSG_CONFIG SCCP configuration – Configuration Request 
+0x7741 SCP_MSG_CNF_SSR Configure Sub-system Resource Request 
+0x7742 SCP_MSG_END_SSR Used to remove configured resources from SCCP 
+module – End Sub-system Resource Request 
+0x7743 SCP_MSG_ADD_CONC Add a concerned resource to any already 
+configured resources in the SCCP module – Add 
+Concerned Resource Request 
+0x7744 SCP_MSG_END_CONC Remove a concerned resource from the SCCP 
+module – End Concerned Resource Request 
+0x7745 SCP_MSG_GTT_ADD Used to add a primary and possibly a backup 
+translation for a specific GT to the GTT table – 
+Add Translation request 
+0x7746 SCP_MSG_GTT_REM Remove a translation from the GTT table – End 
+Translation request 
+0x7747 SCP_MSG_GTT_MOD Modify an existing GTT table entry – Modify 
+Translation Request 
+0x7748 SCP_MSG_CNF_TIM Used to configure SCCP management timers – 
+Configure Timers Request 
+0x7749 SCP_MSG_RESTART Provided to allow user application to invoke the 
+restart procedure within the SCCP module – 
+Restart Request 
+0x774a SCP_MSG_RESET Reset the module 
+0x774b SCP_MSG_GTT_GET Get an existing GTT table entry – Get Translation 
+Request 
+0x774c SCP_MSG_GTT_TEST Used to test a translation – Test Translation 
+Request  
+0x8742 SCP_MSG_RX_IND Receive indication to user – SCCP Receive 
+Indication 
+0x8745 SCP_MSG_SCMG_IND Used by SCCP management to notify local sub- 
+systems about the change of state of other sub- 
+systems whether local or remote – Management 
+Indication 
+0xc002 TIM_MSG_TM_EXP Periodic timer tick message issued by the timer 
+module 
+0xc740 SCP_MSG_TX_REQ Transmit request from user – SCCP Transmit 
+Request 
+0xc744 SCP_MSG_SCMG_REQ Used by application sub-system to notify SCCP in 
+change of sub-system status – Management 
+Request 
+SCCP Programmer's Manual Issue 7 
+page 120 
