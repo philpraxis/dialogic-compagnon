@@ -46,6 +46,7 @@ class message_definition(object):
       """docstring for decompose"""
       print "decompose(%s)" % param
       ahead_index = self.offset_size_index + 1
+      split_string = ""
       while self.db_content[ahead_index].strip(string.whitespace + string.punctuation) != "Description":
          #print "Offset + description: %s" % self.db_content[ahead_index].strip()
          x = self.db_content[ahead_index].strip().split(' ')
@@ -55,8 +56,10 @@ class message_definition(object):
          while not self.db_content[ahead_index+1].strip().split(' ')[0].isdigit() and self.db_content[ahead_index+1].strip(string.whitespace + string.punctuation) != "Description":
             text = "%s %s" % (text, self.db_content[ahead_index+1].strip())
             ahead_index += 1
+         split_string = split_string + param[p_offset : p_offset + p_size ] + " "
          print " %s= 0x%s\t(%s)" % ( x[2], param[p_offset : p_offset + p_size ], text)
          ahead_index += 1
+      print split_string
 
 
 class db(object):
@@ -137,31 +140,6 @@ class Message(object):
       """docstring for dump_elements"""
       for k, v in self.elements.iteritems():
          print "       %s: %s" % (k, v)
-      
-         
-   # def db_list(self):
-   #    """docstring for db_list"""
-   #    self.db = glob.glob("*.db")
-   
-   # def db_find_msg(self, msg_type = False):
-   #    """docstring for db_find_msg"""
-   #    if msg_type == False:
-   #       msg_type = self.elements['t']
-   # 
-   #    for db in self.db.list:
-   #       if self.debug: print db
-   #       content = open(db).readlines()
-   #       for index,line in enumerate(content):
-   #          # print line
-   #          if "(0x%s)"%msg_type in line:
-   #             print line
-   #             if line.split(' ')[0] == "type":
-   #                print "Found definition: %s in %s" % (line, db)
-   #                if  "FIELD NAME MEANING" in content[index-1]:
-   #                   print "This is a name-list definition"
-   #                else:
-   #                   print "This is possible a position definition: %s" % content[index-1]
-   #                return
 
 def main(argv=None):
 	if argv is None:
