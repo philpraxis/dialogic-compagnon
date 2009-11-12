@@ -5,16 +5,13 @@ diadecode.py
 
 Created by Philippe Langlois on 2009-11-11.
 Copyright (c) 2009 P1 Security. All rights reserved.
+http://www.p1security.com/
 
 Issues / TODO / Questions:
-
 * Currently, the IS41 PDF is password protected and I canot copy/paste from it. :(
    There will be no support for IS41 messages decoding ;-)
-   
 * Will Dialogic like this project?
-
 * I guess i'd better put this as an online service because Dialogic could be a pain for using their PDF as DB
-
 * Will SS7 developpers use this project?
 """
 
@@ -24,7 +21,52 @@ import glob
 import string
 
 help_message = '''
-The help message goes here.
+Created by Philippe Langlois on 2009-11-11.
+Copyright (c) 2009 P1 Security. All rights reserved.
+http://www.p1security.com/
+
+Usage: diadecode.py -m <message>
+"-h", "--help":
+	this message
+"-m", "--message":
+   message you want to decode
+
+Example:
+./diadecode.py -m M-t7740-i0000-fef-d33-r8000-p018381063322efef00000002011000ef001c000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+./diadecode.py -m M-t7780-i0000-fef-d14-r8000-p001415339e9e00000000002000400040000080000410080200ff0000000000000000000000000000
+
+Configuration for s7_play for Dialogic are not really super clear:
+**************************************************************
+*    SCCP Configuration.
+**************************************************************
+*       Issue configuration message to the SCCP module:
+*                                          --maint_id
+*                                    --mod_id                ----SMB flags
+*                                ----options --------pc    --SMB id
+*                              --sio     --mgmt_id       --SCCP inst
+*                            --ver     --mtp_id      ----max_sif -- num_uc
+M-t7740-i0000-fef-d33-r8000-p018303223322efef00000002011000ef0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+Logs from Dialogic are typically cryptic:
+S7L:I0000 M t32da i0000 fd2 def r0000 s00 e00000000 p0002000000010000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+S7L:I0000 M t02f0 i0000 fd2 def r0000 s00 e00000000 p0000000100020000000000010000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+S7L:I0000 M t02db i0000 fd2 def r0000 s00 e00000000 p00000002
+S7L:I0000 M t02e0 i0000 fd2 def r0000 s00 e00000000 p0002
+S7L:I0000 M t0762 i7740 f33 def r0000 s05 e000000cd
+S7L:I0000 SCCP Software event : SCPSWE_BAD_MSG
+S7L:I0000 M t3740 i0000 f33 def r0000 s05 e00000000 p018303223322efef00000001011000ef0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+S7L:I0000 M t3741 i0000 f33 def r0000 s06 e00000000 p00031401000000000800000000000000000000000000000000000000000000000000000000000000
+S7L:I0000 M t3741 i0000 f33 def r0000 s06 e00000000 p00010000000000020000000000000000000000000000000000000000000000000000000000000000
+S7L:I0000 M t3741 i0000 f33 def r0000 s06 e00000000 p00020000000000020800000000000000000000000000000000000000000000000000000000000000
+S7L:I0000 M t8744 i0008 f33 def r0000 s00 e00000000 p0101000000000000
+S7L:I0000 M t07a2 i7780 f14 def r0000 s06 e000000cd
+S7L:I0000 TCAP Software event : TCPSWE_BAD_MSG
+S7L:I0000 M t3780 i0000 f14 def r0000 s05 e00000000 p000015339e9e00000020000000400040000080000410080200ff0000000000000000000000000000
+S7L:I0000 M t1795 i0000 f14 def r0000 s00 e00000000 p0000000f0000000f0000007f
+
+The *.db files must be in the current directory where you execute this program.
 '''
 
 
@@ -142,6 +184,7 @@ class Message(object):
          print "       %s: %s" % (k, v)
 
 def main(argv=None):
+	message = False
 	if argv is None:
 		argv = sys.argv
 	try:
@@ -166,6 +209,10 @@ def main(argv=None):
 		print >> sys.stderr, sys.argv[0].split("/")[-1] + ": " + str(err.msg)
 		print >> sys.stderr, "\t for help use --help"
 		return 2
+		
+	if message == False:
+	   print help_message
+	   return 3
 
    # print "Payload:" + message
    # msg.db_find_msg()
