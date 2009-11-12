@@ -7,16 +7,21 @@ Created by Philippe Langlois on 2009-11-11.
 Copyright (c) 2009 P1 Security. All rights reserved.
 
 Issues / TODO / Questions:
+
 * Currently, the IS41 PDF is password protected and I canot copy/paste from it. :(
    There will be no support for IS41 messages decoding ;-)
+   
 * Will Dialogic like this project?
+
+* I guess i'd better put this as an online service because Dialogic could be a pain for using their PDF as DB
+
 * Will SS7 developpers use this project?
 """
 
 import sys
 import getopt
 import glob
-
+import string
 
 help_message = '''
 The help message goes here.
@@ -41,13 +46,17 @@ class message_definition(object):
       """docstring for decompose"""
       print "decompose(%s)" % param
       ahead_index = self.offset_size_index + 1
-      while self.db_content[ahead_index].strip() != "Description":
+      while self.db_content[ahead_index].strip(string.whitespace + string.punctuation) != "Description":
          #print "Offset + description: %s" % self.db_content[ahead_index].strip()
          x = self.db_content[ahead_index].strip().split(' ')
          p_offset = int(x[0]) * 2
          p_size = int(x[1]) * 2
+         text = ' '.join(x[2:])
+         while not self.db_content[ahead_index+1].strip().split(' ')[0].isdigit() and self.db_content[ahead_index+1].strip(string.whitespace + string.punctuation) != "Description":
+            text = "%s %s" % (text, self.db_content[ahead_index+1].strip())
+            ahead_index += 1
+         print " %s= 0x%s\t(%s)" % ( x[2], param[p_offset : p_offset + p_size ], text)
          ahead_index += 1
-         print " %s[]= 0x%s \t (%s)" % ( x[2], param[p_offset : p_offset + p_size ], ' '.join(x[2:]))
 
 
 class db(object):
@@ -100,7 +109,7 @@ class db(object):
 
 class Message(object):
    """Process Messages from Dialogic stack"""
-   def __init__(self, message, arg_debug=True):
+   def __init__(self, message, arg_debug=False):
       super(Message, self).__init__()
       if arg_debug == True:
          self.debug = True
@@ -123,6 +132,12 @@ class Message(object):
          element_key = part[0:1]
          self.elements[element_key] = part[1:]
          if self.debug: print "%s:%s" % (element_key, part[1:])
+         
+   def dump_elements(self):
+      """docstring for dump_elements"""
+      for k, v in self.elements.iteritems():
+         print "       %s: %s" % (k, v)
+      
          
    # def db_list(self):
    #    """docstring for db_list"""
@@ -177,6 +192,7 @@ def main(argv=None):
    # print "Payload:" + message
    # msg.db_find_msg()
 	msg_def = msg.db.find_definition(msg.elements['t'])
+	msg.dump_elements()
 	if msg_def != False:
 	   msg_def.decompose(msg.elements['p'])
 
