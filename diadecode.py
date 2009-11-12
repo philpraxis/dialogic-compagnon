@@ -25,7 +25,8 @@ Created by Philippe Langlois on 2009-11-11.
 Copyright (c) 2009 P1 Security. All rights reserved.
 http://www.p1security.com/
 
-Usage: diadecode.py -m <message>
+Usage: 
+diadecode.py [ -m <message> | -l "<log line>" ]
 "-h", "--help":
 	this message
 "-m", "--message":
@@ -34,6 +35,7 @@ Usage: diadecode.py -m <message>
 Example:
 ./diadecode.py -m M-t7740-i0000-fef-d33-r8000-p018381063322efef00000002011000ef001c000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 ./diadecode.py -m M-t7780-i0000-fef-d14-r8000-p001415339e9e00000000002000400040000080000410080200ff0000000000000000000000000000
+./diadecode.py -l "S7L:I0000 M t3741 i0000 f33 def r0000 s06 e00000000 p00031401000000000800000000000000000000000000000000000000000000000000000000000000"
 
 Configuration for s7_play for Dialogic are not really super clear:
 **************************************************************
@@ -150,13 +152,15 @@ class db(object):
                      return msg_def
                   else:
                      return False
+      # DID not find anything
+      return False
 
 
 class Message(object):
    """Process Messages from Dialogic stack"""
-   def __init__(self, message, arg_debug=False):
+   def __init__(self, message, debug=False, isLog=False):
       super(Message, self).__init__()
-      if arg_debug == True:
+      if debug == True:
          self.debug = True
       else:
          self.debug = False
@@ -167,7 +171,15 @@ class Message(object):
 
       self.message = message
 
-      parts = self.message.split('-')
+      if isLog:
+         # Treat argument as log... that's not very beautiful as code... how to refactor this?
+         parts = self.message.split(' ')
+         if parts[0].split(':')[0] == "S7L":
+            parts.pop(0)
+      else:
+         # Otherwise treat as message
+         parts = self.message.split('-')
+      
       self.msg_type = parts.pop(0)
       if self.debug: print "self.msg_type=%s" % self.msg_type
       if self.debug: print "parts=%s" % parts
@@ -184,12 +196,12 @@ class Message(object):
          print "       %s: %s" % (k, v)
 
 def main(argv=None):
-	message = False
+	msg = False
 	if argv is None:
 		argv = sys.argv
 	try:
 		try:
-			opts, args = getopt.getopt(argv[1:], "m:ho:v", ["message=", "help", "output="])
+			opts, args = getopt.getopt(argv[1:], "m:ho:vl:", ["message=", "help", "output=", "log="])
 		except getopt.error, msg:
 			raise Usage(msg)
 	
@@ -204,13 +216,16 @@ def main(argv=None):
 			if option in ("-m", "--message"):
 				message = value
 				msg = Message(message)
+			if option in ("-l", "--log"):
+				log = value
+				msg = Message(log, debug=False, isLog=True)
 
 	except Usage, err:
 		print >> sys.stderr, sys.argv[0].split("/")[-1] + ": " + str(err.msg)
 		print >> sys.stderr, "\t for help use --help"
 		return 2
 		
-	if message == False:
+	if msg == False:
 	   print help_message
 	   return 3
 
@@ -220,6 +235,8 @@ def main(argv=None):
 	msg.dump_elements()
 	if msg_def != False:
 	   msg_def.decompose(msg.elements['p'])
+	else:
+	   print "Cannot find message definition... :( please try to update the *.db files"
 
 if __name__ == "__main__":
 	sys.exit(main())
