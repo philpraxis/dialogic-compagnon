@@ -7,6 +7,8 @@ Created by Philippe Langlois on 2009-11-11.
 Copyright (c) 2009 P1 Security. All rights reserved.
 http://www.p1security.com/
 
+Code under eGPL license. http://www.egpl.info
+
 Issues / TODO / Questions:
 * Currently, the IS41 PDF is password protected and I canot copy/paste from it. :(
    There will be no support for IS41 messages decoding ;-)
@@ -92,7 +94,7 @@ class message_definition(object):
       ahead_index = self.offset_size_index + 1
       split_string = ""
       while self.db_content[ahead_index].strip(string.whitespace + string.punctuation) != "Description":
-         #print "Offset + description: %s" % self.db_content[ahead_index].strip()
+         print "Offset + description: %s" % self.db_content[ahead_index].strip()
          x = self.db_content[ahead_index].strip().split(' ')
          p_offset = int(x[0]) * 2
          p_size = int(x[1]) * 2
